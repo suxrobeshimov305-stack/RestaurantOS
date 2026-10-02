@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Stollar va Buyurtmalar</title>
+    <title>RestaurantOS - Kassa va Chek</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -17,20 +17,39 @@
         .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee; }
         .add-btn { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
-        .close-btn { background: #e67e22; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
+        .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
+
+        /* Chek dizayni (Chop etish uchun) */
+        #receipt-area {
+            display: none;
+            width: 280px;
+            padding: 15px;
+            background: #fff;
+            border: 1px dashed #333;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px auto;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #receipt-area, #receipt-area * { visibility: visible; }
+            #receipt-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; border: none; }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Stollar bo'yicha alohida buyurtma boshqaruvi</p>
+        <p>Stollar, buyurtmalar va to'lov cheki tizimi</p>
     </header>
 
     <div class="container">
         <!-- 1. Stollar moduli -->
         <div class="card">
-            <h2>Stollar (Buyurtma kiritish uchun tanlang)</h2>
+            <h2>Stollar (Tanlang)</h2>
             <div class="tables-grid">
                 <button id="btn-1" class="table-btn free selected" onclick="selectTable(1)">Stol 1 (Bo'sh)</button>
                 <button id="btn-2" class="table-btn free" onclick="selectTable(2)">Stol 2 (Bo'sh)</button>
@@ -39,7 +58,7 @@
             </div>
         </div>
 
-        <!-- 2. Menyu va Alohida stol buyurtmasi -->
+        <!-- 2. Menyu va Buyurtma -->
         <div class="card">
             <h2 id="order-title">Stol 1 buyurtmasi</h2>
             
@@ -60,9 +79,33 @@
                 <h3>Joriy hisob:</h3>
                 <ul id="order-list"></ul>
                 <h4>Jami: <span id="total-price">0</span> so'm</h4>
-                <button class="close-btn" onclick="closeTableOrder()">Hisobni yopish (Stolni bo'shatish)</button>
+                
+                <div class="btn-group">
+                    <button class="print-btn" onclick="printReceipt()">Chek chiqarish</button>
+                    <button class="close-btn" onclick="closeTableOrder()">Hisobni yopish</button>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Yashirin kassa cheki bloki -->
+    <div id="receipt-area">
+        <center>
+            <h3>=== RESTAURANT OS ===</h3>
+            <p>To'lov cheki</p>
+            <p id="receipt-date"></p>
+            <p><b id="receipt-table"></b></p>
+            <hr>
+        </center>
+        <div id="receipt-items"></div>
+        <hr>
+        <h4 style="display:flex; justify-content:space-between;">
+            <span>JAMI:</span>
+            <span id="receipt-total">0 so'm</span>
+        </h4>
+        <center>
+            <p>Xaridingiz uchun rahmat!</p>
+        </center>
     </div>
 
     <script>
@@ -120,13 +163,53 @@
         }
 
         function closeTableOrder() {
-            tableOrders[selectedTable] = [];
+            if (tableOrders[selectedTable].length === 0) {
+                alert('Bu stolda hali buyurtma yo\'q!');
+                return;
+            }
 
-            var currentBtn = document.getElementById('btn-' + selectedTable);
-            currentBtn.className = 'table-btn free selected';
-            currentBtn.innerText = 'Stol ' + selectedTable + ' (Bo\'sh)';
+            if (confirm('Stol ' + selectedTable + ' hisobi yopilsinmi?')) {
+                tableOrders[selectedTable] = [];
 
-            renderOrderList();
+                var currentBtn = document.getElementById('btn-' + selectedTable);
+                currentBtn.className = 'table-btn free selected';
+                currentBtn.innerText = 'Stol ' + selectedTable + ' (Bo\'sh)';
+
+                renderOrderList();
+            }
+        }
+
+        function printReceipt() {
+            var currentOrders = tableOrders[selectedTable];
+            if (currentOrders.length === 0) {
+                alert('Chek chiqarish uchun avval taom qo\'shing!');
+                return;
+            }
+
+            var now = new Date();
+            var dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+            document.getElementById('receipt-date').innerText = dateStr;
+            document.getElementById('receipt-table').innerText = 'Stol raqami: #' + selectedTable;
+
+            var itemsContainer = document.getElementById('receipt-items');
+            itemsContainer.innerHTML = '';
+            var total = 0;
+
+            for (var i = 0; i < currentOrders.length; i++) {
+                var row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.justifyContent = 'space-between';
+                row.style.marginBottom = '5px';
+                row.innerHTML = '<span>' + currentOrders[i].name + '</span><span>' + currentOrders[i].price + ' so\'m</span>';
+                itemsContainer.appendChild(row);
+                total = total + currentOrders[i].price;
+            }
+
+            document.getElementById('receipt-total').innerText = total + ' so\'m';
+
+            // Brauzerning standart chop etish oynasini ochadi
+            window.print();
         }
     </script>
 </body>
