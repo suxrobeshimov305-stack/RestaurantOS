@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Kassa, Chek va Yangi Taom</title>
+    <title>RestaurantOS - To'liq Boshqaruv Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -21,10 +21,10 @@
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
 
-        /* Yangi taom qo'shish formasi */
-        .add-food-form { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
-        .add-food-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
-        .btn-create { background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        /* Forma va qo'shimcha tugmalar */
+        .add-form { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
+        .add-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
+        .btn-create { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 
         /* Chek dizayni (Chop etish uchun) */
         #receipt-area {
@@ -48,18 +48,18 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Stollar, dinamik menyu va kassa tizimi</p>
+        <p>Stollar, dinamik menyu va chek chiqarish tizimi</p>
     </header>
 
     <div class="container">
         <!-- 1. Stollar moduli -->
         <div class="card">
             <h2>Stollar (Tanlang)</h2>
-            <div class="tables-grid">
-                <button id="btn-1" class="table-btn free selected" onclick="selectTable(1)">Stol 1 (Bo'sh)</button>
-                <button id="btn-2" class="table-btn free" onclick="selectTable(2)">Stol 2 (Bo'sh)</button>
-                <button id="btn-3" class="table-btn free" onclick="selectTable(3)">Stol 3 (Bo'sh)</button>
-                <button id="btn-4" class="table-btn free" onclick="selectTable(4)">Stol 4 (Bo'sh)</button>
+            <div class="tables-grid" id="tables-container"></div>
+            
+            <!-- Yangi stol qo'shish tugmasi -->
+            <div class="add-form">
+                <button class="btn-create" onclick="addNewTable()">+ Yangi stol qo'shish</button>
             </div>
         </div>
 
@@ -69,10 +69,10 @@
             <div id="menu-container"></div>
 
             <!-- Yangi taom kiritish bloki -->
-            <div class="add-food-form">
-                <input type="text" id="new-food-name" placeholder="Taom nomi (masalan, Manti)">
+            <div class="add-form">
+                <input type="text" id="new-food-name" placeholder="Taom nomi">
                 <input type="number" id="new-food-price" placeholder="Narxi (so'm)">
-                <button class="btn-create" onclick="addNewMenuItem()">+ Menyuga qo'shish</button>
+                <button class="btn-create" onclick="addNewMenuItem()" style="width: auto;">+ Menyuga qo'shish</button>
             </div>
         </div>
 
@@ -115,18 +115,71 @@
 
     <script>
         var selectedTable = 1;
+        var tableCount = 4;
+        var tableOrders = {};
+
         var menuItems = [
             { name: 'Osh', price: 35000 },
             { name: 'Shashlik', price: 18000 },
             { name: 'Choy', price: 5000 }
         ];
 
-        var tableOrders = {
-            1: [],
-            2: [],
-            3: [],
-            4: []
-        };
+        // Dastlabki stollar buyurtma massivini to'ldirish
+        for (var i = 1; i <= tableCount; i++) {
+            tableOrders[i] = [];
+        }
+
+        function renderTables() {
+            var container = document.getElementById('tables-container');
+            container.innerHTML = '';
+
+            for (var i = 1; i <= tableCount; i++) {
+                var btn = document.createElement('button');
+                btn.id = 'btn-' + i;
+                
+                var isBusy = tableOrders[i] && tableOrders[i].length > 0;
+                var statusClass = isBusy ? 'busy' : 'free';
+                var statusText = isBusy ? '(Band)' : '(Bo\'sh)';
+                var selectedClass = (i === selectedTable) ? ' selected' : '';
+
+                btn.className = 'table-btn ' + statusClass + selectedClass;
+                btn.innerText = 'Stol ' + i + ' ' + statusText;
+                
+                (function(num) {
+                    btn.onclick = function() {
+                        selectTable(num);
+                    };
+                })(i);
+
+                container.appendChild(btn);
+            }
+        }
+
+        function addNewTable() {
+            tableCount++;
+            tableOrders[tableCount] = [];
+            renderTables();
+            selectTable(tableCount);
+        }
+
+        function selectTable(tableNum) {
+            selectedTable = tableNum;
+
+            for (var i = 1; i <= tableCount; i++) {
+                var btn = document.getElementById('btn-' + i);
+                if (btn) {
+                    btn.classList.remove('selected');
+                }
+            }
+
+            var currentBtn = document.getElementById('btn-' + tableNum);
+            if (currentBtn) {
+                currentBtn.classList.add('selected');
+            }
+
+            document.getElementById('order-title').innerText = 'Stol ' + tableNum + ' buyurtmasi';
+            renderOrderList();
+        }
 
         function renderMenu() {
             var container = document.getElementById('menu-container');
@@ -161,25 +214,6 @@
             priceInput.value = '';
         }
 
-        function selectTable(tableNum) {
-            selectedTable = tableNum;
-
-            for (var i = 1; i <= 4; i++) {
-                var btn = document.getElementById('btn-' + i);
-                if (btn) {
-                    btn.classList.remove('selected');
-                }
-            }
-
-            var currentBtn = document.getElementById('btn-' + tableNum);
-            if (currentBtn) {
-                currentBtn.classList.add('selected');
-            }
-
-            document.getElementById('order-title').innerText = 'Stol ' + tableNum + ' buyurtmasi';
-            renderOrderList();
-        }
-
         function addToOrder(name, price) {
             tableOrders[selectedTable].push({ name: name, price: price });
 
@@ -195,7 +229,7 @@
             list.innerHTML = '';
             var total = 0;
 
-            var currentOrders = tableOrders[selectedTable];
+            var currentOrders = tableOrders[selectedTable] || [];
             for (var i = 0; i < currentOrders.length; i++) {
                 var li = document.createElement('li');
                 li.innerText = currentOrders[i].name + ' - ' + currentOrders[i].price.toLocaleString() + ' so\'m';
@@ -207,7 +241,7 @@
         }
 
         function closeTableOrder() {
-            if (tableOrders[selectedTable].length === 0) {
+            if (!tableOrders[selectedTable] || tableOrders[selectedTable].length === 0) {
                 alert('Bu stolda hali buyurtma yo\'q!');
                 return;
             }
@@ -225,7 +259,7 @@
 
         function printReceipt() {
             var currentOrders = tableOrders[selectedTable];
-            if (currentOrders.length === 0) {
+            if (!currentOrders || currentOrders.length === 0) {
                 alert('Chek chiqarish uchun avval taom qo\'shing!');
                 return;
             }
@@ -254,7 +288,8 @@
             window.print();
         }
 
-        // Dastlabki menyuni yuklash
+        // Boshlang'ich elementlarni chizish
+        renderTables();
         renderMenu();
     </script>
 </body>
