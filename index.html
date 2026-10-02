@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Xavfsiz Boshqaruv Tizimi</title>
+    <title>RestaurantOS - Kassa va Kunlik Hisobot</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
         .container { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .full-width-card { width: 100%; flex: 100%; box-sizing: border-box; }
         .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
         .table-btn { padding: 18px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 15px; }
         .free { background-color: #27ae60; }
@@ -26,7 +27,20 @@
         .add-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .btn-create { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 
-        /* Maxsus xavfsizlik oynasi (Modal) */
+        /* Hisobot paneli stillari */
+        .stats-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
+        .stat-box { flex: 1; min-width: 180px; background: #f8f9fa; border-left: 5px solid #2980b9; padding: 15px; border-radius: 6px; }
+        .stat-box.green { border-color: #27ae60; }
+        .stat-box.orange { border-color: #e67e22; }
+        .stat-box h4 { margin: 0 0 5px 0; color: #7f8c8d; font-size: 14px; }
+        .stat-box .value { font-size: 22px; font-weight: bold; color: #2c3e50; }
+
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .history-table th, .history-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .history-table th { background: #f1f2f6; color: #333; }
+        .reset-history-btn { background: #7f8c8d; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; margin-top: -35px; }
+
+        /* Modal oyna */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -62,12 +76,7 @@
             font-size: 14px;
             cursor: pointer;
         }
-        .checklist-item input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            margin-top: 2px;
-        }
+        .checklist-item input { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; }
         .modal-card input[type="text"] {
             width: 100%;
             padding: 9px;
@@ -77,39 +86,9 @@
             font-size: 14px;
             margin-top: 8px;
         }
-        .modal-card input[type="text"]:focus {
-            border-color: #c0392b;
-            outline: none;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 18px;
-        }
-        .btn-cancel {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            flex: 1;
-            font-weight: bold;
-        }
-        .btn-danger-confirm {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            flex: 1;
-            font-weight: bold;
-            opacity: 0.4;
-        }
-        .btn-danger-confirm:disabled {
-            cursor: not-allowed;
-        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-cancel { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
+        .btn-danger-confirm { background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; opacity: 0.4; }
 
         #receipt-area {
             display: none;
@@ -131,7 +110,7 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Stollar, xavfsiz boshqaruv va kassa tizimi</p>
+        <p>Boshqaruv, Kassa va Kunlik Hisobot</p>
     </header>
 
     <div class="container">
@@ -173,9 +152,46 @@
                 <button class="delete-table-btn" onclick="attemptDeleteTable()">🗑 Ushbu stolni o'chirish</button>
             </div>
         </div>
+
+        <!-- 4. Kunlik kassa hisoboti (Z-Report) -->
+        <div class="card full-width-card">
+            <h2>Kunlik Kassa Hisoboti</h2>
+            <button class="reset-history-btn" onclick="resetDailyStats()">Kunni yakunlash (Nollash)</button>
+            
+            <div class="stats-grid">
+                <div class="stat-box green">
+                    <h4>BUGUNGI JAMI TUSHUM</h4>
+                    <div class="value" id="stat-total-revenue">0 so'm</div>
+                </div>
+                <div class="stat-box">
+                    <h4>YOPILGAN STOLLAR SONI</h4>
+                    <div class="value" id="stat-orders-count">0 ta</div>
+                </div>
+                <div class="stat-box orange">
+                    <h4>O'RTACHA CHEK</h4>
+                    <div class="value" id="stat-avg-check">0 so'm</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 5px;">Yopilgan cheklar jurnali:</h3>
+            <div style="max-height: 250px; overflow-y: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Vaqt</th>
+                            <th>Stol</th>
+                            <th>Taomlar</th>
+                            <th>Jami summa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-rows"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <!-- Xavfsizlik Modal Oynasi (Yopilmagan shotlar uchun) -->
+    <!-- Xavfsizlik Modal Oynasi -->
     <div class="modal-overlay" id="security-modal">
         <div class="modal-card">
             <h3 style="color: #c0392b; margin-top: 0;">⚠️ DIQQAT! Xavfli amal</h3>
@@ -239,6 +255,9 @@
         var savedOrders = localStorage.getItem('res_orders');
         var tableOrders = savedOrders ? JSON.parse(savedOrders) : {};
 
+        var savedHistory = localStorage.getItem('res_sales_history');
+        var salesHistory = savedHistory ? JSON.parse(savedHistory) : [];
+
         for (var i = 1; i <= tableCount; i++) {
             if (!tableOrders[i]) {
                 tableOrders[i] = [];
@@ -249,6 +268,7 @@
             localStorage.setItem('res_table_count', tableCount);
             localStorage.setItem('res_menu', JSON.stringify(menuItems));
             localStorage.setItem('res_orders', JSON.stringify(tableOrders));
+            localStorage.setItem('res_sales_history', JSON.stringify(salesHistory));
         }
 
         function renderTables() {
@@ -293,7 +313,6 @@
 
             var currentOrders = tableOrders[selectedTable] || [];
 
-            // Agar stolda to'lanmagan buyurtmalar bo'lsa -> Qiyin himoyali oynani ochamiz
             if (currentOrders.length > 0) {
                 var sum = 0;
                 for (var i = 0; i < currentOrders.length; i++) {
@@ -303,7 +322,6 @@
                 document.getElementById('modal-warning-text').innerHTML = 
                     '<b>Stol #' + selectedTable + '</b>da jami <b>' + sum.toLocaleString() + ' so\'m</b> miqdoridagi hisob yopilmagan! Agar o\'chirsangiz, bu hisob tizimdan yo\'qoladi.';
                 
-                // Formani tozalash
                 document.getElementById('chk-unpaid').checked = false;
                 document.getElementById('chk-confirm').checked = false;
                 document.getElementById('delete-input-text').value = '';
@@ -311,7 +329,6 @@
 
                 document.getElementById('security-modal').style.display = 'flex';
             } else {
-                // Agar stol bo'sh bo'lsa -> oddiy tasdiqlash yetarli
                 if (confirm('Stol ' + selectedTable + ' bo\'sh. Haqiqatan ham uni o\'chirmoqchimisiz?')) {
                     executeDelete();
                 }
@@ -443,58 +460,24 @@
         }
 
         function closeTableOrder() {
-            if (!tableOrders[selectedTable] || tableOrders[selectedTable].length === 0) {
+            var currentOrders = tableOrders[selectedTable] || [];
+            if (currentOrders.length === 0) {
                 alert('Bu stolda hali buyurtma yo\'q!');
                 return;
             }
 
-            if (confirm('Stol ' + selectedTable + ' hisobi yopilsinmi?')) {
-                tableOrders[selectedTable] = [];
-                saveData();
-
-                var currentBtn = document.getElementById('btn-' + selectedTable);
-                currentBtn.className = 'table-btn free selected';
-                currentBtn.innerText = 'Stol ' + selectedTable + ' (Bo\'sh)';
-
-                renderOrderList();
-            }
-        }
-
-        function printReceipt() {
-            var currentOrders = tableOrders[selectedTable];
-            if (!currentOrders || currentOrders.length === 0) {
-                alert('Chek chiqarish uchun avval taom qo\'shing!');
-                return;
-            }
-
-            var now = new Date();
-            var dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-
-            document.getElementById('receipt-date').innerText = dateStr;
-            document.getElementById('receipt-table').innerText = 'Stol raqami: #' + selectedTable;
-
-            var itemsContainer = document.getElementById('receipt-items');
-            itemsContainer.innerHTML = '';
-            var total = 0;
-
+            var sum = 0;
+            var itemsList = [];
             for (var i = 0; i < currentOrders.length; i++) {
-                var row = document.createElement('div');
-                row.style.display = 'flex';
-                row.style.justifyContent = 'space-between';
-                row.style.marginBottom = '5px';
-                row.innerHTML = '<span>' + currentOrders[i].name + '</span><span>' + currentOrders[i].price.toLocaleString() + ' so\'m</span>';
-                itemsContainer.appendChild(row);
-                total = total + currentOrders[i].price;
+                sum += currentOrders[i].price;
+                itemsList.push(currentOrders[i].name);
             }
 
-            document.getElementById('receipt-total').innerText = total.toLocaleString() + ' so\'m';
-            window.print();
-        }
+            if (confirm('Stol ' + selectedTable + ' hisobi (' + sum.toLocaleString() + ' so\'m) to\'landimi va yopilsinmi?')) {
+                var now = new Date();
+                var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // Boshlang'ich yuklash
-        renderTables();
-        renderMenu();
-        renderOrderList();
-    </script>
-</body>
-</html>
+                // Kunlik kassa jurnaliga yozish
+                salesHistory.unshift({
+                    table: selectedTable,
+                    tim
