@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Kassa va Chek</title>
+    <title>RestaurantOS - Kassa, Chek va Yangi Taom</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -20,6 +20,11 @@
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
+
+        /* Yangi taom qo'shish formasi */
+        .add-food-form { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
+        .add-food-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
+        .btn-create { background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         /* Chek dizayni (Chop etish uchun) */
         #receipt-area {
@@ -43,7 +48,7 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Stollar, buyurtmalar va to'lov cheki tizimi</p>
+        <p>Stollar, dinamik menyu va kassa tizimi</p>
     </header>
 
     <div class="container">
@@ -58,23 +63,23 @@
             </div>
         </div>
 
-        <!-- 2. Menyu va Buyurtma -->
+        <!-- 2. Menyu moduli -->
+        <div class="card">
+            <h2>Menyu</h2>
+            <div id="menu-container"></div>
+
+            <!-- Yangi taom kiritish bloki -->
+            <div class="add-food-form">
+                <input type="text" id="new-food-name" placeholder="Taom nomi (masalan, Manti)">
+                <input type="number" id="new-food-price" placeholder="Narxi (so'm)">
+                <button class="btn-create" onclick="addNewMenuItem()">+ Menyuga qo'shish</button>
+            </div>
+        </div>
+
+        <!-- 3. Tanlangan stol buyurtmasi -->
         <div class="card">
             <h2 id="order-title">Stol 1 buyurtmasi</h2>
             
-            <div class="menu-item">
-                <span>Osh - 35 000 so'm</span>
-                <button class="add-btn" onclick="addToOrder('Osh', 35000)">Qo'shish</button>
-            </div>
-            <div class="menu-item">
-                <span>Shashlik - 18 000 so'm</span>
-                <button class="add-btn" onclick="addToOrder('Shashlik', 18000)">Qo'shish</button>
-            </div>
-            <div class="menu-item">
-                <span>Choy - 5 000 so'm</span>
-                <button class="add-btn" onclick="addToOrder('Choy', 5000)">Qo'shish</button>
-            </div>
-
             <div class="order-box">
                 <h3>Joriy hisob:</h3>
                 <ul id="order-list"></ul>
@@ -88,7 +93,7 @@
         </div>
     </div>
 
-    <!-- Yashirin kassa cheki bloki -->
+    <!-- Yashirin kassa cheki -->
     <div id="receipt-area">
         <center>
             <h3>=== RESTAURANT OS ===</h3>
@@ -110,12 +115,51 @@
 
     <script>
         var selectedTable = 1;
+        var menuItems = [
+            { name: 'Osh', price: 35000 },
+            { name: 'Shashlik', price: 18000 },
+            { name: 'Choy', price: 5000 }
+        ];
+
         var tableOrders = {
             1: [],
             2: [],
             3: [],
             4: []
         };
+
+        function renderMenu() {
+            var container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            for (var i = 0; i < menuItems.length; i++) {
+                var item = menuItems[i];
+                var div = document.createElement('div');
+                div.className = 'menu-item';
+                div.innerHTML = '<span>' + item.name + ' - ' + item.price.toLocaleString() + ' so\'m</span>' +
+                                '<button class="add-btn" onclick="addToOrder(\'' + item.name + '\', ' + item.price + ')">Qo\'shish</button>';
+                container.appendChild(div);
+            }
+        }
+
+        function addNewMenuItem() {
+            var nameInput = document.getElementById('new-food-name');
+            var priceInput = document.getElementById('new-food-price');
+
+            var name = nameInput.value.trim();
+            var price = parseInt(priceInput.value);
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert('Iltimos, taom nomini va narxini to\'g\'ri kiriting!');
+                return;
+            }
+
+            menuItems.push({ name: name, price: price });
+            renderMenu();
+
+            nameInput.value = '';
+            priceInput.value = '';
+        }
 
         function selectTable(tableNum) {
             selectedTable = tableNum;
@@ -154,12 +198,12 @@
             var currentOrders = tableOrders[selectedTable];
             for (var i = 0; i < currentOrders.length; i++) {
                 var li = document.createElement('li');
-                li.innerText = currentOrders[i].name + ' - ' + currentOrders[i].price + ' so\'m';
+                li.innerText = currentOrders[i].name + ' - ' + currentOrders[i].price.toLocaleString() + ' so\'m';
                 list.appendChild(li);
                 total = total + currentOrders[i].price;
             }
 
-            document.getElementById('total-price').innerText = total;
+            document.getElementById('total-price').innerText = total.toLocaleString();
         }
 
         function closeTableOrder() {
@@ -201,16 +245,17 @@
                 row.style.display = 'flex';
                 row.style.justifyContent = 'space-between';
                 row.style.marginBottom = '5px';
-                row.innerHTML = '<span>' + currentOrders[i].name + '</span><span>' + currentOrders[i].price + ' so\'m</span>';
+                row.innerHTML = '<span>' + currentOrders[i].name + '</span><span>' + currentOrders[i].price.toLocaleString() + ' so\'m</span>';
                 itemsContainer.appendChild(row);
                 total = total + currentOrders[i].price;
             }
 
-            document.getElementById('receipt-total').innerText = total + ' so\'m';
-
-            // Brauzerning standart chop etish oynasini ochadi
+            document.getElementById('receipt-total').innerText = total.toLocaleString() + ' so\'m';
             window.print();
         }
+
+        // Dastlabki menyuni yuklash
+        renderMenu();
     </script>
 </body>
 </html>
