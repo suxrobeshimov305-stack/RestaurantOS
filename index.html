@@ -10,11 +10,11 @@
         .container { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
-        .table-btn { padding: 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 16px; transition: 0.2s; }
+        .table-btn { padding: 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 16px; }
         .free { background-color: #27ae60; }
         .busy { background-color: #e74c3c; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee; }
-        .add-btn { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .add-btn { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .order-box { margin-top: 15px; padding: 10px; background: #ecf0f1; border-radius: 5px; }
     </style>
 </head>
@@ -28,7 +28,7 @@
     <div class="container">
         <!-- 1. Stollar moduli -->
         <div class="card">
-            <h2>Stollar (Bosib holatini o'zgartiring)</h2>
+            <h2>Stollar holati</h2>
             <div class="tables-grid">
                 <button class="table-btn free" onclick="toggleTable(this, 1)">Stol 1 (Bo'sh)</button>
                 <button class="table-btn free" onclick="toggleTable(this, 2)">Stol 2 (Bo'sh)</button>
@@ -62,27 +62,25 @@
     </div>
 
     <script>
-        function toggleTable(button, tableNumber) {
-            if (button.classList.contains('free')) {
-                button.classList.remove('free');
-                button.classList.add('busy');
-                button.innerText = Stol ${tableNumber} (Band);
+        function toggleTable(btn, num) {
+            if (btn.className.indexOf('free') !== -1) {
+                btn.className = 'table-btn busy';
+                btn.innerText = 'Stol ' + num + ' (Band)';
             } else {
-                button.classList.remove('busy');
-                button.classList.add('free');
-                button.innerText = Stol ${tableNumber} (Bo'sh);
+                btn.className = 'table-btn free';
+                btn.innerText = 'Stol ' + num + ' (Bo\'sh)';
             }
         }
 
-        let total = 0;
-        function addToOrder(itemName, price) {
-            const list = document.getElementById('order-list');
-            const item = document.createElement('li');
-            item.innerText = ${itemName} - ${price.toLocaleString()} so'm;
-            list.appendChild(item);
+        var total = 0;
+        function addToOrder(name, price) {
+            var list = document.getElementById('order-list');
+            var li = document.createElement('li');
+            li.innerText = name + ' - ' + price + ' so\'m';
+            list.appendChild(li);
 
-            total += price;
-            document.getElementById('total-price').innerText = total.toLocaleString();
+            total = total + price;
+            document.getElementById('total-price').innerText = total;
         }
     </script>
 </body>
