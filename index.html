@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestaurantOS - Boshqaruv Tizimi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
+        .container { display: flex; gap: 20px; margin-top: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; flex: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .table-btn { padding: 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; }
+        .free { background-color: #27ae60; }
+        .busy { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>RestaurantOS</h1>
+        <p>Kichik restoran boshqaruv tizimi (MVP)</p>
+    </header>
+
+    <div class="container">
+        <!-- 1. Stollar moduli -->
+        <div class="card">
+            <h2>Stollar holati</h2>
+            <button class="table-btn free">Stol 1 (Bo'sh)</button>
+            <button class="table-btn busy">Stol 2 (Band)</button>
+            <button class="table-btn free">Stol 3 (Bo'sh)</button>
+            <button class="table-btn free">Stol 4 (Bo'sh)</button>
+        </div>
+
+        <!-- 2. Menyu moduli -->
+        <div class="card">
+            <h2>Menyu</h2>
+            <ul>
+                <li>Osh - 35 000 so'm</li>
+                <li>Shashlik - 18 000 so'm</li>
+                <li>Choy - 5 000 so'm</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
