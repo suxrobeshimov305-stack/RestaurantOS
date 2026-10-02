@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Kassa va Kunlik Hisobot</title>
+    <title>RestaurantOS - Boshqaruv va Kassa</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -27,7 +27,6 @@
         .add-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .btn-create { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 
-        /* Hisobot paneli stillari */
         .stats-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
         .stat-box { flex: 1; min-width: 180px; background: #f8f9fa; border-left: 5px solid #2980b9; padding: 15px; border-radius: 6px; }
         .stat-box.green { border-color: #27ae60; }
@@ -40,7 +39,6 @@
         .history-table th { background: #f1f2f6; color: #333; }
         .reset-history-btn { background: #7f8c8d; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; margin-top: -35px; }
 
-        /* Modal oyna */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -153,7 +151,7 @@
             </div>
         </div>
 
-        <!-- 4. Kunlik kassa hisoboti (Z-Report) -->
+        <!-- 4. Kunlik kassa hisoboti -->
         <div class="card full-width-card">
             <h2>Kunlik Kassa Hisoboti</h2>
             <button class="reset-history-btn" onclick="resetDailyStats()">Kunni yakunlash (Nollash)</button>
@@ -191,7 +189,7 @@
         </div>
     </div>
 
-    <!-- Xavfsizlik Modal Oynasi -->
+    <!-- Modal darcha -->
     <div class="modal-overlay" id="security-modal">
         <div class="modal-card">
             <h3 style="color: #c0392b; margin-top: 0;">⚠️ DIQQAT! Xavfli amal</h3>
@@ -204,7 +202,7 @@
 
             <label class="checklist-item">
                 <input type="checkbox" id="chk-confirm" onchange="validateModal()">
-                <span>Stol va unga tegishli barcha ma'lumotlar qaytmas bo'lib o'chishiga roziman</span>
+                <span>Stol va unga tegishli barcha ma'lumotlar o'chishiga roziman</span>
             </label>
 
             <div style="margin-top: 12px;">
@@ -242,22 +240,41 @@
     <script>
         var selectedTable = 1;
 
+        // Xotirani o'qish va avtomatik xatolikdan himoyalash
         var savedCount = localStorage.getItem('res_table_count');
-        var tableCount = savedCount ? parseInt(savedCount) : 4;
+        var tableCount = parseInt(savedCount);
+        
+        // Agar xotirada stollar soni bo'lmasa yoki 1 dan kam bo'lsa -> avtomatik 4 qilib qo'yadi!
+        if (isNaN(tableCount) || tableCount < 1) {
+            tableCount = 4;
+        }
 
         var savedMenu = localStorage.getItem('res_menu');
-        var menuItems = savedMenu ? JSON.parse(savedMenu) : [
-            { name: 'Osh', price: 35000 },
-            { name: 'Shashlik', price: 18000 },
-            { name: 'Choy', price: 5000 }
-        ];
+        var menuItems = null;
+        try {
+            menuItems = JSON.parse(savedMenu);
+        } catch(e) {}
+        if (!Array.isArray(menuItems) || menuItems.length === 0) {
+            menuItems = [
+                { name: 'Osh', price: 35000 },
+                { name: 'Shashlik', price: 18000 },
+                { name: 'Choy', price: 5000 }
+            ];
+        }
 
         var savedOrders = localStorage.getItem('res_orders');
-        var tableOrders = savedOrders ? JSON.parse(savedOrders) : {};
+        var tableOrders = {};
+        try {
+            tableOrders = JSON.parse(savedOrders) || {};
+        } catch(e) {}
 
         var savedHistory = localStorage.getItem('res_sales_history');
-        var salesHistory = savedHistory ? JSON.parse(savedHistory) : [];
+        var salesHistory = [];
+        try {
+            salesHistory = JSON.parse(savedHistory) || [];
+        } catch(e) {}
 
+        // Har bir stol uchun ro'yxat borligini kafolatlash
         for (var i = 1; i <= tableCount; i++) {
             if (!tableOrders[i]) {
                 tableOrders[i] = [];
@@ -320,7 +337,7 @@
                 }
                 
                 document.getElementById('modal-warning-text').innerHTML = 
-                    '<b>Stol #' + selectedTable + '</b>da jami <b>' + sum.toLocaleString() + ' so\'m</b> miqdoridagi hisob yopilmagan! Agar o\'chirsangiz, bu hisob tizimdan yo\'qoladi.';
+                    '<b>Stol #' + selectedTable + '</b>da jami <b>' + sum.toLocaleString() + ' so\'m</b> miqdoridagi hisob yopilmagan! O\'chirsangiz, hisob yo\'qoladi.';
                 
                 document.getElementById('chk-unpaid').checked = false;
                 document.getElementById('chk-confirm').checked = false;
@@ -329,7 +346,7 @@
 
                 document.getElementById('security-modal').style.display = 'flex';
             } else {
-                if (confirm('Stol ' + selectedTable + ' bo\'sh. Haqiqatan ham uni o\'chirmoqchimisiz?')) {
+                if (confirm('Stol ' + selectedTable + ' bo\'sh. Uni o\'chirmoqchimisiz?')) {
                     executeDelete();
                 }
             }
@@ -377,6 +394,7 @@
         }
 
         function selectTable(tableNum) {
+            if (tableNum > tableCount) tableNum = 1;
             selectedTable = tableNum;
 
             for (var i = 1; i <= tableCount; i++) {
@@ -437,8 +455,10 @@
             saveData();
 
             var currentBtn = document.getElementById('btn-' + selectedTable);
-            currentBtn.className = 'table-btn busy selected';
-            currentBtn.innerText = 'Stol ' + selectedTable + ' (Band)';
+            if (currentBtn) {
+                currentBtn.className = 'table-btn busy selected';
+                currentBtn.innerText = 'Stol ' + selectedTable + ' (Band)';
+            }
 
             renderOrderList();
         }
@@ -468,16 +488,4 @@
 
             var sum = 0;
             var itemsList = [];
-            for (var i = 0; i < currentOrders.length; i++) {
-                sum += currentOrders[i].price;
-                itemsList.push(currentOrders[i].name);
-            }
-
-            if (confirm('Stol ' + selectedTable + ' hisobi (' + sum.toLocaleString() + ' so\'m) to\'landimi va yopilsinmi?')) {
-                var now = new Date();
-                var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                // Kunlik kassa jurnaliga yozish
-                salesHistory.unshift({
-                    table: selectedTable,
-                    tim
+            for (var i = 0; i < currentOrders.len
