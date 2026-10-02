@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Stol Boshqaruvi va O'chirish</title>
+    <title>RestaurantOS - Xavfsiz Boshqaruv Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -26,6 +26,91 @@
         .add-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .btn-create { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 
+        /* Maxsus xavfsizlik oynasi (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 420px;
+            width: 90%;
+            border-top: 6px solid #c0392b;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        }
+        .warning-text {
+            color: #c0392b;
+            font-size: 15px;
+            line-height: 1.4;
+            background: #fde8e8;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .checklist-item {
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .checklist-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+        .modal-card input[type="text"] {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .modal-card input[type="text"]:focus {
+            border-color: #c0392b;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: bold;
+        }
+        .btn-danger-confirm {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: bold;
+            opacity: 0.4;
+        }
+        .btn-danger-confirm:disabled {
+            cursor: not-allowed;
+        }
+
         #receipt-area {
             display: none;
             width: 280px;
@@ -35,7 +120,6 @@
             font-family: 'Courier New', Courier, monospace;
             margin: 20px auto;
         }
-
         @media print {
             body * { visibility: hidden; }
             #receipt-area, #receipt-area * { visibility: visible; }
@@ -47,7 +131,7 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Stollar, menyu, chek va xotira boshqaruvi</p>
+        <p>Stollar, xavfsiz boshqaruv va kassa tizimi</p>
     </header>
 
     <div class="container">
@@ -86,7 +170,35 @@
                     <button class="print-btn" onclick="printReceipt()">Chek chiqarish</button>
                     <button class="close-btn" onclick="closeTableOrder()">Hisobni yopish</button>
                 </div>
-                <button class="delete-table-btn" onclick="deleteCurrentTable()">🗑 Ushbu stolni butunlay o'chirish</button>
+                <button class="delete-table-btn" onclick="attemptDeleteTable()">🗑 Ushbu stolni o'chirish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Xavfsizlik Modal Oynasi (Yopilmagan shotlar uchun) -->
+    <div class="modal-overlay" id="security-modal">
+        <div class="modal-card">
+            <h3 style="color: #c0392b; margin-top: 0;">⚠️ DIQQAT! Xavfli amal</h3>
+            <div class="warning-text" id="modal-warning-text"></div>
+
+            <label class="checklist-item">
+                <input type="checkbox" id="chk-unpaid" onchange="validateModal()">
+                <span>Ushbu stolda <b>to'lanmagan hisob</b> borligini bilaman</span>
+            </label>
+
+            <label class="checklist-item">
+                <input type="checkbox" id="chk-confirm" onchange="validateModal()">
+                <span>Stol va unga tegishli barcha ma'lumotlar qaytmas bo'lib o'chishiga roziman</span>
+            </label>
+
+            <div style="margin-top: 12px;">
+                <label style="font-size: 13px; color: #555;">Tasdiqlash uchun <b>OCHIRISH</b> so'zini yozing:</label>
+                <input type="text" id="delete-input-text" placeholder="OCHIRISH" oninput="validateModal()">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
+                <button class="btn-danger-confirm" id="btn-final-delete" disabled onclick="executeDelete()">O'chirilsin</button>
             </div>
         </div>
     </div>
@@ -114,7 +226,6 @@
     <script>
         var selectedTable = 1;
 
-        // LocalStorage'dan ma'lumotlarni o'qish
         var savedCount = localStorage.getItem('res_table_count');
         var tableCount = savedCount ? parseInt(savedCount) : 4;
 
@@ -174,22 +285,61 @@
             selectTable(tableCount);
         }
 
-        function deleteCurrentTable() {
+        function attemptDeleteTable() {
             if (tableCount <= 1) {
-                alert('Kamida bitta stol qolishi kerak!');
+                alert('Tizimda kamida bitta stol qolishi shart!');
                 return;
             }
 
-            // Agar stolda faol buyurtma bo'lsa ogohlantirish
-            if (tableOrders[selectedTable] && tableOrders[selectedTable].length > 0) {
-                var confirmDelete = confirm('Diqqat! Stol ' + selectedTable + ' da to\'lanmagan buyurtmalar bor. Baribir o\'chirilsinmi?');
-                if (!confirmDelete) return;
-            } else {
-                var confirmDelete = confirm('Haqiqatan ham Stol ' + selectedTable + ' ni o\'chirmoqchimisiz?');
-                if (!confirmDelete) return;
-            }
+            var currentOrders = tableOrders[selectedTable] || [];
 
-            // Yangi massivga stollarni tartib bilan qayta yozish
+            // Agar stolda to'lanmagan buyurtmalar bo'lsa -> Qiyin himoyali oynani ochamiz
+            if (currentOrders.length > 0) {
+                var sum = 0;
+                for (var i = 0; i < currentOrders.length; i++) {
+                    sum += currentOrders[i].price;
+                }
+                
+                document.getElementById('modal-warning-text').innerHTML = 
+                    '<b>Stol #' + selectedTable + '</b>da jami <b>' + sum.toLocaleString() + ' so\'m</b> miqdoridagi hisob yopilmagan! Agar o\'chirsangiz, bu hisob tizimdan yo\'qoladi.';
+                
+                // Formani tozalash
+                document.getElementById('chk-unpaid').checked = false;
+                document.getElementById('chk-confirm').checked = false;
+                document.getElementById('delete-input-text').value = '';
+                validateModal();
+
+                document.getElementById('security-modal').style.display = 'flex';
+            } else {
+                // Agar stol bo'sh bo'lsa -> oddiy tasdiqlash yetarli
+                if (confirm('Stol ' + selectedTable + ' bo\'sh. Haqiqatan ham uni o\'chirmoqchimisiz?')) {
+                    executeDelete();
+                }
+            }
+        }
+
+        function validateModal() {
+            var chk1 = document.getElementById('chk-unpaid').checked;
+            var chk2 = document.getElementById('chk-confirm').checked;
+            var txt = document.getElementById('delete-input-text').value.trim();
+            var btn = document.getElementById('btn-final-delete');
+
+            if (chk1 && chk2 && txt === 'OCHIRISH') {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('security-modal').style.display = 'none';
+        }
+
+        function executeDelete() {
+            closeModal();
+
             var newOrders = {};
             var counter = 1;
 
@@ -202,7 +352,7 @@
 
             tableCount--;
             tableOrders = newOrders;
-            selectedTable = 1; // 1-stolga qaytish
+            selectedTable = 1;
 
             saveData();
             renderTables();
