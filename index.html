@@ -10,24 +10,30 @@
         .container { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .full-width { width: 100%; flex: 100%; box-sizing: border-box; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-header h2 { margin: 0; }
+        .btn-settings { background: transparent; border: 1px solid #bdc3c7; border-radius: 6px; padding: 4px 10px; font-size: 20px; cursor: pointer; color: #2c3e50; line-height: 1; transition: 0.2s; }
+        .btn-settings:hover { background: #ecf0f1; border-color: #7f8c8d; }
+
         .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
         .table-btn { padding: 18px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 15px; }
         .free { background-color: #27ae60; }
         .busy { background-color: #e74c3c; }
         .selected { border-color: #f39c12 !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.8); }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee; }
-        .menu-actions { display: flex; gap: 5px; }
-        .add-btn { background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .edit-btn { background: #f39c12; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .del-menu-btn { background: #e74c3c; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; background: #fafafa; border-radius: 6px; }
+        .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .add-btn:hover { background: #2980b9; }
+
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .delete-btn { background: #c0392b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .add-form { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
-        .add-form input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        .add-form { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; }
         .btn-green { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+
         .stats-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
         .stat-box { flex: 1; min-width: 180px; background: #f8f9fa; border-left: 5px solid #27ae60; padding: 15px; border-radius: 6px; }
         .stat-box h4 { margin: 0 0 5px 0; color: #7f8c8d; }
@@ -35,6 +41,40 @@
         .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
         .history-table th { background: #f1f2f6; }
+
+        /* Modal (Menyu boshqaruvi) oynasi */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h3 { margin: 0; color: #2c3e50; }
+        .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #7f8c8d; line-height: 1; }
+        
+        .manage-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .manage-table th, .manage-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 14px; }
+        .manage-actions { display: flex; gap: 6px; justify-content: flex-end; }
+        .btn-action-edit { background: #f39c12; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .btn-action-del { background: #e74c3c; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+
+        .modal-add-box { display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #eee; flex-wrap: wrap; }
+        .modal-add-box input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 120px; }
+        .modal-add-box button { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         @media print {
             body * { visibility: hidden; }
@@ -61,15 +101,13 @@
             </div>
         </div>
 
-        <!-- 2. Menyu -->
+        <!-- 2. Menyu (toza, qulay ko'rinish) -->
         <div class="card">
-            <h2>Menyu</h2>
-            <div id="menu-container"></div>
-            <div class="add-form">
-                <input type="text" id="new-name" placeholder="Taom nomi">
-                <input type="number" id="new-price" placeholder="Narxi">
-                <button class="btn-green" id="btn-add-menu" style="width: auto;" type="button">+ Qo'shish</button>
+            <div class="card-header">
+                <h2>Menyu</h2>
+                <button class="btn-settings" id="btn-open-menu-manager" title="Menyuni boshqarish (tahrirlash/o'chirish)">⋮</button>
             </div>
+            <div id="menu-container"></div>
         </div>
 
         <!-- 3. Joriy stol hisobi -->
@@ -106,6 +144,33 @@
                 </thead>
                 <tbody id="history-rows"></tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Menyu boshqaruvi (Modal oyna) -->
+    <div class="modal-overlay" id="menu-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Menyuni Boshqarish</h3>
+                <button class="close-modal-btn" id="btn-close-menu-modal">&times;</button>
+            </div>
+
+            <table class="manage-table">
+                <thead>
+                    <tr>
+                        <th>Taom nomi</th>
+                        <th>Narxi</th>
+                        <th style="text-align: right;">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody id="manage-menu-rows"></tbody>
+            </table>
+
+            <div class="modal-add-box">
+                <input type="text" id="modal-new-name" placeholder="Yangi taom nomi">
+                <input type="number" id="modal-new-price" placeholder="Narxi (so'm)">
+                <button id="modal-btn-add" type="button">+ Qo'shish</button>
+            </div>
         </div>
     </div>
 
@@ -202,6 +267,7 @@
             }
         }
 
+        // Asosiy ekrandagi menyu: toza va faqat "Qo'shish" tugmali
         function renderMenu() {
             var container = document.getElementById('menu-container');
             container.innerHTML = '';
@@ -211,41 +277,32 @@
                 div.className = 'menu-item';
                 div.innerHTML = '<span><b>' + item.name + '</b> - ' + item.price.toLocaleString() + ' so\'m</span>';
 
-                var actions = document.createElement('div');
-                actions.className = 'menu-actions';
-
-                // Buyurtmaga qo'shish tugmasi
                 var addBtn = document.createElement('button');
                 addBtn.className = 'add-btn';
-                addBtn.innerText = "+";
-                addBtn.title = "Buyurtmaga qo'shish";
+                addBtn.innerText = "Qo'shish";
                 addBtn.onclick = function() {
                     addMenuItemByIndex(index);
                 };
 
-                // Tahrirlash tugmasi
-                var editBtn = document.createElement('button');
-                editBtn.className = 'edit-btn';
-                editBtn.innerText = "✏️";
-                editBtn.title = "Nomini yoki narxini tahrirlash";
-                editBtn.onclick = function() {
-                    editMenuItem(index);
-                };
-
-                // Menyudan o'chirish tugmasi
-                var delBtn = document.createElement('button');
-                delBtn.className = 'del-menu-btn';
-                delBtn.innerText = "🗑";
-                delBtn.title = "Menyudan butunlay o'chirish";
-                delBtn.onclick = function() {
-                    deleteMenuItem(index);
-                };
-
-                actions.appendChild(addBtn);
-                actions.appendChild(editBtn);
-                actions.appendChild(delBtn);
-                div.appendChild(actions);
+                div.appendChild(addBtn);
                 container.appendChild(div);
+            });
+        }
+
+        // Modal oyna ichidagi to'liq boshqaruv jadvali
+        function renderManageMenu() {
+            var tbody = document.getElementById('manage-menu-rows');
+            tbody.innerHTML = '';
+
+            state.menu.forEach(function(item, index) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td><b>' + item.name + '</b></td>' +
+                               '<td>' + item.price.toLocaleString() + ' so\'m</td>' +
+                               '<td class="manage-actions">' +
+                                   '<button class="btn-action-edit" onclick="editMenuItem(' + index + ')">✏️ Tahrirlash</button>' +
+                                   '<button class="btn-action-del" onclick="deleteMenuItem(' + index + ')">🗑 O\'chirish</button>' +
+                               '</td>';
+                tbody.appendChild(tr);
             });
         }
 
@@ -267,7 +324,6 @@
             renderOrder();
         }
 
-        // Taom nomini va narxini tahrirlash funksiyasi
         function editMenuItem(index) {
             var item = state.menu[index];
             if (!item) return;
@@ -293,18 +349,39 @@
 
             saveStorage();
             renderMenu();
+            renderManageMenu();
         }
 
-        // Taomni menyudan o'chirish funksiyasi
         function deleteMenuItem(index) {
             var item = state.menu[index];
             if (!item) return;
 
-            if (confirm('"' + item.name + '" taomini menyudan o\'chirmoqchimisiz?')) {
+            if (confirm('"' + item.name + '" taomini ro\'yxatdan butunlay o\'chirmoqchimisiz?')) {
                 state.menu.splice(index, 1);
                 saveStorage();
                 renderMenu();
+                renderManageMenu();
             }
+        }
+
+        function addMenuFromModal() {
+            var nameInput = document.getElementById('modal-new-name');
+            var priceInput = document.getElementById('modal-new-price');
+            var name = nameInput.value.trim();
+            var price = parseInt(priceInput.value);
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert("Iltimos, taom nomi va narxini to'g'ri kiriting!");
+                return;
+            }
+
+            state.menu.push({ name: name, price: price });
+            saveStorage();
+            renderMenu();
+            renderManageMenu();
+
+            nameInput.value = '';
+            priceInput.value = '';
         }
 
         function renderOrder() {
@@ -351,25 +428,6 @@
             state.orders[state.tableCount] = [];
             saveStorage();
             selectTable(state.tableCount);
-        }
-
-        function addNewMenuItem() {
-            var nameInput = document.getElementById('new-name');
-            var priceInput = document.getElementById('new-price');
-            var name = nameInput.value.trim();
-            var price = parseInt(priceInput.value);
-
-            if (!name || isNaN(price) || price <= 0) {
-                alert("Iltimos, taom nomi va narxini to'g'ri kiriting!");
-                return;
-            }
-
-            state.menu.push({ name: name, price: price });
-            saveStorage();
-            renderMenu();
-
-            nameInput.value = '';
-            priceInput.value = '';
         }
 
         function closeTableOrder() {
@@ -459,12 +517,29 @@
             window.print();
         }
 
+        // Modalni ochish / yopish
+        var menuModal = document.getElementById('menu-modal');
+        document.getElementById('btn-open-menu-manager').onclick = function() {
+            renderManageMenu();
+            menuModal.style.display = 'flex';
+        };
+        document.getElementById('btn-close-menu-modal').onclick = function() {
+            menuModal.style.display = 'none';
+        };
+        window.onclick = function(e) {
+            if (e.target === menuModal) {
+                menuModal.style.display = 'none';
+            }
+        };
+
+        // Hodisalar
+        document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
         document.getElementById('btn-add-table').addEventListener('click', addNewTable);
-        document.getElementById('btn-add-menu').addEventListener('click', addNewMenuItem);
         document.getElementById('btn-print').addEventListener('click', printReceipt);
         document.getElementById('btn-close-order').addEventListener('click', closeTableOrder);
         document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
 
+        // Boshlang'ich yuklash
         loadStorage();
         renderTables();
         renderMenu();
