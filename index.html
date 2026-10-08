@@ -31,6 +31,13 @@
         .add-btn:hover { background: #2980b9; }
 
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
+        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #dcdde1; }
+        .order-item-info { flex: 1; }
+        .order-item-controls { display: flex; align-items: center; gap: 6px; }
+        .qty-btn { background: #fff; border: 1px solid #bdc3c7; border-radius: 4px; width: 26px; height: 26px; font-weight: bold; cursor: pointer; }
+        .qty-btn:hover { background: #dfe4ea; }
+        .del-item-btn { background: #e74c3c; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
@@ -108,7 +115,7 @@
             <h2 id="order-title">Stol buyurtmasi</h2>
             <div class="order-box">
                 <h3>Joriy hisob:</h3>
-                <ul id="order-list"></ul>
+                <div id="order-list"></div>
                 <h4>Jami: <span id="total-price">0</span> so'm</h4>
                 <div class="btn-group">
                     <button class="print-btn" id="btn-print" type="button">Chek chiqarish</button>
@@ -165,7 +172,7 @@
         </div>
     </div>
 
-    <!-- Chek chop etish -->
+    <!-- Chop etish cheki -->
     <div id="receipt-area">
         <center>
             <h3>RESTAURANT OS</h3>
@@ -222,7 +229,7 @@
                     if (Array.isArray(parsedM) && parsedM.length > 0) state.menu = parsedM;
                 }
 
-                var o = localStorage.getItem('ros_orders_v3');
+                var o = localStorage.getItem('ros_orders_v4');
                 if (o) {
                     var parsedO = JSON.parse(o);
                     if (parsedO && typeof parsedO === 'object') state.orders = parsedO;
@@ -252,7 +259,7 @@
             try {
                 localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
                 localStorage.setItem('ros_menu', JSON.stringify(state.menu));
-                localStorage.setItem('ros_orders_v3', JSON.stringify(state.orders));
+                localStorage.setItem('ros_orders_v4', JSON.stringify(state.orders));
                 localStorage.setItem('ros_history_v3', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga saqlashda xato:", e);
@@ -386,10 +393,44 @@
                 state.orders[state.selectedKey] = [];
             }
 
-            state.orders[state.selectedKey].push({
-                name: item.name,
-                price: item.price
-            });
+            var currentOrders = state.orders[state.selectedKey];
+            var existing = currentOrders.find(function(o) { return o.name === item.name; });
+
+            if (existing) {
+                existing.qty++;
+            } else {
+                currentOrders.push({
+                    name: item.name,
+                    price: item.price,
+                    qty: 1
+                });
+            }
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
+        function changeOrderQty(itemIndex, delta) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
+
+            currentOrders[itemIndex].qty += delta;
+
+            if (currentOrders[itemIndex].qty <= 0) {
+                currentOrders.splice(itemIndex, 1);
+            }
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
+        function removeOrderItem(itemIndex) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
+
+            currentOrders.splice(itemIndex, 1);
 
             saveStorage();
             renderTables();
@@ -405,12 +446,29 @@
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var title = curTbl ? curTbl.zone + ': Stol ' + curTbl.number : 'Stol';
 
-            currentOrders.forEach(function(order) {
-                var li = document.createElement('li');
-                li.innerText = order.name + ' - ' + order.price.toLocaleString() + ' so\'m';
-                list.appendChild(li);
-                total += order.price;
-            });
+            if (currentOrders.length === 0) {
+                list.innerHTML = '<p style="color:#7f8c8d; font-size:14px;">Hozircha buyurtma yo\'q</p>';
+            } else {
+                currentOrders.forEach(function(order, idx) {
+                    var itemSubtotal = order.price * order.qty;
+                    total += itemSubtotal;
+
+                    var row = document.createElement('div');
+                    row.className = 'order-item-row';
+                    row.innerHTML = 
+                        '<div class="order-item-info">' +
+                            '<b>' + order.name + '</b><br>' +
+                            '<span style="font-size:12px; color:#555;">' + order.price.toLocaleString() + ' x ' + order.qty + ' = ' + itemSubtotal.toLocaleString() + ' so\'m</span>' +
+                        '</div>' +
+                        '<div class="order-item-controls">' +
+                            '<button class="qty-btn" onclick="changeOrderQty(' + idx + ', -1)">–</button>' +
+                            '<b>' + order.qty + '</b>' +
+                            '<button class="qty-btn" onclick="changeOrderQty(' + idx + ', 1)">+</button>' +
+                            '<button class="del-item-btn" onclick="removeOrderItem(' + idx + ')" title="O\'chirish">🗑</button>' +
+                        '</div>';
+                    list.appendChild(row);
+                });
+            }
 
             document.getElementById('total-price').innerText = total.toLocaleString();
             document.getElementById('order-title').innerText = title + ' buyurtmasi';
@@ -425,8 +483,8 @@
 
             var sum = 0, itemNames = [];
             currentOrders.forEach(function(i) {
-                sum += i.price;
-                itemNames.push(i.name);
+                sum += (i.price * i.qty);
+                itemNames.push(i.name + ' (x' + i.qty + ')');
             });
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
@@ -484,8 +542,9 @@
             var sum = 0;
 
             currentOrders.forEach(function(item) {
-                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + '</span><span>' + item.price.toLocaleString() + ' so\'m</span></div>';
-                sum += item.price;
+                var itemTotal = item.price * item.qty;
+                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
+                sum += itemTotal;
             });
 
             document.getElementById('rc-total').innerText = sum.toLocaleString();
