@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Professional POS Tizimi</title>
+    <title>RestaurantOS - To'lov Turlari va Kassa Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -30,7 +30,6 @@
         .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .add-btn:hover { background: #2980b9; }
 
-        /* Buyurtma oynasi */
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
         .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border-bottom: 1px solid #dcdde1; position: relative; }
         .order-item-row:last-child { border-bottom: none; }
@@ -58,7 +57,6 @@
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
 
-        /* Xizmat haqi va summa paneli */
         .service-fee-panel { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; }
         .service-fee-panel select { padding: 4px 8px; border-radius: 4px; border: 1px solid #bdc3c7; }
         .calc-details { margin-top: 8px; font-size: 13px; color: #555; }
@@ -73,22 +71,29 @@
         .add-form select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 140px; }
         .btn-green { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 
-        .stats-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
-        .stat-box { flex: 1; min-width: 180px; background: #f8f9fa; border-left: 5px solid #27ae60; padding: 15px; border-radius: 6px; }
-        .stat-box h4 { margin: 0 0 5px 0; color: #7f8c8d; }
-        .stat-box .val { font-size: 20px; font-weight: bold; color: #2c3e50; }
+        /* Kassa hisoboti statistikasi */
+        .stats-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+        .stat-box { flex: 1; min-width: 140px; background: #f8f9fa; border-left: 4px solid #27ae60; padding: 12px; border-radius: 6px; }
+        .stat-box h4 { margin: 0 0 5px 0; color: #7f8c8d; font-size: 12px; }
+        .stat-box .val { font-size: 17px; font-weight: bold; color: #2c3e50; }
         
         .btn-export-excel { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
         .btn-export-excel:hover { background: #219653; }
 
         .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+        .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
         .history-table th { background: #f1f2f6; }
 
+        /* To'lov usuli modali */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 500px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 480px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #7f8c8d; }
+        
+        .payment-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .payment-btn { padding: 14px; border: 2px solid #ddd; background: #fff; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .payment-btn:hover { border-color: #27ae60; background: #f0fff4; color: #27ae60; }
+
         .manage-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .manage-table th, .manage-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 14px; }
         .manage-actions { display: flex; gap: 6px; justify-content: flex-end; }
@@ -111,7 +116,7 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Zonalar, Menyu, Xizmat Haqi va Kunlik Kassa Tizimi</p>
+        <p>Zonalar, Menyu, To'lov Turlari va Kassa Tizimi</p>
     </header>
 
     <div class="container">
@@ -147,7 +152,6 @@
                 <h3>Joriy hisob:</h3>
                 <div id="order-list"></div>
 
-                <!-- Xizmat haqi va yakuniy summa bo'limi -->
                 <div class="service-fee-panel">
                     <span>Xizmat haqi:</span>
                     <select id="service-fee-rate" onchange="updateServiceFee()">
@@ -166,7 +170,7 @@
 
                 <div class="btn-group">
                     <button class="print-btn" id="btn-print" type="button">Chek chiqarish</button>
-                    <button class="close-btn" id="btn-close-order" type="button">Hisobni yopish</button>
+                    <button class="close-btn" id="btn-open-pay-modal" type="button">Hisobni yopish</button>
                 </div>
                 <button class="delete-btn" id="btn-delete-table" type="button">🗑 Ushbu stolni o'chirish</button>
             </div>
@@ -180,20 +184,44 @@
             </div>
             <div class="stats-grid">
                 <div class="stat-box">
-                    <h4>BUGUNGI TUSHUM</h4>
+                    <h4>JAMI TUSHUM</h4>
                     <div class="val" id="stat-rev">0 so'm</div>
                 </div>
-                <div class="stat-box" style="border-color:#3498db;">
-                    <h4>YOPILGAN CHEKLAR</h4>
-                    <div class="val" id="stat-cnt">0 ta</div>
+                <div class="stat-box" style="border-left-color: #2ecc71;">
+                    <h4>💵 NAQD</h4>
+                    <div class="val" id="stat-cash">0 so'm</div>
+                </div>
+                <div class="stat-box" style="border-left-color: #3498db;">
+                    <h4>💳 KARTA</h4>
+                    <div class="val" id="stat-card">0 so'm</div>
+                </div>
+                <div class="stat-box" style="border-left-color: #9b59b6;">
+                    <h4>📲 PAYME / CLICK</h4>
+                    <div class="val" id="stat-payme">0 so'm</div>
                 </div>
             </div>
             <table class="history-table">
                 <thead>
-                    <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>Xizmat haqi</th><th>Summa</th></tr>
+                    <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
                 </thead>
                 <tbody id="history-rows"></tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- To'lov usulini tanlash modali -->
+    <div class="modal-overlay" id="pay-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>To'lov Turini Tanlang</h3>
+                <button class="close-modal-btn" id="btn-close-pay-modal">&times;</button>
+            </div>
+            <p style="margin-top:15px; font-size:16px;">To'lanishi kerak bo'lgan summa: <b id="pay-modal-amount" style="color:#27ae60;">0 so'm</b></p>
+            <div class="payment-options">
+                <button class="payment-btn" onclick="confirmPayment('Naqd')">💵 Naqd pul</button>
+                <button class="payment-btn" onclick="confirmPayment('Karta (Terminal)')">💳 Karta (Uzcard / Humo)</button>
+                <button class="payment-btn" onclick="confirmPayment('Payme / Click')">📲 Payme / Click</button>
+            </div>
         </div>
     </div>
 
@@ -206,11 +234,7 @@
             </div>
             <table class="manage-table">
                 <thead>
-                    <tr>
-                        <th>Taom nomi</th>
-                        <th>Narxi</th>
-                        <th style="text-align: right;">Amallar</th>
-                    </tr>
+                    <tr><th>Taom nomi</th><th>Narxi</th><th style="text-align: right;">Amallar</th></tr>
                 </thead>
                 <tbody id="manage-menu-rows"></tbody>
             </table>
@@ -295,7 +319,7 @@
                     if (parsedSF && typeof parsedSF === 'object') state.serviceFees = parsedSF;
                 }
 
-                var h = localStorage.getItem('ros_history_v4');
+                var h = localStorage.getItem('ros_history_v5');
                 if (h) {
                     var parsedH = JSON.parse(h);
                     if (Array.isArray(parsedH)) state.history = parsedH;
@@ -305,17 +329,11 @@
             }
 
             state.tables.forEach(function(tbl) {
-                if (!Array.isArray(state.orders[tbl.key])) {
-                    state.orders[tbl.key] = [];
-                }
-                if (state.serviceFees[tbl.key] === undefined) {
-                    state.serviceFees[tbl.key] = 10;
-                }
+                if (!Array.isArray(state.orders[tbl.key])) state.orders[tbl.key] = [];
+                if (state.serviceFees[tbl.key] === undefined) state.serviceFees[tbl.key] = 10;
             });
 
-            if (state.tables.length > 0) {
-                state.selectedKey = state.tables[0].key;
-            }
+            if (state.tables.length > 0) state.selectedKey = state.tables[0].key;
         }
 
         function saveStorage() {
@@ -324,7 +342,7 @@
                 localStorage.setItem('ros_menu', JSON.stringify(state.menu));
                 localStorage.setItem('ros_orders_v4', JSON.stringify(state.orders));
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
-                localStorage.setItem('ros_history_v4', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v5', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga saqlashda xato:", e);
             }
@@ -333,7 +351,6 @@
         function renderZoneFilters() {
             var bar = document.getElementById('zone-filter-bar');
             bar.innerHTML = '';
-
             zones.forEach(function(zone) {
                 var btn = document.createElement('button');
                 btn.className = 'zone-btn' + (zone === currentZoneFilter ? ' active' : '');
@@ -369,10 +386,7 @@
                 btn.className = 'table-btn ' + (isBusy ? 'busy' : 'free') + (tbl.key === state.selectedKey ? ' selected' : '');
                 btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b> ' + (isBusy ? '(Band)' : '(Bo\'sh)');
 
-                btn.onclick = function() {
-                    selectTable(tbl.key);
-                };
-
+                btn.onclick = function() { selectTable(tbl.key); };
                 container.appendChild(btn);
             });
         }
@@ -399,9 +413,7 @@
 
             var maxNum = 0;
             state.tables.forEach(function(t) {
-                if (t.zone === selectedZone && t.number > maxNum) {
-                    maxNum = t.number;
-                }
+                if (t.zone === selectedZone && t.number > maxNum) maxNum = t.number;
             });
             var nextNum = maxNum + 1;
             var newKey = selectedZone + '-' + nextNum;
@@ -415,11 +427,7 @@
         }
 
         function deleteCurrentTable() {
-            if (state.tables.length <= 1) {
-                alert("Kamida 1 ta stol qolishi shart!");
-                return;
-            }
-
+            if (state.tables.length <= 1) return alert("Kamida 1 ta stol qolishi shart!");
             var curOrders = state.orders[state.selectedKey] || [];
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var tblName = curTbl ? curTbl.zone + ' ' + curTbl.number + '-stol' : 'Stol';
@@ -443,7 +451,6 @@
         function renderMenu() {
             var container = document.getElementById('menu-container');
             container.innerHTML = '';
-
             state.menu.forEach(function(item, index) {
                 var div = document.createElement('div');
                 div.className = 'menu-item';
@@ -452,9 +459,7 @@
                 var addBtn = document.createElement('button');
                 addBtn.className = 'add-btn';
                 addBtn.innerText = "Qo'shish";
-                addBtn.onclick = function() {
-                    addMenuItemByIndex(index);
-                };
+                addBtn.onclick = function() { addMenuItemByIndex(index); };
 
                 div.appendChild(addBtn);
                 container.appendChild(div);
@@ -465,21 +470,14 @@
             var item = state.menu[index];
             if (!item) return;
 
-            if (!state.orders[state.selectedKey]) {
-                state.orders[state.selectedKey] = [];
-            }
-
+            if (!state.orders[state.selectedKey]) state.orders[state.selectedKey] = [];
             var currentOrders = state.orders[state.selectedKey];
             var existing = currentOrders.find(function(o) { return o.name === item.name; });
 
             if (existing) {
                 existing.qty++;
             } else {
-                currentOrders.push({
-                    name: item.name,
-                    price: item.price,
-                    qty: 1
-                });
+                currentOrders.push({ name: item.name, price: item.price, qty: 1 });
             }
 
             saveStorage();
@@ -498,9 +496,7 @@
             if (!currentOrders[itemIndex]) return;
 
             currentOrders[itemIndex].qty += delta;
-            if (currentOrders[itemIndex].qty <= 0) {
-                currentOrders.splice(itemIndex, 1);
-            }
+            if (currentOrders[itemIndex].qty <= 0) currentOrders.splice(itemIndex, 1);
 
             activeDropdownIndex = null;
             saveStorage();
@@ -514,28 +510,36 @@
 
             currentOrders.splice(itemIndex, 1);
             activeDropdownIndex = null;
-
             saveStorage();
             renderTables();
             renderOrder();
         }
 
+        function getCurrentCalculations() {
+            var subtotal = 0;
+            var currentOrders = state.orders[state.selectedKey] || [];
+            currentOrders.forEach(function(o) { subtotal += (o.price * o.qty); });
+
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(subtotal * (feePct / 100));
+            var total = subtotal + feeAmount;
+
+            return { subtotal: subtotal, feePct: feePct, feeAmount: feeAmount, total: total, orders: currentOrders };
+        }
+
         function renderOrder() {
             var list = document.getElementById('order-list');
             list.innerHTML = '';
-            var subtotal = 0;
-            var currentOrders = state.orders[state.selectedKey] || [];
+            var calc = getCurrentCalculations();
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var title = curTbl ? curTbl.zone + ': Stol ' + curTbl.number : 'Stol';
 
-            if (currentOrders.length === 0) {
+            if (calc.orders.length === 0) {
                 list.innerHTML = '<p style="color:#7f8c8d; font-size:14px; margin: 10px 0;">Hozircha buyurtma yo\'q</p>';
             } else {
-                currentOrders.forEach(function(order, idx) {
+                calc.orders.forEach(function(order, idx) {
                     var itemSubtotal = order.price * order.qty;
-                    subtotal += itemSubtotal;
-
                     var isMenuOpen = (activeDropdownIndex === idx);
 
                     var row = document.createElement('div');
@@ -555,12 +559,8 @@
                 });
             }
 
-            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
-            var feeAmount = Math.round(subtotal * (feePct / 100));
-            var total = subtotal + feeAmount;
-
-            document.getElementById('calc-details').innerText = 'Taomlar: ' + subtotal.toLocaleString() + ' so\'m | Xizmat (' + feePct + '%): ' + feeAmount.toLocaleString() + ' so\'m';
-            document.getElementById('total-price').innerText = total.toLocaleString();
+            document.getElementById('calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' so\'m | Xizmat (' + calc.feePct + '%): ' + calc.feeAmount.toLocaleString() + ' so\'m';
+            document.getElementById('total-price').innerText = calc.total.toLocaleString();
             document.getElementById('order-title').innerText = title + ' buyurtmasi';
         }
 
@@ -571,78 +571,80 @@
             }
         });
 
-        function closeTableOrder() {
-            var currentOrders = state.orders[state.selectedKey] || [];
-            if (currentOrders.length === 0) {
-                alert("Bu stolda buyurtma yo'q!");
-                return;
-            }
+        // To'lov darchasini ochish
+        var payModal = document.getElementById('pay-modal');
+        document.getElementById('btn-open-pay-modal').onclick = function() {
+            var calc = getCurrentCalculations();
+            if (calc.orders.length === 0) return alert("Bu stolda buyurtma yo'q!");
 
-            var subtotal = 0, itemNames = [];
-            currentOrders.forEach(function(i) {
-                subtotal += (i.price * i.qty);
-                itemNames.push(i.name + ' (x' + i.qty + ')');
-            });
+            document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
+            payModal.style.display = 'flex';
+        };
+        document.getElementById('btn-close-pay-modal').onclick = function() { payModal.style.display = 'none'; };
 
-            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
-            var feeAmount = Math.round(subtotal * (feePct / 100));
-            var total = subtotal + feeAmount;
+        function confirmPayment(method) {
+            var calc = getCurrentCalculations();
+            var itemNames = [];
+            calc.orders.forEach(function(i) { itemNames.push(i.name + ' (x' + i.qty + ')'); });
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var zone = curTbl ? curTbl.zone : '-';
             var num = curTbl ? curTbl.number : '-';
 
-            if (confirm(zone + ' ' + num + '-stol hisobi (' + total.toLocaleString() + ' so\'m) yopilsinmi?')) {
-                var d = new Date();
-                state.history.unshift({
-                    time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    date: d.toLocaleDateString(),
-                    zone: zone,
-                    tableNum: num,
-                    items: itemNames.join('; '),
-                    serviceFee: feeAmount,
-                    total: total
-                });
+            var d = new Date();
+            state.history.unshift({
+                time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: d.toLocaleDateString(),
+                zone: zone,
+                tableNum: num,
+                items: itemNames.join('; '),
+                method: method,
+                serviceFee: calc.feeAmount,
+                total: calc.total
+            });
 
-                state.orders[state.selectedKey] = [];
-                activeDropdownIndex = null;
-                saveStorage();
-                renderTables();
-                renderOrder();
-                renderReports();
-            }
+            state.orders[state.selectedKey] = [];
+            activeDropdownIndex = null;
+            payModal.style.display = 'none';
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+            renderReports();
         }
 
         function renderReports() {
-            var totalRevenue = 0;
+            var tot = 0, cash = 0, card = 0, payme = 0;
             var tbody = document.getElementById('history-rows');
             tbody.innerHTML = '';
 
             state.history.forEach(function(rec) {
-                totalRevenue += rec.total;
+                tot += rec.total;
+                if (rec.method === 'Naqd') cash += rec.total;
+                else if (rec.method === 'Karta (Terminal)') card += rec.total;
+                else payme += rec.total;
+
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td>' + rec.time + '</td>' +
                                '<td>' + rec.zone + '</td>' +
                                '<td>Stol ' + rec.tableNum + '</td>' +
                                '<td>' + rec.items + '</td>' +
-                               '<td>' + (rec.serviceFee ? rec.serviceFee.toLocaleString() : '0') + ' so\'m</td>' +
+                               '<td><b>' + (rec.method || 'Naqd') + '</b></td>' +
                                '<td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('stat-rev').innerText = totalRevenue.toLocaleString() + ' so\'m';
-            document.getElementById('stat-cnt').innerText = state.history.length + ' ta';
+            document.getElementById('stat-rev').innerText = tot.toLocaleString() + ' so\'m';
+            document.getElementById('stat-cash').innerText = cash.toLocaleString() + ' so\'m';
+            document.getElementById('stat-card').innerText = card.toLocaleString() + ' so\'m';
+            document.getElementById('stat-payme').innerText = payme.toLocaleString() + ' so\'m';
         }
 
-        // Excel (CSV) fayl qilib yuklab olish
         function exportHistoryToCSV() {
-            if (state.history.length === 0) {
-                alert("Hozircha yopilgan hisoblar yo'q!");
-                return;
-            }
+            if (state.history.length === 0) return alert("Hozircha yopilgan hisoblar yo'q!");
 
-            var csvContent = "\uFEFF"; // UTF-8 BOM o'zbek harflari buzulmasligi uchun
-            csvContent += "Sana va Vaqt,Zona,Stol,Buyurtma taomlari,Xizmat haqi (so'm),Jami summa (so'm)\n";
+            var csvContent = "\uFEFF";
+            csvContent += "Sana va Vaqt,Zona,Stol,Buyurtma taomlari,To'lov turi,Xizmat haqi (so'm),Jami summa (so'm)\n";
 
             state.history.forEach(function(r) {
                 var row = [
@@ -650,6 +652,7 @@
                     '"' + r.zone + '"',
                     '"Stol ' + r.tableNum + '"',
                     '"' + r.items.replace(/"/g, '""') + '"',
+                    '"' + (r.method || 'Naqd') + '"',
                     r.serviceFee || 0,
                     r.total
                 ];
@@ -668,11 +671,8 @@
         }
 
         function printReceipt() {
-            var currentOrders = state.orders[state.selectedKey] || [];
-            if (currentOrders.length === 0) {
-                alert("Buyurtma yo'q!");
-                return;
-            }
+            var calc = getCurrentCalculations();
+            if (calc.orders.length === 0) return alert("Buyurtma yo'q!");
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var title = curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol';
@@ -681,22 +681,16 @@
             document.getElementById('rc-table').innerText = title;
             var rcBox = document.getElementById('rc-items');
             rcBox.innerHTML = '';
-            var subtotal = 0;
 
-            currentOrders.forEach(function(item) {
+            calc.orders.forEach(function(item) {
                 var itemTotal = item.price * item.qty;
                 rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
-                subtotal += itemTotal;
             });
 
-            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
-            var feeAmount = Math.round(subtotal * (feePct / 100));
-            var total = subtotal + feeAmount;
-
-            document.getElementById('rc-subtotal').innerText = subtotal.toLocaleString();
-            document.getElementById('rc-fee-pct').innerText = feePct;
-            document.getElementById('rc-service').innerText = feeAmount.toLocaleString();
-            document.getElementById('rc-total').innerText = total.toLocaleString();
+            document.getElementById('rc-subtotal').innerText = calc.subtotal.toLocaleString();
+            document.getElementById('rc-fee-pct').innerText = calc.feePct;
+            document.getElementById('rc-service').innerText = calc.feeAmount.toLocaleString();
+            document.getElementById('rc-total').innerText = calc.total.toLocaleString();
             window.print();
         }
 
@@ -755,12 +749,15 @@
             menuModal.style.display = 'flex';
         };
         document.getElementById('btn-close-menu-modal').onclick = function() { menuModal.style.display = 'none'; };
-        window.onclick = function(e) { if (e.target === menuModal) menuModal.style.display = 'none'; };
+
+        window.onclick = function(e) {
+            if (e.target === menuModal) menuModal.style.display = 'none';
+            if (e.target === payModal) payModal.style.display = 'none';
+        };
 
         document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
         document.getElementById('btn-add-table').addEventListener('click', addNewTable);
         document.getElementById('btn-print').addEventListener('click', printReceipt);
-        document.getElementById('btn-close-order').addEventListener('click', closeTableOrder);
         document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
         document.getElementById('btn-export-csv').addEventListener('click', exportHistoryToCSV);
 
