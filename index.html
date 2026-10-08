@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Zonalarga Ajratilgan Stollar</title>
+    <title>RestaurantOS - Professional POS Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; }
@@ -30,7 +30,7 @@
         .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .add-btn:hover { background: #2980b9; }
 
-        /* Ixcham buyurtma ro'yxati */
+        /* Buyurtma oynasi */
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
         .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border-bottom: 1px solid #dcdde1; position: relative; }
         .order-item-row:last-child { border-bottom: none; }
@@ -38,16 +38,7 @@
         .order-item-info b { font-size: 15px; color: #2c3e50; }
         .order-subtext { font-size: 12px; color: #57606f; margin-top: 2px; }
 
-        /* Nuqtacha tugmasi va popup menyusi */
-        .order-item-menu-btn {
-            background: transparent;
-            border: none;
-            font-size: 18px;
-            color: #747d8c;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
+        .order-item-menu-btn { background: transparent; border: none; font-size: 18px; color: #747d8c; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
         .order-item-menu-btn:hover { background: #dfe4ea; color: #2f3542; }
 
         .order-item-dropdown {
@@ -61,26 +52,19 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 50;
             overflow: hidden;
-            min-width: 130px;
+            min-width: 140px;
         }
-        .order-item-dropdown button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 8px 12px;
-            text-align: left;
-            font-size: 13px;
-            cursor: pointer;
-            color: #2f3542;
-        }
+        .order-item-dropdown button { display: flex; align-items: center; width: 100%; background: none; border: none; padding: 8px 12px; text-align: left; font-size: 13px; cursor: pointer; color: #2f3542; }
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
-        .order-item-dropdown button.btn-del-action:hover { background: #ffeaa7; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        /* Xizmat haqi va summa paneli */
+        .service-fee-panel { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; }
+        .service-fee-panel select { padding: 4px 8px; border-radius: 4px; border: 1px solid #bdc3c7; }
+        .calc-details { margin-top: 8px; font-size: 13px; color: #555; }
+        .total-display { font-size: 18px; margin-top: 6px; color: #2c3e50; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 12px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .delete-btn { background: #c0392b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
@@ -93,6 +77,10 @@
         .stat-box { flex: 1; min-width: 180px; background: #f8f9fa; border-left: 5px solid #27ae60; padding: 15px; border-radius: 6px; }
         .stat-box h4 { margin: 0 0 5px 0; color: #7f8c8d; }
         .stat-box .val { font-size: 20px; font-weight: bold; color: #2c3e50; }
+        
+        .btn-export-excel { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-export-excel:hover { background: #219653; }
+
         .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
         .history-table th { background: #f1f2f6; }
@@ -123,7 +111,7 @@
 
     <header>
         <h1>RestaurantOS</h1>
-        <p>Zonalar, Menyu va Kunlik Kassa Tizimi</p>
+        <p>Zonalar, Menyu, Xizmat Haqi va Kunlik Kassa Tizimi</p>
     </header>
 
     <div class="container">
@@ -158,7 +146,24 @@
             <div class="order-box">
                 <h3>Joriy hisob:</h3>
                 <div id="order-list"></div>
-                <h4>Jami: <span id="total-price">0</span> so'm</h4>
+
+                <!-- Xizmat haqi va yakuniy summa bo'limi -->
+                <div class="service-fee-panel">
+                    <span>Xizmat haqi:</span>
+                    <select id="service-fee-rate" onchange="updateServiceFee()">
+                        <option value="0">0%</option>
+                        <option value="10" selected>10%</option>
+                        <option value="15">15%</option>
+                        <option value="20">20%</option>
+                    </select>
+                </div>
+                <div class="calc-details" id="calc-details">
+                    Taomlar: 0 so'm | Xizmat: 0 so'm
+                </div>
+                <div class="total-display">
+                    <b>Jami: <span id="total-price" style="color:#27ae60;">0</span> so'm</b>
+                </div>
+
                 <div class="btn-group">
                     <button class="print-btn" id="btn-print" type="button">Chek chiqarish</button>
                     <button class="close-btn" id="btn-close-order" type="button">Hisobni yopish</button>
@@ -169,7 +174,10 @@
 
         <!-- 4. Kunlik Hisobot -->
         <div class="card full-width">
-            <h2>Kunlik Kassa Hisoboti</h2>
+            <div class="card-header">
+                <h2>Kunlik Kassa Hisoboti</h2>
+                <button class="btn-export-excel" id="btn-export-csv">📥 Excel (CSV) yuklab olish</button>
+            </div>
             <div class="stats-grid">
                 <div class="stat-box">
                     <h4>BUGUNGI TUSHUM</h4>
@@ -182,7 +190,7 @@
             </div>
             <table class="history-table">
                 <thead>
-                    <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>Summa</th></tr>
+                    <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>Xizmat haqi</th><th>Summa</th></tr>
                 </thead>
                 <tbody id="history-rows"></tbody>
             </table>
@@ -214,7 +222,7 @@
         </div>
     </div>
 
-    <!-- Chek chop etish -->
+    <!-- Chop etish cheki -->
     <div id="receipt-area">
         <center>
             <h3>RESTAURANT OS</h3>
@@ -225,6 +233,8 @@
         </center>
         <div id="rc-items"></div>
         <hr>
+        <div style="font-size:12px; margin-bottom: 4px;">Taomlar: <span id="rc-subtotal">0</span> so'm</div>
+        <div style="font-size:12px; margin-bottom: 8px;">Xizmat haqi (<span id="rc-fee-pct">0</span>%): <span id="rc-service">0</span> so'm</div>
         <h4>JAMI: <span id="rc-total">0</span> so'm</h4>
     </div>
 
@@ -255,6 +265,7 @@
                 { name: "Sho'rva", price: 30000 }
             ],
             orders: {},
+            serviceFees: {},
             history: []
         };
 
@@ -278,7 +289,13 @@
                     if (parsedO && typeof parsedO === 'object') state.orders = parsedO;
                 }
 
-                var h = localStorage.getItem('ros_history_v3');
+                var sf = localStorage.getItem('ros_service_fees');
+                if (sf) {
+                    var parsedSF = JSON.parse(sf);
+                    if (parsedSF && typeof parsedSF === 'object') state.serviceFees = parsedSF;
+                }
+
+                var h = localStorage.getItem('ros_history_v4');
                 if (h) {
                     var parsedH = JSON.parse(h);
                     if (Array.isArray(parsedH)) state.history = parsedH;
@@ -290,6 +307,9 @@
             state.tables.forEach(function(tbl) {
                 if (!Array.isArray(state.orders[tbl.key])) {
                     state.orders[tbl.key] = [];
+                }
+                if (state.serviceFees[tbl.key] === undefined) {
+                    state.serviceFees[tbl.key] = 10;
                 }
             });
 
@@ -303,7 +323,8 @@
                 localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
                 localStorage.setItem('ros_menu', JSON.stringify(state.menu));
                 localStorage.setItem('ros_orders_v4', JSON.stringify(state.orders));
-                localStorage.setItem('ros_history_v3', JSON.stringify(state.history));
+                localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
+                localStorage.setItem('ros_history_v4', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga saqlashda xato:", e);
             }
@@ -359,7 +380,16 @@
         function selectTable(key) {
             state.selectedKey = key;
             activeDropdownIndex = null;
+            var fee = state.serviceFees[key] !== undefined ? state.serviceFees[key] : 10;
+            document.getElementById('service-fee-rate').value = fee;
             renderTables();
+            renderOrder();
+        }
+
+        function updateServiceFee() {
+            var sel = document.getElementById('service-fee-rate');
+            state.serviceFees[state.selectedKey] = parseInt(sel.value) || 0;
+            saveStorage();
             renderOrder();
         }
 
@@ -378,6 +408,7 @@
 
             state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
             state.orders[newKey] = [];
+            state.serviceFees[newKey] = 10;
 
             saveStorage();
             selectTable(newKey);
@@ -402,6 +433,7 @@
 
             state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
             delete state.orders[state.selectedKey];
+            delete state.serviceFees[state.selectedKey];
 
             state.selectedKey = state.tables[0].key;
             saveStorage();
@@ -457,11 +489,7 @@
 
         function toggleItemDropdown(idx, event) {
             event.stopPropagation();
-            if (activeDropdownIndex === idx) {
-                activeDropdownIndex = null;
-            } else {
-                activeDropdownIndex = idx;
-            }
+            activeDropdownIndex = (activeDropdownIndex === idx) ? null : idx;
             renderOrder();
         }
 
@@ -470,7 +498,6 @@
             if (!currentOrders[itemIndex]) return;
 
             currentOrders[itemIndex].qty += delta;
-
             if (currentOrders[itemIndex].qty <= 0) {
                 currentOrders.splice(itemIndex, 1);
             }
@@ -496,7 +523,7 @@
         function renderOrder() {
             var list = document.getElementById('order-list');
             list.innerHTML = '';
-            var total = 0;
+            var subtotal = 0;
             var currentOrders = state.orders[state.selectedKey] || [];
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
@@ -507,7 +534,7 @@
             } else {
                 currentOrders.forEach(function(order, idx) {
                     var itemSubtotal = order.price * order.qty;
-                    total += itemSubtotal;
+                    subtotal += itemSubtotal;
 
                     var isMenuOpen = (activeDropdownIndex === idx);
 
@@ -528,11 +555,15 @@
                 });
             }
 
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(subtotal * (feePct / 100));
+            var total = subtotal + feeAmount;
+
+            document.getElementById('calc-details').innerText = 'Taomlar: ' + subtotal.toLocaleString() + ' so\'m | Xizmat (' + feePct + '%): ' + feeAmount.toLocaleString() + ' so\'m';
             document.getElementById('total-price').innerText = total.toLocaleString();
             document.getElementById('order-title').innerText = title + ' buyurtmasi';
         }
 
-        // Tashqariga bosilganda ochiq turgan ⋮ popup menyusini yopish
         window.addEventListener('click', function() {
             if (activeDropdownIndex !== null) {
                 activeDropdownIndex = null;
@@ -547,24 +578,30 @@
                 return;
             }
 
-            var sum = 0, itemNames = [];
+            var subtotal = 0, itemNames = [];
             currentOrders.forEach(function(i) {
-                sum += (i.price * i.qty);
+                subtotal += (i.price * i.qty);
                 itemNames.push(i.name + ' (x' + i.qty + ')');
             });
+
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(subtotal * (feePct / 100));
+            var total = subtotal + feeAmount;
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var zone = curTbl ? curTbl.zone : '-';
             var num = curTbl ? curTbl.number : '-';
 
-            if (confirm(zone + ' ' + num + '-stol hisobi (' + sum.toLocaleString() + ' so\'m) yopilsinmi?')) {
+            if (confirm(zone + ' ' + num + '-stol hisobi (' + total.toLocaleString() + ' so\'m) yopilsinmi?')) {
                 var d = new Date();
                 state.history.unshift({
                     time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    date: d.toLocaleDateString(),
                     zone: zone,
                     tableNum: num,
-                    items: itemNames.join(', '),
-                    total: sum
+                    items: itemNames.join('; '),
+                    serviceFee: feeAmount,
+                    total: total
                 });
 
                 state.orders[state.selectedKey] = [];
@@ -584,12 +621,50 @@
             state.history.forEach(function(rec) {
                 totalRevenue += rec.total;
                 var tr = document.createElement('tr');
-                tr.innerHTML = '<td>' + rec.time + '</td><td>' + rec.zone + '</td><td>Stol ' + rec.tableNum + '</td><td>' + rec.items + '</td><td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
+                tr.innerHTML = '<td>' + rec.time + '</td>' +
+                               '<td>' + rec.zone + '</td>' +
+                               '<td>Stol ' + rec.tableNum + '</td>' +
+                               '<td>' + rec.items + '</td>' +
+                               '<td>' + (rec.serviceFee ? rec.serviceFee.toLocaleString() : '0') + ' so\'m</td>' +
+                               '<td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
                 tbody.appendChild(tr);
             });
 
             document.getElementById('stat-rev').innerText = totalRevenue.toLocaleString() + ' so\'m';
             document.getElementById('stat-cnt').innerText = state.history.length + ' ta';
+        }
+
+        // Excel (CSV) fayl qilib yuklab olish
+        function exportHistoryToCSV() {
+            if (state.history.length === 0) {
+                alert("Hozircha yopilgan hisoblar yo'q!");
+                return;
+            }
+
+            var csvContent = "\uFEFF"; // UTF-8 BOM o'zbek harflari buzulmasligi uchun
+            csvContent += "Sana va Vaqt,Zona,Stol,Buyurtma taomlari,Xizmat haqi (so'm),Jami summa (so'm)\n";
+
+            state.history.forEach(function(r) {
+                var row = [
+                    '"' + (r.date || '') + ' ' + r.time + '"',
+                    '"' + r.zone + '"',
+                    '"Stol ' + r.tableNum + '"',
+                    '"' + r.items.replace(/"/g, '""') + '"',
+                    r.serviceFee || 0,
+                    r.total
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement("a");
+            var today = new Date().toISOString().slice(0, 10);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "RestaurantOS_Kassa_" + today + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function printReceipt() {
@@ -606,15 +681,22 @@
             document.getElementById('rc-table').innerText = title;
             var rcBox = document.getElementById('rc-items');
             rcBox.innerHTML = '';
-            var sum = 0;
+            var subtotal = 0;
 
             currentOrders.forEach(function(item) {
                 var itemTotal = item.price * item.qty;
                 rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
-                sum += itemTotal;
+                subtotal += itemTotal;
             });
 
-            document.getElementById('rc-total').innerText = sum.toLocaleString();
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(subtotal * (feePct / 100));
+            var total = subtotal + feeAmount;
+
+            document.getElementById('rc-subtotal').innerText = subtotal.toLocaleString();
+            document.getElementById('rc-fee-pct').innerText = feePct;
+            document.getElementById('rc-service').innerText = feeAmount.toLocaleString();
+            document.getElementById('rc-total').innerText = total.toLocaleString();
             window.print();
         }
 
@@ -673,12 +755,14 @@
             menuModal.style.display = 'flex';
         };
         document.getElementById('btn-close-menu-modal').onclick = function() { menuModal.style.display = 'none'; };
+        window.onclick = function(e) { if (e.target === menuModal) menuModal.style.display = 'none'; };
 
         document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
         document.getElementById('btn-add-table').addEventListener('click', addNewTable);
         document.getElementById('btn-print').addEventListener('click', printReceipt);
         document.getElementById('btn-close-order').addEventListener('click', closeTableOrder);
         document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
+        document.getElementById('btn-export-csv').addEventListener('click', exportHistoryToCSV);
 
         loadStorage();
         renderZoneFilters();
