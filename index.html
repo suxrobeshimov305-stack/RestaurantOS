@@ -121,7 +121,6 @@
     </div>
 
     <script>
-        // Holat (State)
         var state = {
             selectedTable: 1,
             tableCount: 4,
@@ -130,11 +129,10 @@
                 { name: 'Shashlik', price: 18000 },
                 { name: 'Choy', price: 5000 }
             ],
-            orders: { 1: [], 2: [], 3: [], 4: [] },
+            orders: {},
             history: []
         };
 
-        // Xotiradan o'qish
         function loadStorage() {
             try {
                 var c = localStorage.getItem('ros_count');
@@ -158,7 +156,7 @@
                     if (Array.isArray(parsedH)) state.history = parsedH;
                 }
             } catch (e) {
-                console.error("Xotira yuklashda xato:", e);
+                console.error("Xotiradan o'qishda xato:", e);
             }
 
             for (var i = 1; i <= state.tableCount; i++) {
@@ -168,7 +166,6 @@
             }
         }
 
-        // Xotiraga saqlash
         function saveStorage() {
             try {
                 localStorage.setItem('ros_count', state.tableCount);
@@ -180,7 +177,6 @@
             }
         }
 
-        // Stollarni chizish
         function renderTables() {
             var container = document.getElementById('tables-container');
             container.innerHTML = '';
@@ -193,9 +189,9 @@
                 btn.className = 'table-btn ' + (isBusy ? 'busy' : 'free') + (i === state.selectedTable ? ' selected' : '');
                 btn.innerText = 'Stol ' + i + ' ' + (isBusy ? '(Band)' : '(Bo\'sh)');
 
-                btn.onclick = (function(tableNum) {
+                btn.onclick = (function(num) {
                     return function() {
-                        selectTable(tableNum);
+                        selectTable(num);
                     };
                 })(i);
 
@@ -203,12 +199,11 @@
             }
         }
 
-        // Menyuni chizish
         function renderMenu() {
             var container = document.getElementById('menu-container');
             container.innerHTML = '';
 
-            state.menu.forEach(function(item) {
+            state.menu.forEach(function(item, index) {
                 var div = document.createElement('div');
                 div.className = 'menu-item';
                 div.innerHTML = '<span>' + item.name + ' - ' + item.price.toLocaleString() + ' so\'m</span>';
@@ -216,8 +211,10 @@
                 var addBtn = document.createElement('button');
                 addBtn.className = 'add-btn';
                 addBtn.innerText = "Qo'shish";
+                
+                // Indeks orqali qo'shish - matnli xatoliklarni oldini oladi
                 addBtn.onclick = function() {
-                    addToOrder(item.name, item.price);
+                    addMenuItemByIndex(index);
                 };
 
                 div.appendChild(addBtn);
@@ -225,7 +222,24 @@
             });
         }
 
-        // Joriy stol buyurtmasini chizish
+        function addMenuItemByIndex(index) {
+            var item = state.menu[index];
+            if (!item) return;
+
+            if (!state.orders[state.selectedTable]) {
+                state.orders[state.selectedTable] = [];
+            }
+
+            state.orders[state.selectedTable].push({
+                name: item.name,
+                price: item.price
+            });
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
         function renderOrder() {
             var list = document.getElementById('order-list');
             list.innerHTML = '';
@@ -243,7 +257,6 @@
             document.getElementById('order-title').innerText = 'Stol ' + state.selectedTable + ' buyurtmasi';
         }
 
-        // Hisobotni chizish
         function renderReports() {
             var totalRevenue = 0;
             var tbody = document.getElementById('history-rows');
@@ -260,14 +273,12 @@
             document.getElementById('stat-cnt').innerText = state.history.length + ' ta';
         }
 
-        // Stol tanlash
         function selectTable(num) {
             state.selectedTable = num;
             renderTables();
             renderOrder();
         }
 
-        // Yangi stol qo'shish
         function addNewTable() {
             state.tableCount++;
             state.orders[state.tableCount] = [];
@@ -275,18 +286,6 @@
             selectTable(state.tableCount);
         }
 
-        // Taom qo'shish (buyurtmaga)
-        function addToOrder(name, price) {
-            if (!state.orders[state.selectedTable]) {
-                state.orders[state.selectedTable] = [];
-            }
-            state.orders[state.selectedTable].push({ name: name, price: price });
-            saveStorage();
-            renderTables();
-            renderOrder();
-        }
-
-        // Yangi menyu kiritish
         function addNewMenuItem() {
             var nameInput = document.getElementById('new-name');
             var priceInput = document.getElementById('new-price');
@@ -306,7 +305,6 @@
             priceInput.value = '';
         }
 
-        // Hisobni yopish
         function closeTableOrder() {
             var currentOrders = state.orders[state.selectedTable] || [];
             if (currentOrders.length === 0) {
@@ -338,7 +336,6 @@
             }
         }
 
-        // Stolni o'chirish
         function deleteCurrentTable() {
             if (state.tableCount <= 1) {
                 alert("Kamida 1 ta stol qolishi shart!");
@@ -373,7 +370,6 @@
             selectTable(1);
         }
 
-        // Chek chop etish
         function printReceipt() {
             var currentOrders = state.orders[state.selectedTable] || [];
             if (currentOrders.length === 0) {
@@ -396,14 +392,12 @@
             window.print();
         }
 
-        // Hodisalarni ulash (Event listeners)
         document.getElementById('btn-add-table').addEventListener('click', addNewTable);
         document.getElementById('btn-add-menu').addEventListener('click', addNewMenuItem);
         document.getElementById('btn-print').addEventListener('click', printReceipt);
         document.getElementById('btn-close-order').addEventListener('click', closeTableOrder);
         document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
 
-        // Boshlang'ich yuklash
         loadStorage();
         renderTables();
         renderMenu();
