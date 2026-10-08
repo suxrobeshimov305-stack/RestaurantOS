@@ -30,13 +30,55 @@
         .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .add-btn:hover { background: #2980b9; }
 
+        /* Ixcham buyurtma ro'yxati */
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
-        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #dcdde1; }
+        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border-bottom: 1px solid #dcdde1; position: relative; }
+        .order-item-row:last-child { border-bottom: none; }
         .order-item-info { flex: 1; }
-        .order-item-controls { display: flex; align-items: center; gap: 6px; }
-        .qty-btn { background: #fff; border: 1px solid #bdc3c7; border-radius: 4px; width: 26px; height: 26px; font-weight: bold; cursor: pointer; }
-        .qty-btn:hover { background: #dfe4ea; }
-        .del-item-btn { background: #e74c3c; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+        .order-item-info b { font-size: 15px; color: #2c3e50; }
+        .order-subtext { font-size: 12px; color: #57606f; margin-top: 2px; }
+
+        /* Nuqtacha tugmasi va popup menyusi */
+        .order-item-menu-btn {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: #747d8c;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .order-item-menu-btn:hover { background: #dfe4ea; color: #2f3542; }
+
+        .order-item-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 36px;
+            background: white;
+            border: 1px solid #ced6e0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 50;
+            overflow: hidden;
+            min-width: 130px;
+        }
+        .order-item-dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+            cursor: pointer;
+            color: #2f3542;
+        }
+        .order-item-dropdown button:hover { background: #f1f2f6; }
+        .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
+        .order-item-dropdown button.btn-del-action:hover { background: #ffeaa7; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
@@ -172,7 +214,7 @@
         </div>
     </div>
 
-    <!-- Chop etish cheki -->
+    <!-- Chek chop etish -->
     <div id="receipt-area">
         <center>
             <h3>RESTAURANT OS</h3>
@@ -189,6 +231,7 @@
     <script>
         var zones = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
         var currentZoneFilter = "Barchasi";
+        var activeDropdownIndex = null;
 
         var state = {
             selectedKey: "Asosiy zal-1",
@@ -315,6 +358,7 @@
 
         function selectTable(key) {
             state.selectedKey = key;
+            activeDropdownIndex = null;
             renderTables();
             renderOrder();
         }
@@ -411,6 +455,16 @@
             renderOrder();
         }
 
+        function toggleItemDropdown(idx, event) {
+            event.stopPropagation();
+            if (activeDropdownIndex === idx) {
+                activeDropdownIndex = null;
+            } else {
+                activeDropdownIndex = idx;
+            }
+            renderOrder();
+        }
+
         function changeOrderQty(itemIndex, delta) {
             var currentOrders = state.orders[state.selectedKey] || [];
             if (!currentOrders[itemIndex]) return;
@@ -421,6 +475,7 @@
                 currentOrders.splice(itemIndex, 1);
             }
 
+            activeDropdownIndex = null;
             saveStorage();
             renderTables();
             renderOrder();
@@ -431,6 +486,7 @@
             if (!currentOrders[itemIndex]) return;
 
             currentOrders.splice(itemIndex, 1);
+            activeDropdownIndex = null;
 
             saveStorage();
             renderTables();
@@ -447,24 +503,26 @@
             var title = curTbl ? curTbl.zone + ': Stol ' + curTbl.number : 'Stol';
 
             if (currentOrders.length === 0) {
-                list.innerHTML = '<p style="color:#7f8c8d; font-size:14px;">Hozircha buyurtma yo\'q</p>';
+                list.innerHTML = '<p style="color:#7f8c8d; font-size:14px; margin: 10px 0;">Hozircha buyurtma yo\'q</p>';
             } else {
                 currentOrders.forEach(function(order, idx) {
                     var itemSubtotal = order.price * order.qty;
                     total += itemSubtotal;
 
+                    var isMenuOpen = (activeDropdownIndex === idx);
+
                     var row = document.createElement('div');
                     row.className = 'order-item-row';
                     row.innerHTML = 
                         '<div class="order-item-info">' +
-                            '<b>' + order.name + '</b><br>' +
-                            '<span style="font-size:12px; color:#555;">' + order.price.toLocaleString() + ' x ' + order.qty + ' = ' + itemSubtotal.toLocaleString() + ' so\'m</span>' +
+                            '<b>' + order.name + ' <span style="color:#2980b9;">&times; ' + order.qty + '</span></b>' +
+                            '<div class="order-subtext">' + order.price.toLocaleString() + ' so\'mdan = ' + itemSubtotal.toLocaleString() + ' so\'m</div>' +
                         '</div>' +
-                        '<div class="order-item-controls">' +
-                            '<button class="qty-btn" onclick="changeOrderQty(' + idx + ', -1)">–</button>' +
-                            '<b>' + order.qty + '</b>' +
-                            '<button class="qty-btn" onclick="changeOrderQty(' + idx + ', 1)">+</button>' +
-                            '<button class="del-item-btn" onclick="removeOrderItem(' + idx + ')" title="O\'chirish">🗑</button>' +
+                        '<button class="order-item-menu-btn" onclick="toggleItemDropdown(' + idx + ', event)">⋮</button>' +
+                        '<div class="order-item-dropdown" style="display: ' + (isMenuOpen ? 'block' : 'none') + ';">' +
+                            '<button onclick="changeOrderQty(' + idx + ', 1)">➕ Bitta qo\'shish (+1)</button>' +
+                            '<button onclick="changeOrderQty(' + idx + ', -1)">➖ Bitta kamaytirish (-1)</button>' +
+                            '<button class="btn-del-action" onclick="removeOrderItem(' + idx + ')">🗑 Butunlay o\'chirish</button>' +
                         '</div>';
                     list.appendChild(row);
                 });
@@ -473,6 +531,14 @@
             document.getElementById('total-price').innerText = total.toLocaleString();
             document.getElementById('order-title').innerText = title + ' buyurtmasi';
         }
+
+        // Tashqariga bosilganda ochiq turgan ⋮ popup menyusini yopish
+        window.addEventListener('click', function() {
+            if (activeDropdownIndex !== null) {
+                activeDropdownIndex = null;
+                renderOrder();
+            }
+        });
 
         function closeTableOrder() {
             var currentOrders = state.orders[state.selectedKey] || [];
@@ -502,6 +568,7 @@
                 });
 
                 state.orders[state.selectedKey] = [];
+                activeDropdownIndex = null;
                 saveStorage();
                 renderTables();
                 renderOrder();
@@ -606,7 +673,6 @@
             menuModal.style.display = 'flex';
         };
         document.getElementById('btn-close-menu-modal').onclick = function() { menuModal.style.display = 'none'; };
-        window.onclick = function(e) { if (e.target === menuModal) menuModal.style.display = 'none'; };
 
         document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
         document.getElementById('btn-add-table').addEventListener('click', addNewTable);
