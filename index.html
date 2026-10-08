@@ -16,7 +16,10 @@
         .busy { background-color: #e74c3c; }
         .selected { border-color: #f39c12 !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.8); }
         .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee; }
-        .add-btn { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .menu-actions { display: flex; gap: 5px; }
+        .add-btn { background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .edit-btn { background: #f39c12; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .del-menu-btn { background: #e74c3c; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
@@ -206,18 +209,42 @@
             state.menu.forEach(function(item, index) {
                 var div = document.createElement('div');
                 div.className = 'menu-item';
-                div.innerHTML = '<span>' + item.name + ' - ' + item.price.toLocaleString() + ' so\'m</span>';
+                div.innerHTML = '<span><b>' + item.name + '</b> - ' + item.price.toLocaleString() + ' so\'m</span>';
 
+                var actions = document.createElement('div');
+                actions.className = 'menu-actions';
+
+                // Buyurtmaga qo'shish tugmasi
                 var addBtn = document.createElement('button');
                 addBtn.className = 'add-btn';
-                addBtn.innerText = "Qo'shish";
-                
-                // Indeks orqali qo'shish - matnli xatoliklarni oldini oladi
+                addBtn.innerText = "+";
+                addBtn.title = "Buyurtmaga qo'shish";
                 addBtn.onclick = function() {
                     addMenuItemByIndex(index);
                 };
 
-                div.appendChild(addBtn);
+                // Tahrirlash tugmasi
+                var editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.innerText = "✏️";
+                editBtn.title = "Nomini yoki narxini tahrirlash";
+                editBtn.onclick = function() {
+                    editMenuItem(index);
+                };
+
+                // Menyudan o'chirish tugmasi
+                var delBtn = document.createElement('button');
+                delBtn.className = 'del-menu-btn';
+                delBtn.innerText = "🗑";
+                delBtn.title = "Menyudan butunlay o'chirish";
+                delBtn.onclick = function() {
+                    deleteMenuItem(index);
+                };
+
+                actions.appendChild(addBtn);
+                actions.appendChild(editBtn);
+                actions.appendChild(delBtn);
+                div.appendChild(actions);
                 container.appendChild(div);
             });
         }
@@ -238,6 +265,46 @@
             saveStorage();
             renderTables();
             renderOrder();
+        }
+
+        // Taom nomini va narxini tahrirlash funksiyasi
+        function editMenuItem(index) {
+            var item = state.menu[index];
+            if (!item) return;
+
+            var newName = prompt("Taomning yangi nomini kiriting:", item.name);
+            if (newName === null) return;
+            newName = newName.trim();
+            if (!newName) {
+                alert("Taom nomi bo'sh bo'lishi mumkin emas!");
+                return;
+            }
+
+            var newPriceStr = prompt("Taom narxini kiriting (so'm):", item.price);
+            if (newPriceStr === null) return;
+            var newPrice = parseInt(newPriceStr);
+            if (isNaN(newPrice) || newPrice <= 0) {
+                alert("Narx noto'g'ri kiritildi!");
+                return;
+            }
+
+            state.menu[index].name = newName;
+            state.menu[index].price = newPrice;
+
+            saveStorage();
+            renderMenu();
+        }
+
+        // Taomni menyudan o'chirish funksiyasi
+        function deleteMenuItem(index) {
+            var item = state.menu[index];
+            if (!item) return;
+
+            if (confirm('"' + item.name + '" taomini menyudan o\'chirmoqchimisiz?')) {
+                state.menu.splice(index, 1);
+                saveStorage();
+                renderMenu();
+            }
         }
 
         function renderOrder() {
