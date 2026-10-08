@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Zallar, Kassa va KDS Oshxona</title>
+    <title>RestaurantOS - Ofitsiantlar, KDS va Kassa Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -30,7 +30,6 @@
         .busy { background-color: #e74c3c; }
         .selected { border-color: #f39c12 !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.8); }
 
-        /* Taom tayyor bo'lganda miltillovchi animatsiya */
         @keyframes pulse-ready {
             0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.9); border-color: #2ecc71; }
             70% { box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); border-color: #27ae60; }
@@ -59,12 +58,14 @@
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
 
-        .service-fee-panel { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; }
+        .service-fee-panel { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .service-fee-panel select { padding: 4px 8px; border-radius: 4px; border: 1px solid #bdc3c7; }
         .calc-details { margin-top: 8px; font-size: 13px; color: #555; }
         .total-display { font-size: 18px; margin-top: 6px; color: #2c3e50; }
 
-        .btn-group { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .btn-ready-serve { display: none; width: 100%; background: #2ecc71; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; animation: pulse-ready 1.2s infinite; }
+
+        .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
         .kitchen-btn { background: #16a085; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; min-width: 130px; }
         .print-btn { background: #2980b9; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
         .close-btn { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; }
@@ -100,33 +101,10 @@
         .btn-kds-ready { background: #27ae60; }
         .btn-kds-done { background: #7f8c8d; }
 
-        /* Toast ogohlantirish (Notification) */
-        #notification-box {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-        .toast-msg {
-            background: #2c3e50;
-            color: white;
-            padding: 14px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-            border-left: 5px solid #2ecc71;
-            font-size: 14px;
-            pointer-events: auto;
-            animation: slideIn 0.3s ease-out;
-            max-width: 320px;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        /* Toast ogohlantirish */
+        #notification-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-msg { background: #2c3e50; color: white; padding: 14px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border-left: 5px solid #2ecc71; font-size: 14px; pointer-events: auto; animation: slideIn 0.3s ease-out; max-width: 320px; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* Modallar */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
@@ -156,13 +134,12 @@
 </head>
 <body>
 
-    <!-- Xabarnomalar uchun konteyner -->
     <div id="notification-box"></div>
 
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Kassa va Oshxona Tizimi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Ofitsiant, Kassa va Oshxona Tizimi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -208,17 +185,29 @@
                     <h3>Joriy hisob:</h3>
                     <div id="order-list"></div>
 
+                    <!-- Ofitsiant va xizmat haqi tanlovi -->
                     <div class="service-fee-panel">
-                        <span>Xizmat haqi:</span>
-                        <select id="service-fee-rate" onchange="updateServiceFee()">
-                            <option value="0">0%</option>
-                            <option value="10" selected>10%</option>
-                            <option value="15">15%</option>
-                            <option value="20">20%</option>
-                        </select>
+                        <div>
+                            <span>Ofitsiant: </span>
+                            <select id="waiter-select" onchange="updateWaiterSelection()"></select>
+                            <button onclick="addNewWaiterPrompt()" style="padding:2px 6px; font-size:12px; cursor:pointer;" title="Yangi ofitsiant qo'shish">+</button>
+                        </div>
+                        <div>
+                            <span>Xizmat haqi: </span>
+                            <select id="service-fee-rate" onchange="updateServiceFee()">
+                                <option value="0">0%</option>
+                                <option value="10" selected>10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20%</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div class="calc-details" id="calc-details">Taomlar: 0 so'm | Xizmat: 0 so'm</div>
                     <div class="total-display"><b>Jami: <span id="total-price" style="color:#27ae60;">0</span> so'm</b></div>
+
+                    <!-- Tayyor taomni zalda qabul qilish tugmasi -->
+                    <button class="btn-ready-serve" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taomni oshxonadan oldim (Mijozga topshirildi)</button>
 
                     <div class="btn-group">
                         <button class="kitchen-btn" id="btn-send-kitchen" type="button">👨‍🍳 Oshxonaga yuborish</button>
@@ -229,9 +218,10 @@
                 </div>
             </div>
 
+            <!-- Kassa hisoboti va Ofitsiantlar tahlili -->
             <div class="card full-width">
                 <div class="card-header">
-                    <h2>Kunlik Kassa Hisoboti</h2>
+                    <h2>Kunlik Kassa va Ofitsiantlar Hisoboti</h2>
                     <button class="btn-export-excel" id="btn-export-csv">📥 Excel (CSV) yuklab olish</button>
                 </div>
                 <div class="stats-grid">
@@ -252,9 +242,15 @@
                         <div class="val" id="stat-payme">0 so'm</div>
                     </div>
                 </div>
+
+                <div style="margin-top:20px;">
+                    <h3 style="margin-bottom:8px; font-size:15px; color:#2c3e50;">Ofitsiantlar bo'yicha ko'rsatkichlar:</h3>
+                    <div id="waiter-summary-boxes" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+                </div>
+
                 <table class="history-table">
                     <thead>
-                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
+                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Ofitsiant</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
                     </thead>
                     <tbody id="history-rows"></tbody>
                 </table>
@@ -317,6 +313,7 @@
             <p>To'lov Cheki</p>
             <p id="rc-date"></p>
             <p><b id="rc-table"></b></p>
+            <p style="font-size:12px;">Ofitsiant: <span id="rc-waiter"></span></p>
             <hr>
         </center>
         <div id="rc-items"></div>
@@ -333,6 +330,8 @@
 
         var state = {
             selectedKey: "Asosiy zal-1",
+            waiters: ["Aliyor", "Jasur", "Malika"],
+            tableWaiters: {},
             tables: [
                 { key: "Asosiy zal-1", zone: "Asosiy zal", number: 1 },
                 { key: "Asosiy zal-2", zone: "Asosiy zal", number: 2 },
@@ -358,27 +357,23 @@
             history: []
         };
 
-        // Ovozli signal (Ding ovozi)
         function playAlertSound() {
             try {
                 var ctx = new (window.AudioContext || window.webkitAudioContext)();
                 var osc = ctx.createOscillator();
                 var gain = ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
                 gain.gain.setValueAtTime(0.2, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.6);
-            } catch (e) {
-                console.log("Audio ruxsati berilmagan:", e);
-            }
+            } catch (e) {}
         }
 
-        // Qalqib chiquvchi xabar (Toast)
         function showNotification(text) {
             playAlertSound();
             var box = document.getElementById('notification-box');
@@ -409,10 +404,16 @@
                 var sf = localStorage.getItem('ros_service_fees');
                 if (sf) { var pSF = JSON.parse(sf); if (pSF && typeof pSF === 'object') state.serviceFees = pSF; }
 
+                var w = localStorage.getItem('ros_waiters_list');
+                if (w) { var pW = JSON.parse(w); if (Array.isArray(pW) && pW.length > 0) state.waiters = pW; }
+
+                var tw = localStorage.getItem('ros_table_waiters');
+                if (tw) { var pTW = JSON.parse(tw); if (pTW && typeof pTW === 'object') state.tableWaiters = pTW; }
+
                 var k = localStorage.getItem('ros_kds_v1');
                 if (k) { var pK = JSON.parse(k); if (Array.isArray(pK)) state.kdsTickets = pK; }
 
-                var h = localStorage.getItem('ros_history_v5');
+                var h = localStorage.getItem('ros_history_v6');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
                 console.error("Xotira yuklashda xato:", e);
@@ -421,6 +422,7 @@
             state.tables.forEach(function(tbl) {
                 if (!Array.isArray(state.orders[tbl.key])) state.orders[tbl.key] = [];
                 if (state.serviceFees[tbl.key] === undefined) state.serviceFees[tbl.key] = 10;
+                if (!state.tableWaiters[tbl.key]) state.tableWaiters[tbl.key] = state.waiters[0] || 'Ofitsiant';
             });
 
             if (state.tables.length > 0) state.selectedKey = state.tables[0].key;
@@ -432,8 +434,10 @@
                 localStorage.setItem('ros_menu', JSON.stringify(state.menu));
                 localStorage.setItem('ros_orders_v4', JSON.stringify(state.orders));
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
+                localStorage.setItem('ros_waiters_list', JSON.stringify(state.waiters));
+                localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
                 localStorage.setItem('ros_kds_v1', JSON.stringify(state.kdsTickets));
-                localStorage.setItem('ros_history_v5', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v6', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
             }
@@ -481,6 +485,38 @@
             }
         }
 
+        function renderWaitersSelect() {
+            var sel = document.getElementById('waiter-select');
+            sel.innerHTML = '';
+            state.waiters.forEach(function(w) {
+                var opt = document.createElement('option');
+                opt.value = w;
+                opt.innerText = w;
+                sel.appendChild(opt);
+            });
+            var currentW = state.tableWaiters[state.selectedKey] || state.waiters[0];
+            sel.value = currentW;
+        }
+
+        function updateWaiterSelection() {
+            var sel = document.getElementById('waiter-select');
+            state.tableWaiters[state.selectedKey] = sel.value;
+            saveStorage();
+            renderOrder();
+        }
+
+        function addNewWaiterPrompt() {
+            var name = prompt("Yangi ofitsiant ismini kiriting:");
+            if (!name) return;
+            name = name.trim();
+            if (state.waiters.includes(name)) return alert("Bu ofitsiant allaqachon mavjud!");
+            state.waiters.push(name);
+            state.tableWaiters[state.selectedKey] = name;
+            saveStorage();
+            renderWaitersSelect();
+            renderOrder();
+        }
+
         function renderZoneFilters() {
             var bar = document.getElementById('zone-filter-bar');
             bar.innerHTML = '';
@@ -515,16 +551,16 @@
                 var orders = state.orders[tbl.key] || [];
                 var isBusy = orders.length > 0;
 
-                // Ushbu stolning taomi oshxonada TAYYOR holatdami?
                 var isReady = state.kdsTickets.some(function(t) {
                     return t.tableKey === tbl.key && t.status === 'ready';
                 });
 
                 var statusText = isReady ? '🔔 TAYYOR!' : (isBusy ? '(Band)' : '(Bo\'sh)');
                 var baseClass = isReady ? 'table-ready-alert' : (isBusy ? 'busy' : 'free');
+                var waiterName = state.tableWaiters[tbl.key] ? ' <span style="font-size:11px;opacity:0.85;">[' + state.tableWaiters[tbl.key] + ']</span>' : '';
 
                 btn.className = 'table-btn ' + baseClass + (tbl.key === state.selectedKey ? ' selected' : '');
-                btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b> ' + statusText;
+                btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b> ' + statusText + '<br>' + waiterName;
                 btn.onclick = function() { selectTable(tbl.key); };
                 container.appendChild(btn);
             });
@@ -535,6 +571,7 @@
             activeDropdownIndex = null;
             var fee = state.serviceFees[key] !== undefined ? state.serviceFees[key] : 10;
             document.getElementById('service-fee-rate').value = fee;
+            renderWaitersSelect();
             renderTables();
             renderOrder();
         }
@@ -558,6 +595,7 @@
             state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
             state.orders[newKey] = [];
             state.serviceFees[newKey] = 10;
+            state.tableWaiters[newKey] = state.waiters[0] || 'Ofitsiant';
 
             saveStorage();
             selectTable(newKey);
@@ -579,6 +617,7 @@
             state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
             delete state.orders[state.selectedKey];
             delete state.serviceFees[state.selectedKey];
+            delete state.tableWaiters[state.selectedKey];
 
             state.selectedKey = state.tables[0].key;
             saveStorage();
@@ -672,13 +711,23 @@
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var title = curTbl ? curTbl.zone + ': Stol ' + curTbl.number : 'Stol';
 
-            // Oshxona holati haqida belgi
             var kdsItem = state.kdsTickets.find(function(t) { return t.tableKey === state.selectedKey && t.status !== 'done'; });
             var kdsStatusBadge = '';
+            var serveBtn = document.getElementById('btn-serve-order');
+
             if (kdsItem) {
-                if (kdsItem.status === 'waiting') kdsStatusBadge = ' <small style="color:#f39c12;">[Oshxonada: Kutilmoqda]</small>';
-                else if (kdsItem.status === 'cooking') kdsStatusBadge = ' <small style="color:#3498db;">[Oshxonada: Pishirilmoqda]</small>';
-                else if (kdsItem.status === 'ready') kdsStatusBadge = ' <small style="color:#27ae60; font-weight:bold;">[🔔 TAYYOR BO\'LDI! Olib keting]</small>';
+                if (kdsItem.status === 'waiting') {
+                    kdsStatusBadge = ' <small style="color:#f39c12;">[Oshxonada: Kutilmoqda]</small>';
+                    serveBtn.style.display = 'none';
+                } else if (kdsItem.status === 'cooking') {
+                    kdsStatusBadge = ' <small style="color:#3498db;">[Oshxonada: Pishirilmoqda]</small>';
+                    serveBtn.style.display = 'none';
+                } else if (kdsItem.status === 'ready') {
+                    kdsStatusBadge = ' <small style="color:#27ae60; font-weight:bold;">[🔔 TAYYOR! Olib keting]</small>';
+                    serveBtn.style.display = 'block'; // Zalda "Topshirildi" tugmasi chiqadi
+                }
+            } else {
+                serveBtn.style.display = 'none';
             }
 
             if (calc.orders.length === 0) {
@@ -710,6 +759,20 @@
             document.getElementById('order-title').innerHTML = title + ' buyurtmasi' + kdsStatusBadge;
         }
 
+        // Ofitsiant taomni oshxonadan olganda bosadigan amal
+        function serveOrderToGuests() {
+            var curTicket = state.kdsTickets.find(function(t) { return t.tableKey === state.selectedKey && t.status === 'ready'; });
+            if (curTicket) {
+                curTicket.status = 'done';
+                saveStorage();
+                updateBadges();
+                renderTables();
+                renderOrder();
+                if (document.getElementById('view-kds').style.display === 'block') renderKDS();
+                alert("Taom topshirildi deb belgilandi. Stol odatiy band holatiga qaytdi.");
+            }
+        }
+
         window.addEventListener('click', function() {
             if (activeDropdownIndex !== null) {
                 activeDropdownIndex = null;
@@ -725,10 +788,10 @@
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var zone = curTbl ? curTbl.zone : '-';
             var num = curTbl ? curTbl.number : '-';
+            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
 
             var d = new Date();
             var timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
             var itemsCopy = JSON.parse(JSON.stringify(curOrders));
 
             state.kdsTickets.unshift({
@@ -736,6 +799,7 @@
                 tableKey: state.selectedKey,
                 zone: zone,
                 tableNum: num,
+                waiter: waiter,
                 time: timeStr,
                 items: itemsCopy,
                 status: 'waiting'
@@ -774,7 +838,7 @@
                 if (ticket.status === 'waiting') {
                     actionsHtml = '<button class="kds-btn btn-kds-cook" onclick="changeKdsStatus(' + ticket.id + ', \'cooking\')">Pishirishni boshlash</button>';
                 } else if (ticket.status === 'cooking') {
-                    actionsHtml = '<button class="kds-btn btn-kds-ready" onclick="changeKdsStatus(' + ticket.id + ', \'ready\')">Tayyor bo\'ldi (Ofitsiantni chaqirish)</button>';
+                    actionsHtml = '<button class="kds-btn btn-kds-ready" onclick="changeKdsStatus(' + ticket.id + ', \'ready\')">Tayyor bo\'ldi (Ofitsiantga bildirish)</button>';
                 } else {
                     actionsHtml = '<button class="kds-btn btn-kds-done" onclick="changeKdsStatus(' + ticket.id + ', \'done\')">Ofitsiant olib ketdi (Yopish)</button>';
                 }
@@ -782,7 +846,7 @@
                 card.innerHTML = 
                     '<div>' +
                         '<div class="kds-header">' +
-                            '<div><b>' + ticket.zone + ' | Stol ' + ticket.tableNum + '</b><br><small style="color:#555;">' + statusText + '</small></div>' +
+                            '<div><b>' + ticket.zone + ' | Stol ' + ticket.tableNum + '</b><br><small style="color:#555;">' + statusText + ' (' + (ticket.waiter || 'Ofitsiant') + ')</small></div>' +
                             '<span class="kds-time">🕒 ' + ticket.time + '</span>' +
                         '</div>' +
                         '<ul class="kds-items">' + itemsHtml + '</ul>' +
@@ -801,10 +865,10 @@
                 updateBadges();
                 renderKDS();
                 renderTables();
+                renderOrder();
 
-                // Agar taom "Tayyor bo'ldi" holatiga o'tsa -> Ofitsiantga signal berish!
                 if (newStatus === 'ready') {
-                    showNotification(ticket.zone + ' - Stol #' + ticket.tableNum + ' taomlari tayyor bo\'ldi! Olib ketishingiz mumkin.');
+                    showNotification(ticket.zone + ' - Stol #' + ticket.tableNum + ' (' + (ticket.waiter || '') + ') taomlari tayyor bo\'ldi!');
                 }
             }
         }
@@ -827,6 +891,7 @@
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var zone = curTbl ? curTbl.zone : '-';
             var num = curTbl ? curTbl.number : '-';
+            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
 
             var d = new Date();
             state.history.unshift({
@@ -834,13 +899,13 @@
                 date: d.toLocaleDateString(),
                 zone: zone,
                 tableNum: num,
+                waiter: waiter,
                 items: itemNames.join('; '),
                 method: method,
                 serviceFee: calc.feeAmount,
                 total: calc.total
             });
 
-            // Stol hisobi yopilganda ushbu stolning KDS chiptalari ham avtomatik yopiladi
             state.kdsTickets.forEach(function(t) {
                 if (t.tableKey === state.selectedKey) t.status = 'done';
             });
@@ -858,6 +923,8 @@
 
         function renderReports() {
             var tot = 0, cash = 0, card = 0, payme = 0;
+            var waiterStats = {};
+
             var tbody = document.getElementById('history-rows');
             tbody.innerHTML = '';
 
@@ -867,12 +934,19 @@
                 else if (rec.method === 'Karta (Terminal)') card += rec.total;
                 else payme += rec.total;
 
+                var w = rec.waiter || 'Noma\'lum';
+                if (!waiterStats[w]) waiterStats[w] = { total: 0, fee: 0, count: 0 };
+                waiterStats[w].total += rec.total;
+                waiterStats[w].fee += (rec.serviceFee || 0);
+                waiterStats[w].count++;
+
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td>' + rec.time + '</td>' +
                                '<td>' + rec.zone + '</td>' +
                                '<td>Stol ' + rec.tableNum + '</td>' +
+                               '<td><b>' + w + '</b></td>' +
                                '<td>' + rec.items + '</td>' +
-                               '<td><b>' + (rec.method || 'Naqd') + '</b></td>' +
+                               '<td>' + (rec.method || 'Naqd') + '</td>' +
                                '<td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
                 tbody.appendChild(tr);
             });
@@ -881,19 +955,33 @@
             document.getElementById('stat-cash').innerText = cash.toLocaleString() + ' so\'m';
             document.getElementById('stat-card').innerText = card.toLocaleString() + ' so\'m';
             document.getElementById('stat-payme').innerText = payme.toLocaleString() + ' so\'m';
+
+            // Ofitsiantlar tahlili qutilari
+            var wBox = document.getElementById('waiter-summary-boxes');
+            wBox.innerHTML = '';
+            for (var waiter in waiterStats) {
+                var div = document.createElement('div');
+                div.style.cssText = "background:#fff; border:1px solid #ddd; padding:10px 14px; border-radius:6px; min-width:180px; font-size:13px;";
+                div.innerHTML = '<b>👤 ' + waiter + '</b><br>' +
+                                '<span style="color:#555;">Stollar soni: ' + waiterStats[waiter].count + ' ta</span><br>' +
+                                '<span style="color:#27ae60; font-weight:bold;">Tushum: ' + waiterStats[waiter].total.toLocaleString() + ' so\'m</span><br>' +
+                                '<small style="color:#e67e22;">Xizmat ulushi: ' + waiterStats[waiter].fee.toLocaleString() + ' so\'m</small>';
+                wBox.appendChild(div);
+            }
         }
 
         function exportHistoryToCSV() {
             if (state.history.length === 0) return alert("Hozircha yopilgan hisoblar yo'q!");
 
             var csvContent = "\uFEFF";
-            csvContent += "Sana va Vaqt,Zona,Stol,Buyurtma taomlari,To'lov turi,Xizmat haqi (so'm),Jami summa (so'm)\n";
+            csvContent += "Sana va Vaqt,Zona,Stol,Ofitsiant,Buyurtma taomlari,To'lov turi,Xizmat haqi (so'm),Jami summa (so'm)\n";
 
             state.history.forEach(function(r) {
                 var row = [
                     '"' + (r.date || '') + ' ' + r.time + '"',
                     '"' + r.zone + '"',
                     '"Stol ' + r.tableNum + '"',
+                    '"' + (r.waiter || 'Ofitsiant') + '"',
                     '"' + r.items.replace(/"/g, '""') + '"',
                     '"' + (r.method || 'Naqd') + '"',
                     r.serviceFee || 0,
@@ -922,6 +1010,7 @@
 
             document.getElementById('rc-date').innerText = new Date().toLocaleString();
             document.getElementById('rc-table').innerText = title;
+            document.getElementById('rc-waiter').innerText = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
             var rcBox = document.getElementById('rc-items');
             rcBox.innerHTML = '';
 
@@ -1009,6 +1098,7 @@
         renderZoneFilters();
         renderTables();
         renderMenu();
+        renderWaitersSelect();
         renderOrder();
         renderReports();
         updateBadges();
