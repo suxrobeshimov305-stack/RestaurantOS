@@ -16,14 +16,12 @@
         .btn-settings { background: transparent; border: 1px solid #bdc3c7; border-radius: 6px; padding: 4px 10px; font-size: 20px; cursor: pointer; color: #2c3e50; line-height: 1; }
         .btn-settings:hover { background: #ecf0f1; }
 
-        /* Zonalar filtri stillari */
         .zone-filter-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #eee; }
         .zone-btn { background: #e0e0e0; color: #333; border: none; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; transition: 0.2s; }
         .zone-btn.active { background: #2c3e50; color: white; }
 
         .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
         .table-btn { padding: 14px 10px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 14px; text-align: center; }
-        .table-btn small { display: block; font-size: 11px; font-weight: normal; margin-top: 4px; opacity: 0.9; }
         .free { background-color: #27ae60; }
         .busy { background-color: #e74c3c; }
         .selected { border-color: #f39c12 !important; box-shadow: 0 0 10px rgba(243, 156, 18, 0.8); }
@@ -50,7 +48,6 @@
         .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
         .history-table th { background: #f1f2f6; }
 
-        /* Modal oynalar */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 500px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
@@ -84,13 +81,8 @@
         <!-- 1. Stollar moduli -->
         <div class="card">
             <h2>Stollar (Tanlang)</h2>
-            
-            <!-- Zonalar filtri -->
             <div class="zone-filter-bar" id="zone-filter-bar"></div>
-
             <div class="tables-grid" id="tables-container"></div>
-            
-            <!-- Yangi stol qo'shish -->
             <div class="add-form">
                 <select id="new-table-zone">
                     <option value="Asosiy zal">Asosiy zal</option>
@@ -111,7 +103,7 @@
             <div id="menu-container"></div>
         </div>
 
-        <!-- 3. Tanlangan stol buyurtmasi -->
+        <!-- 3. Tanlangan stol hisobi -->
         <div class="card">
             <h2 id="order-title">Stol buyurtmasi</h2>
             <div class="order-box">
@@ -122,4 +114,453 @@
                     <button class="print-btn" id="btn-print" type="button">Chek chiqarish</button>
                     <button class="close-btn" id="btn-close-order" type="button">Hisobni yopish</button>
                 </div>
-                <button class="delete-btn" id="btn-delete-table" type="button">🗑 Ushbu stolni o'ch
+                <button class="delete-btn" id="btn-delete-table" type="button">🗑 Ushbu stolni o'chirish</button>
+            </div>
+        </div>
+
+        <!-- 4. Kunlik Hisobot -->
+        <div class="card full-width">
+            <h2>Kunlik Kassa Hisoboti</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h4>BUGUNGI TUSHUM</h4>
+                    <div class="val" id="stat-rev">0 so'm</div>
+                </div>
+                <div class="stat-box" style="border-color:#3498db;">
+                    <h4>YOPILGAN CHEKLAR</h4>
+                    <div class="val" id="stat-cnt">0 ta</div>
+                </div>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Taomlar</th><th>Summa</th></tr>
+                </thead>
+                <tbody id="history-rows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Menyu modal oynasi -->
+    <div class="modal-overlay" id="menu-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Menyuni Boshqarish</h3>
+                <button class="close-modal-btn" id="btn-close-menu-modal">&times;</button>
+            </div>
+            <table class="manage-table">
+                <thead>
+                    <tr>
+                        <th>Taom nomi</th>
+                        <th>Narxi</th>
+                        <th style="text-align: right;">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody id="manage-menu-rows"></tbody>
+            </table>
+            <div class="modal-add-box">
+                <input type="text" id="modal-new-name" placeholder="Yangi taom nomi">
+                <input type="number" id="modal-new-price" placeholder="Narxi (so'm)">
+                <button id="modal-btn-add" type="button">+ Qo'shish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chek chop etish -->
+    <div id="receipt-area">
+        <center>
+            <h3>RESTAURANT OS</h3>
+            <p>To'lov Cheki</p>
+            <p id="rc-date"></p>
+            <p><b id="rc-table"></b></p>
+            <hr>
+        </center>
+        <div id="rc-items"></div>
+        <hr>
+        <h4>JAMI: <span id="rc-total">0</span> so'm</h4>
+    </div>
+
+    <script>
+        var zones = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
+        var currentZoneFilter = "Barchasi";
+
+        var state = {
+            selectedKey: "Asosiy zal-1",
+            tables: [
+                { key: "Asosiy zal-1", zone: "Asosiy zal", number: 1 },
+                { key: "Asosiy zal-2", zone: "Asosiy zal", number: 2 },
+                { key: "Asosiy zal-3", zone: "Asosiy zal", number: 3 },
+                { key: "Asosiy zal-4", zone: "Asosiy zal", number: 4 },
+                { key: "Hovli (Leto)-1", zone: "Hovli (Leto)", number: 1 },
+                { key: "Hovli (Leto)-2", zone: "Hovli (Leto)", number: 2 },
+                { key: "Hovli (Leto)-3", zone: "Hovli (Leto)", number: 3 },
+                { key: "Hovli (Leto)-4", zone: "Hovli (Leto)", number: 4 },
+                { key: "Banket zali-1", zone: "Banket zali", number: 1 },
+                { key: "Banket zali-2", zone: "Banket zali", number: 2 },
+                { key: "VIP xona-1", zone: "VIP xona", number: 1 }
+            ],
+            menu: [
+                { name: 'Osh', price: 35000 },
+                { name: 'Shashlik', price: 18000 },
+                { name: 'Choy', price: 5000 },
+                { name: "Sho'rva", price: 30000 }
+            ],
+            orders: {},
+            history: []
+        };
+
+        function loadStorage() {
+            try {
+                var t = localStorage.getItem('ros_tables_v3');
+                if (t) {
+                    var parsedT = JSON.parse(t);
+                    if (Array.isArray(parsedT) && parsedT.length > 0) state.tables = parsedT;
+                }
+
+                var m = localStorage.getItem('ros_menu');
+                if (m) {
+                    var parsedM = JSON.parse(m);
+                    if (Array.isArray(parsedM) && parsedM.length > 0) state.menu = parsedM;
+                }
+
+                var o = localStorage.getItem('ros_orders_v3');
+                if (o) {
+                    var parsedO = JSON.parse(o);
+                    if (parsedO && typeof parsedO === 'object') state.orders = parsedO;
+                }
+
+                var h = localStorage.getItem('ros_history_v3');
+                if (h) {
+                    var parsedH = JSON.parse(h);
+                    if (Array.isArray(parsedH)) state.history = parsedH;
+                }
+            } catch (e) {
+                console.error("Xotira yuklashda xato:", e);
+            }
+
+            state.tables.forEach(function(tbl) {
+                if (!Array.isArray(state.orders[tbl.key])) {
+                    state.orders[tbl.key] = [];
+                }
+            });
+
+            if (state.tables.length > 0) {
+                state.selectedKey = state.tables[0].key;
+            }
+        }
+
+        function saveStorage() {
+            try {
+                localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
+                localStorage.setItem('ros_menu', JSON.stringify(state.menu));
+                localStorage.setItem('ros_orders_v3', JSON.stringify(state.orders));
+                localStorage.setItem('ros_history_v3', JSON.stringify(state.history));
+            } catch (e) {
+                console.error("Xotiraga saqlashda xato:", e);
+            }
+        }
+
+        function renderZoneFilters() {
+            var bar = document.getElementById('zone-filter-bar');
+            bar.innerHTML = '';
+
+            zones.forEach(function(zone) {
+                var btn = document.createElement('button');
+                btn.className = 'zone-btn' + (zone === currentZoneFilter ? ' active' : '');
+                btn.innerText = zone;
+                btn.onclick = function() {
+                    currentZoneFilter = zone;
+                    renderZoneFilters();
+                    renderTables();
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        function renderTables() {
+            var container = document.getElementById('tables-container');
+            container.innerHTML = '';
+
+            var filteredTables = state.tables.filter(function(tbl) {
+                if (currentZoneFilter === "Barchasi") return true;
+                return tbl.zone === currentZoneFilter;
+            });
+
+            if (filteredTables.length === 0) {
+                container.innerHTML = '<p style="color:#7f8c8d; grid-column: span 2; text-align:center;">Ushbu zonada stollar yo\'q.</p>';
+                return;
+            }
+
+            filteredTables.forEach(function(tbl) {
+                var btn = document.createElement('button');
+                var orders = state.orders[tbl.key] || [];
+                var isBusy = orders.length > 0;
+
+                btn.className = 'table-btn ' + (isBusy ? 'busy' : 'free') + (tbl.key === state.selectedKey ? ' selected' : '');
+                btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b> ' + (isBusy ? '(Band)' : '(Bo\'sh)');
+
+                btn.onclick = function() {
+                    selectTable(tbl.key);
+                };
+
+                container.appendChild(btn);
+            });
+        }
+
+        function selectTable(key) {
+            state.selectedKey = key;
+            renderTables();
+            renderOrder();
+        }
+
+        function addNewTable() {
+            var zoneSelect = document.getElementById('new-table-zone');
+            var selectedZone = zoneSelect.value;
+
+            var maxNum = 0;
+            state.tables.forEach(function(t) {
+                if (t.zone === selectedZone && t.number > maxNum) {
+                    maxNum = t.number;
+                }
+            });
+            var nextNum = maxNum + 1;
+            var newKey = selectedZone + '-' + nextNum;
+
+            state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
+            state.orders[newKey] = [];
+
+            saveStorage();
+            selectTable(newKey);
+        }
+
+        function deleteCurrentTable() {
+            if (state.tables.length <= 1) {
+                alert("Kamida 1 ta stol qolishi shart!");
+                return;
+            }
+
+            var curOrders = state.orders[state.selectedKey] || [];
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var tblName = curTbl ? curTbl.zone + ' ' + curTbl.number + '-stol' : 'Stol';
+
+            if (curOrders.length > 0) {
+                var pass = prompt("DIQQAT! " + tblName + "da to'lanmagan hisob bor. O'chirish uchun OCHIRISH so'zini yozing:");
+                if (pass !== 'OCHIRISH') return alert("O'chirish bekor qilindi.");
+            } else {
+                if (!confirm(tblName + " o'chirilsinmi?")) return;
+            }
+
+            state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
+            delete state.orders[state.selectedKey];
+
+            state.selectedKey = state.tables[0].key;
+            saveStorage();
+            selectTable(state.selectedKey);
+        }
+
+        function renderMenu() {
+            var container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            state.menu.forEach(function(item, index) {
+                var div = document.createElement('div');
+                div.className = 'menu-item';
+                div.innerHTML = '<span><b>' + item.name + '</b> - ' + item.price.toLocaleString() + ' so\'m</span>';
+
+                var addBtn = document.createElement('button');
+                addBtn.className = 'add-btn';
+                addBtn.innerText = "Qo'shish";
+                addBtn.onclick = function() {
+                    addMenuItemByIndex(index);
+                };
+
+                div.appendChild(addBtn);
+                container.appendChild(div);
+            });
+        }
+
+        function addMenuItemByIndex(index) {
+            var item = state.menu[index];
+            if (!item) return;
+
+            if (!state.orders[state.selectedKey]) {
+                state.orders[state.selectedKey] = [];
+            }
+
+            state.orders[state.selectedKey].push({
+                name: item.name,
+                price: item.price
+            });
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
+        function renderOrder() {
+            var list = document.getElementById('order-list');
+            list.innerHTML = '';
+            var total = 0;
+            var currentOrders = state.orders[state.selectedKey] || [];
+
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var title = curTbl ? curTbl.zone + ': Stol ' + curTbl.number : 'Stol';
+
+            currentOrders.forEach(function(order) {
+                var li = document.createElement('li');
+                li.innerText = order.name + ' - ' + order.price.toLocaleString() + ' so\'m';
+                list.appendChild(li);
+                total += order.price;
+            });
+
+            document.getElementById('total-price').innerText = total.toLocaleString();
+            document.getElementById('order-title').innerText = title + ' buyurtmasi';
+        }
+
+        function closeTableOrder() {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (currentOrders.length === 0) {
+                alert("Bu stolda buyurtma yo'q!");
+                return;
+            }
+
+            var sum = 0, itemNames = [];
+            currentOrders.forEach(function(i) {
+                sum += i.price;
+                itemNames.push(i.name);
+            });
+
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : '-';
+            var num = curTbl ? curTbl.number : '-';
+
+            if (confirm(zone + ' ' + num + '-stol hisobi (' + sum.toLocaleString() + ' so\'m) yopilsinmi?')) {
+                var d = new Date();
+                state.history.unshift({
+                    time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    zone: zone,
+                    tableNum: num,
+                    items: itemNames.join(', '),
+                    total: sum
+                });
+
+                state.orders[state.selectedKey] = [];
+                saveStorage();
+                renderTables();
+                renderOrder();
+                renderReports();
+            }
+        }
+
+        function renderReports() {
+            var totalRevenue = 0;
+            var tbody = document.getElementById('history-rows');
+            tbody.innerHTML = '';
+
+            state.history.forEach(function(rec) {
+                totalRevenue += rec.total;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + rec.time + '</td><td>' + rec.zone + '</td><td>Stol ' + rec.tableNum + '</td><td>' + rec.items + '</td><td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('stat-rev').innerText = totalRevenue.toLocaleString() + ' so\'m';
+            document.getElementById('stat-cnt').innerText = state.history.length + ' ta';
+        }
+
+        function printReceipt() {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (currentOrders.length === 0) {
+                alert("Buyurtma yo'q!");
+                return;
+            }
+
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var title = curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol';
+
+            document.getElementById('rc-date').innerText = new Date().toLocaleString();
+            document.getElementById('rc-table').innerText = title;
+            var rcBox = document.getElementById('rc-items');
+            rcBox.innerHTML = '';
+            var sum = 0;
+
+            currentOrders.forEach(function(item) {
+                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + '</span><span>' + item.price.toLocaleString() + ' so\'m</span></div>';
+                sum += item.price;
+            });
+
+            document.getElementById('rc-total').innerText = sum.toLocaleString();
+            window.print();
+        }
+
+        function renderManageMenu() {
+            var tbody = document.getElementById('manage-menu-rows');
+            tbody.innerHTML = '';
+            state.menu.forEach(function(item, index) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td><b>' + item.name + '</b></td>' +
+                               '<td>' + item.price.toLocaleString() + ' so\'m</td>' +
+                               '<td class="manage-actions">' +
+                                   '<button class="btn-action-edit" onclick="editMenuItem(' + index + ')">✏️</button>' +
+                                   '<button class="btn-action-del" onclick="deleteMenuItem(' + index + ')">🗑</button>' +
+                               '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editMenuItem(index) {
+            var item = state.menu[index];
+            var newName = prompt("Yangi nom:", item.name);
+            if (!newName) return;
+            var newPrice = parseInt(prompt("Yangi narx:", item.price));
+            if (isNaN(newPrice) || newPrice <= 0) return alert("Xato narx!");
+
+            state.menu[index] = { name: newName.trim(), price: newPrice };
+            saveStorage();
+            renderMenu();
+            renderManageMenu();
+        }
+
+        function deleteMenuItem(index) {
+            if (confirm('O\'chirilsinmi?')) {
+                state.menu.splice(index, 1);
+                saveStorage();
+                renderMenu();
+                renderManageMenu();
+            }
+        }
+
+        function addMenuFromModal() {
+            var n = document.getElementById('modal-new-name').value.trim();
+            var p = parseInt(document.getElementById('modal-new-price').value);
+            if (!n || isNaN(p) || p <= 0) return alert("To'g'ri kiriting!");
+            state.menu.push({ name: n, price: p });
+            saveStorage();
+            renderMenu();
+            renderManageMenu();
+            document.getElementById('modal-new-name').value = '';
+            document.getElementById('modal-new-price').value = '';
+        }
+
+        var menuModal = document.getElementById('menu-modal');
+        document.getElementById('btn-open-menu-manager').onclick = function() {
+            renderManageMenu();
+            menuModal.style.display = 'flex';
+        };
+        document.getElementById('btn-close-menu-modal').onclick = function() { menuModal.style.display = 'none'; };
+        window.onclick = function(e) { if (e.target === menuModal) menuModal.style.display = 'none'; };
+
+        document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
+        document.getElementById('btn-add-table').addEventListener('click', addNewTable);
+        document.getElementById('btn-print').addEventListener('click', printReceipt);
+        document.getElementById('btn-close-order').addEventListener('click', closeTableOrder);
+        document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
+
+        loadStorage();
+        renderZoneFilters();
+        renderTables();
+        renderMenu();
+        renderOrder();
+        renderReports();
+    </script>
+</body>
+</html>
