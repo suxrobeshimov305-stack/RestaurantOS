@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Sexlar, Oshpazlar va KDS Tizimi</title>
+    <title>RestaurantOS - Kassa, KDS va Sklad Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .nav-tabs { display: flex; gap: 10px; }
+        .nav-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
         .nav-btn { background: #34495e; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; position: relative; }
         .nav-btn.active { background: #27ae60; color: white; }
         
@@ -109,6 +109,17 @@
         .btn-kds-ready { background: #27ae60; }
         .btn-kds-done { background: #7f8c8d; }
 
+        /* Sklad / Omborxona dizayni */
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+        .stock-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+        .stock-card.low { border-color: #ef4444; background: #fef2f2; }
+        .stock-card b { font-size: 16px; color: #1e293b; }
+        .stock-card .qty { font-size: 20px; font-weight: bold; color: #0f766e; margin: 8px 0; }
+        .stock-card.low .qty { color: #dc2626; }
+        .stock-card-actions { display: flex; gap: 6px; }
+        .stock-card-actions input { width: 70px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .stock-card-actions button { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
         /* Toast ogohlantirish */
         #notification-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-msg { background: #2c3e50; color: white; padding: 14px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border-left: 5px solid #2ecc71; font-size: 14px; pointer-events: auto; animation: slideIn 0.3s ease-out; max-width: 320px; }
@@ -147,7 +158,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Sexlar, Oshpazlar va Kassa Boshqaruvi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Kassa, Oshxona va Sklad Boshqaruv Tizimi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -157,6 +168,10 @@
             <button class="nav-btn" id="tab-kds-btn" onclick="switchMainTab('kds')">
                 👨‍🍳 Oshxona (KDS) 
                 <span id="kds-badge" style="background:#e74c3c; color:white; border-radius:10px; padding:2px 6px; font-size:11px; display:none;">0</span>
+            </button>
+            <button class="nav-btn" id="tab-stock-btn" onclick="switchMainTab('stock')">
+                📦 Sklad (Ombor)
+                <span id="stock-badge" style="background:#ef4444; color:white; border-radius:10px; padding:2px 6px; font-size:11px; display:none;">!</span>
             </button>
         </div>
     </header>
@@ -193,7 +208,6 @@
                     <h3>Joriy hisob:</h3>
                     <div id="order-list"></div>
 
-                    <!-- Ofitsiant va xizmat haqi tanlovi -->
                     <div class="service-fee-panel">
                         <div>
                             <span>Ofitsiant: </span>
@@ -273,7 +287,6 @@
                 <div style="font-size:13px; color:#555;">🟡 Yangi | 🔵 Pishirilmoqda | 🟢 Tayyor</div>
             </div>
 
-            <!-- Oshpazlar sexi bo'yicha filtr -->
             <div class="kds-dept-bar" id="kds-dept-bar">
                 <button class="kds-dept-btn active" onclick="filterKdsDepartment('Barchasi')">👨‍🍳 Barcha sexlar</button>
                 <button class="kds-dept-btn" onclick="filterKdsDepartment('Issiq taomlar')">🍲 Issiq taomlar</button>
@@ -282,6 +295,30 @@
             </div>
 
             <div class="kds-container" id="kds-orders-container"></div>
+        </div>
+    </div>
+
+    <!-- 3. SKLAD (OMBORXONA) REJIMI -->
+    <div id="view-stock" style="display:none; margin-top:20px;">
+        <div class="card full-width">
+            <div class="card-header">
+                <h2>📦 Omborxona Masalliqlari Qoldig'i</h2>
+                <div style="font-size:13px; color:#555;">Hisob yopilganda masalliqlar avtomatik yechiladi (Spisaniye)</div>
+            </div>
+
+            <!-- Yangi masalliq qo'shish -->
+            <div class="add-form" style="margin-top:0; border-top:none; padding-top:0;">
+                <input type="text" id="new-stock-name" placeholder="Masalliq nomi (masalan: Pomidor)" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:2; min-width:140px;">
+                <input type="number" id="new-stock-qty" placeholder="Miqdori" step="0.1" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:90px;">
+                <select id="new-stock-unit" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:90px;">
+                    <option value="kg">kg</option>
+                    <option value="L">L (litr)</option>
+                    <option value="dona">dona</option>
+                </select>
+                <button class="btn-green" id="btn-add-stock-item" type="button" style="width:auto; flex:1;">+ Masalliq qo'shish</button>
+            </div>
+
+            <div class="stock-grid" id="stock-container"></div>
         </div>
     </div>
 
@@ -350,6 +387,14 @@
         var currentKdsDept = "Barchasi";
         var activeDropdownIndex = null;
 
+        // Tex-karta (1 porsiya taomga ketadigan masalliqlar)
+        var recipeCard = {
+            "Osh": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
+            "Shashlik": [ { item: "Go'sht", qty: 0.25 }, { item: "Piyoz", qty: 0.05 } ],
+            "Sho'rva": [ { item: "Go'sht", qty: 0.2 }, { item: "Sabzi", qty: 0.1 }, { item: "Piyoz", qty: 0.05 } ],
+            "Choy": [ { item: "Choy (paket)", qty: 1 } ]
+        };
+
         var state = {
             selectedKey: "Asosiy zal-1",
             zoneWaiters: {
@@ -377,6 +422,14 @@
                 { name: 'Shashlik', price: 18000, dept: 'Mangal' },
                 { name: 'Choy', price: 5000, dept: 'Bar' },
                 { name: "Sho'rva", price: 30000, dept: 'Issiq taomlar' }
+            ],
+            stock: [
+                { id: 1, name: "Go'sht", qty: 25.0, unit: "kg" },
+                { id: 2, name: "Guruch", qty: 30.0, unit: "kg" },
+                { id: 3, name: "Yog'", qty: 15.0, unit: "L" },
+                { id: 4, name: "Sabzi", qty: 20.0, unit: "kg" },
+                { id: 5, name: "Piyoz", qty: 18.0, unit: "kg" },
+                { id: 6, name: "Choy (paket)", qty: 100, unit: "dona" }
             ],
             orders: {},
             serviceFees: {},
@@ -440,6 +493,9 @@
                 var k = localStorage.getItem('ros_kds_v2');
                 if (k) { var pK = JSON.parse(k); if (Array.isArray(pK)) state.kdsTickets = pK; }
 
+                var s = localStorage.getItem('ros_stock_v1');
+                if (s) { var pS = JSON.parse(s); if (Array.isArray(pS)) state.stock = pS; }
+
                 var h = localStorage.getItem('ros_history_v6');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
@@ -465,6 +521,7 @@
                 localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
                 localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
                 localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
+                localStorage.setItem('ros_stock_v1', JSON.stringify(state.stock));
                 localStorage.setItem('ros_history_v6', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
@@ -474,22 +531,31 @@
         function switchMainTab(tab) {
             var viewHall = document.getElementById('view-hall');
             var viewKds = document.getElementById('view-kds');
+            var viewStock = document.getElementById('view-stock');
             var btnHall = document.getElementById('tab-hall-btn');
             var btnKds = document.getElementById('tab-kds-btn');
+            var btnStock = document.getElementById('tab-stock-btn');
+
+            viewHall.style.display = 'none';
+            viewKds.style.display = 'none';
+            viewStock.style.display = 'none';
+            btnHall.classList.remove('active');
+            btnKds.classList.remove('active');
+            btnStock.classList.remove('active');
 
             if (tab === 'hall') {
                 viewHall.style.display = 'block';
-                viewKds.style.display = 'none';
                 btnHall.classList.add('active');
-                btnKds.classList.remove('active');
                 renderTables();
                 renderOrder();
-            } else {
-                viewHall.style.display = 'none';
+            } else if (tab === 'kds') {
                 viewKds.style.display = 'block';
                 btnKds.classList.add('active');
-                btnHall.classList.remove('active');
                 renderKDS();
+            } else {
+                viewStock.style.display = 'block';
+                btnStock.classList.add('active');
+                renderStock();
             }
         }
 
@@ -511,6 +577,78 @@
             } else {
                 rBadge.style.display = 'none';
             }
+
+            // Sklad ogohlantirishi (kam qolgan masalliqlar)
+            var hasLowStock = state.stock.some(function(item) { return item.qty <= 3; });
+            var sBadge = document.getElementById('stock-badge');
+            sBadge.style.display = hasLowStock ? 'inline-block' : 'none';
+        }
+
+        // Sklad boshqaruvi
+        function renderStock() {
+            var container = document.getElementById('stock-container');
+            container.innerHTML = '';
+
+            state.stock.forEach(function(item, idx) {
+                var isLow = (item.unit === 'dona' ? item.qty <= 10 : item.qty <= 3.0);
+                var card = document.createElement('div');
+                card.className = 'stock-card ' + (isLow ? 'low' : '');
+                card.innerHTML = 
+                    '<div>' +
+                        '<b>' + item.name + '</b>' + (isLow ? ' <span style="color:#dc2626; font-size:12px;">⚠️ Kam qoldi!</span>' : '') +
+                        '<div class="qty">' + item.qty.toFixed(item.unit === 'dona' ? 0 : 2) + ' ' + item.unit + '</div>' +
+                    '</div>' +
+                    '<div class="stock-card-actions">' +
+                        '<input type="number" id="stock-add-val-' + idx + '" placeholder="+Kirim" step="0.5">' +
+                        '<button onclick="addStockQty(' + idx + ')">+Qo\'shish</button>' +
+                    '</div>';
+                container.appendChild(card);
+            });
+        }
+
+        function addStockQty(idx) {
+            var input = document.getElementById('stock-add-val-' + idx);
+            var val = parseFloat(input.value);
+            if (isNaN(val) || val <= 0) return alert("To'g'ri miqdor kiriting!");
+
+            state.stock[idx].qty += val;
+            saveStorage();
+            updateBadges();
+            renderStock();
+        }
+
+        function addNewStockItem() {
+            var n = document.getElementById('new-stock-name').value.trim();
+            var q = parseFloat(document.getElementById('new-stock-qty').value);
+            var u = document.getElementById('new-stock-unit').value;
+
+            if (!n || isNaN(q) || q < 0) return alert("Iltimos, nom va miqdorni to'g'ri kiriting!");
+            state.stock.push({ id: Date.now(), name: n, qty: q, unit: u });
+
+            saveStorage();
+            updateBadges();
+            renderStock();
+
+            document.getElementById('new-stock-name').value = '';
+            document.getElementById('new-stock-qty').value = '';
+        }
+
+        // Avtomatik masalliq ayirish (Spisaniye)
+        function deductIngredientsFromStock(ordersList) {
+            ordersList.forEach(function(order) {
+                var recipe = recipeCard[order.name];
+                if (recipe) {
+                    recipe.forEach(function(ing) {
+                        var totalNeeded = ing.qty * order.qty;
+                        var stockItem = state.stock.find(function(s) { return s.name.toLowerCase() === ing.item.toLowerCase(); });
+                        if (stockItem) {
+                            stockItem.qty = Math.max(0, stockItem.qty - totalNeeded);
+                        }
+                    });
+                }
+            });
+            saveStorage();
+            updateBadges();
         }
 
         function renderWaitersSelect() {
@@ -741,18 +879,26 @@
             renderOrder();
         }
 
-        // Taomga oshpaz uchun eslatma (izoh) yozish
         function addNoteToItem(itemIndex) {
             var currentOrders = state.orders[state.selectedKey] || [];
             if (!currentOrders[itemIndex]) return;
 
             var existingNote = currentOrders[itemIndex].note || '';
-            var userNote = prompt("Oshpaz uchun eslatma (masalan: Piyozi kam bo'lsin, Sho'r bo'lmasin):", existingNote);
+            var userNote = prompt("Oshpaz uchun eslatma (masalan: Ko'k choy bo'lsin, Piyozi kam):", existingNote);
             if (userNote !== null) {
                 currentOrders[itemIndex].note = userNote.trim();
                 activeDropdownIndex = null;
+
+                var activeTicket = state.kdsTickets.find(function(t) { 
+                    return t.tableKey === state.selectedKey && t.status !== 'done'; 
+                });
+                if (activeTicket) {
+                    activeTicket.items = JSON.parse(JSON.stringify(currentOrders));
+                }
+
                 saveStorage();
                 renderOrder();
+                if (document.getElementById('view-kds').style.display === 'block') renderKDS();
             }
         }
 
@@ -861,24 +1007,33 @@
             var timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             var itemsCopy = JSON.parse(JSON.stringify(curOrders));
 
-            state.kdsTickets.unshift({
-                id: Date.now(),
-                tableKey: state.selectedKey,
-                zone: zone,
-                tableNum: num,
-                waiter: waiter,
-                time: timeStr,
-                items: itemsCopy,
-                status: 'waiting'
+            var existingTicket = state.kdsTickets.find(function(t) { 
+                return t.tableKey === state.selectedKey && t.status !== 'done'; 
             });
+
+            if (existingTicket) {
+                existingTicket.items = itemsCopy;
+                existingTicket.time = timeStr;
+                existingTicket.waiter = waiter;
+            } else {
+                state.kdsTickets.unshift({
+                    id: Date.now(),
+                    tableKey: state.selectedKey,
+                    zone: zone,
+                    tableNum: num,
+                    waiter: waiter,
+                    time: timeStr,
+                    items: itemsCopy,
+                    status: 'waiting'
+                });
+            }
 
             saveStorage();
             updateBadges();
             renderOrder();
-            alert("Buyurtma oshxonaga yuborildi!");
+            alert("Oshxonaga muvaffaqiyatli uzatildi / yangilandi!");
         }
 
-        // KDS SEXLAR BO'YICHA FILTR
         function filterKdsDepartment(dept) {
             currentKdsDept = dept;
             var buttons = document.querySelectorAll('.kds-dept-btn');
@@ -892,7 +1047,6 @@
             renderKDS();
         }
 
-        // KDS RENDER
         function renderKDS() {
             var container = document.getElementById('kds-orders-container');
             container.innerHTML = '';
@@ -907,7 +1061,6 @@
             var displayedCards = 0;
 
             activeTickets.forEach(function(ticket) {
-                // Sex bo'yicha saralash
                 var filteredItems = ticket.items.filter(function(item) {
                     if (currentKdsDept === 'Barchasi') return true;
                     return item.dept === currentKdsDept;
@@ -1009,6 +1162,10 @@
                 total: calc.total
             });
 
+            // 1. OMBORDAN MASALLIQLARNI AVTOMATIK YECHISH (SPISANIYE)
+            deductIngredientsFromStock(calc.orders);
+
+            // 2. KDS chiptasini yopish
             state.kdsTickets.forEach(function(t) {
                 if (t.tableKey === state.selectedKey) t.status = 'done';
             });
@@ -1022,6 +1179,7 @@
             renderTables();
             renderOrder();
             renderReports();
+            if (document.getElementById('view-stock').style.display === 'block') renderStock();
         }
 
         function renderReports() {
@@ -1199,6 +1357,7 @@
         document.getElementById('btn-print').addEventListener('click', printReceipt);
         document.getElementById('btn-delete-table').addEventListener('click', deleteCurrentTable);
         document.getElementById('btn-export-csv').addEventListener('click', exportHistoryToCSV);
+        document.getElementById('btn-add-stock-item').addEventListener('click', addNewStockItem);
 
         loadStorage();
         renderZoneFilters();
