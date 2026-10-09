@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Ofitsiantlar, KDS va Kassa Tizimi</title>
+    <title>RestaurantOS - Sexlar, Oshpazlar va KDS Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -42,6 +42,7 @@
         }
         
         .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; background: #fafafa; border-radius: 6px; }
+        .item-badge { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; margin-left: 6px; font-weight: normal; }
         .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .add-btn:hover { background: #2980b9; }
 
@@ -51,9 +52,10 @@
         .order-item-info { flex: 1; }
         .order-item-info b { font-size: 15px; color: #2c3e50; }
         .order-subtext { font-size: 12px; color: #57606f; margin-top: 2px; }
+        .order-note-tag { display: inline-block; font-size: 11px; background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; margin-top: 3px; font-weight: bold; }
 
         .order-item-menu-btn { background: transparent; border: none; font-size: 18px; color: #747d8c; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-        .order-item-dropdown { display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #ced6e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50; overflow: hidden; min-width: 140px; }
+        .order-item-dropdown { display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #ced6e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50; overflow: hidden; min-width: 170px; }
         .order-item-dropdown button { display: flex; align-items: center; width: 100%; background: none; border: none; padding: 8px 12px; text-align: left; font-size: 13px; cursor: pointer; color: #2f3542; }
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
@@ -86,15 +88,21 @@
         .history-table th { background: #f1f2f6; }
 
         /* KDS Oshxona */
-        .kds-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
+        .kds-dept-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .kds-dept-btn { background: #e2e8f0; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .kds-dept-btn.active { background: #16a085; color: white; }
+
+        .kds-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 15px; margin-top: 15px; }
         .kds-card { background: white; border-radius: 8px; border-top: 5px solid #f39c12; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
         .kds-card.cooking { border-top-color: #3498db; }
         .kds-card.ready { border-top-color: #27ae60; background: #f9fff9; }
         .kds-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
-        .kds-header b { font-size: 16px; color: #2c3e50; }
+        .kds-header b { font-size: 15px; color: #2c3e50; }
         .kds-time { font-size: 12px; color: #7f8c8d; }
         .kds-items { list-style: none; padding: 0; margin: 0 0 15px 0; }
-        .kds-items li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size: 14px; display: flex; justify-content: space-between; }
+        .kds-items li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .kds-item-main { display: flex; justify-content: space-between; }
+        .kds-item-note { font-size: 12px; color: #b45309; background: #fef3c7; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px; font-weight: bold; }
         .kds-actions { display: flex; gap: 8px; }
         .kds-btn { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 13px; }
         .btn-kds-cook { background: #3498db; }
@@ -108,7 +116,7 @@
 
         /* Modallar */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 480px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 500px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #7f8c8d; }
         .payment-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
@@ -116,12 +124,12 @@
         .payment-btn:hover { border-color: #27ae60; background: #f0fff4; }
 
         .manage-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .manage-table th, .manage-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 14px; }
+        .manage-table th, .manage-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
         .manage-actions { display: flex; gap: 6px; justify-content: flex-end; }
         .btn-action-edit { background: #f39c12; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; }
         .btn-action-del { background: #e74c3c; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; }
         .modal-add-box { display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #eee; flex-wrap: wrap; }
-        .modal-add-box input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 120px; }
+        .modal-add-box input, .modal-add-box select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .modal-add-box button { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         @media print {
@@ -139,7 +147,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Ofitsiant, Kassa va Oshxona Tizimi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Sexlar, Oshpazlar va Kassa Boshqaruvi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -193,7 +201,7 @@
                             <button onclick="addNewWaiterPrompt()" style="padding:2px 6px; font-size:12px; cursor:pointer;" title="Yangi ofitsiant qo'shish">+</button>
                         </div>
                         <div>
-                            <span>Xizmat haqi: </span>
+                            <span>Xizmat: </span>
                             <select id="service-fee-rate" onchange="updateServiceFee()">
                                 <option value="0">0%</option>
                                 <option value="10" selected>10%</option>
@@ -206,7 +214,6 @@
                     <div class="calc-details" id="calc-details">Taomlar: 0 so'm | Xizmat: 0 so'm</div>
                     <div class="total-display"><b>Jami: <span id="total-price" style="color:#27ae60;">0</span> so'm</b></div>
 
-                    <!-- Tayyor taomni zalda qabul qilish tugmasi -->
                     <button class="btn-ready-serve" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taomni oshxonadan oldim (Mijozga topshirildi)</button>
 
                     <div class="btn-group">
@@ -218,10 +225,10 @@
                 </div>
             </div>
 
-            <!-- Kassa hisoboti va Ofitsiantlar tahlili -->
+            <!-- Kassa hisoboti -->
             <div class="card full-width">
                 <div class="card-header">
-                    <h2>Kunlik Kassa va Ofitsiantlar Hisoboti</h2>
+                    <h2>Kunlik Kassa va Xodimlar Hisoboti</h2>
                     <button class="btn-export-excel" id="btn-export-csv">📥 Excel (CSV) yuklab olish</button>
                 </div>
                 <div class="stats-grid">
@@ -265,6 +272,15 @@
                 <h2>Oshxona Buyurtmalari (Jonli KDS)</h2>
                 <div style="font-size:13px; color:#555;">🟡 Yangi | 🔵 Pishirilmoqda | 🟢 Tayyor</div>
             </div>
+
+            <!-- Oshpazlar sexi bo'yicha filtr -->
+            <div class="kds-dept-bar" id="kds-dept-bar">
+                <button class="kds-dept-btn active" onclick="filterKdsDepartment('Barchasi')">👨‍🍳 Barcha sexlar</button>
+                <button class="kds-dept-btn" onclick="filterKdsDepartment('Issiq taomlar')">🍲 Issiq taomlar</button>
+                <button class="kds-dept-btn" onclick="filterKdsDepartment('Mangal')">🍢 Mangal / Kabob</button>
+                <button class="kds-dept-btn" onclick="filterKdsDepartment('Bar')">☕ Bar / Ichimliklar</button>
+            </div>
+
             <div class="kds-container" id="kds-orders-container"></div>
         </div>
     </div>
@@ -294,12 +310,17 @@
             </div>
             <table class="manage-table">
                 <thead>
-                    <tr><th>Taom nomi</th><th>Narxi</th><th style="text-align: right;">Amallar</th></tr>
+                    <tr><th>Taom</th><th>Sex</th><th>Narxi</th><th style="text-align: right;">Amallar</th></tr>
                 </thead>
                 <tbody id="manage-menu-rows"></tbody>
             </table>
             <div class="modal-add-box">
-                <input type="text" id="modal-new-name" placeholder="Yangi taom nomi">
+                <input type="text" id="modal-new-name" placeholder="Taom nomi">
+                <select id="modal-new-dept">
+                    <option value="Issiq taomlar">Issiq taomlar</option>
+                    <option value="Mangal">Mangal</option>
+                    <option value="Bar">Bar</option>
+                </select>
                 <input type="number" id="modal-new-price" placeholder="Narxi (so'm)">
                 <button id="modal-btn-add" type="button">+ Qo'shish</button>
             </div>
@@ -326,11 +347,17 @@
     <script>
         var zones = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
         var currentZoneFilter = "Barchasi";
+        var currentKdsDept = "Barchasi";
         var activeDropdownIndex = null;
 
         var state = {
             selectedKey: "Asosiy zal-1",
-            waiters: ["Aliyor", "Jasur", "Malika"],
+            zoneWaiters: {
+                "Asosiy zal": ["Aliyor", "Sardor"],
+                "Hovli (Leto)": ["Jasur", "Bekzod"],
+                "Banket zali": ["Malika", "Nigora"],
+                "VIP xona": ["Shaxzod"]
+            },
             tableWaiters: {},
             tables: [
                 { key: "Asosiy zal-1", zone: "Asosiy zal", number: 1 },
@@ -346,10 +373,10 @@
                 { key: "VIP xona-1", zone: "VIP xona", number: 1 }
             ],
             menu: [
-                { name: 'Osh', price: 35000 },
-                { name: 'Shashlik', price: 18000 },
-                { name: 'Choy', price: 5000 },
-                { name: "Sho'rva", price: 30000 }
+                { name: 'Osh', price: 35000, dept: 'Issiq taomlar' },
+                { name: 'Shashlik', price: 18000, dept: 'Mangal' },
+                { name: 'Choy', price: 5000, dept: 'Bar' },
+                { name: "Sho'rva", price: 30000, dept: 'Issiq taomlar' }
             ],
             orders: {},
             serviceFees: {},
@@ -395,22 +422,22 @@
                 var t = localStorage.getItem('ros_tables_v3');
                 if (t) { var pT = JSON.parse(t); if (Array.isArray(pT) && pT.length > 0) state.tables = pT; }
 
-                var m = localStorage.getItem('ros_menu');
+                var m = localStorage.getItem('ros_menu_v2');
                 if (m) { var pM = JSON.parse(m); if (Array.isArray(pM) && pM.length > 0) state.menu = pM; }
 
-                var o = localStorage.getItem('ros_orders_v4');
+                var o = localStorage.getItem('ros_orders_v5');
                 if (o) { var pO = JSON.parse(o); if (pO && typeof pO === 'object') state.orders = pO; }
 
                 var sf = localStorage.getItem('ros_service_fees');
                 if (sf) { var pSF = JSON.parse(sf); if (pSF && typeof pSF === 'object') state.serviceFees = pSF; }
 
-                var w = localStorage.getItem('ros_waiters_list');
-                if (w) { var pW = JSON.parse(w); if (Array.isArray(pW) && pW.length > 0) state.waiters = pW; }
+                var zw = localStorage.getItem('ros_zone_waiters');
+                if (zw) { var pZW = JSON.parse(zw); if (pZW && typeof pZW === 'object') state.zoneWaiters = pZW; }
 
                 var tw = localStorage.getItem('ros_table_waiters');
                 if (tw) { var pTW = JSON.parse(tw); if (pTW && typeof pTW === 'object') state.tableWaiters = pTW; }
 
-                var k = localStorage.getItem('ros_kds_v1');
+                var k = localStorage.getItem('ros_kds_v2');
                 if (k) { var pK = JSON.parse(k); if (Array.isArray(pK)) state.kdsTickets = pK; }
 
                 var h = localStorage.getItem('ros_history_v6');
@@ -422,7 +449,8 @@
             state.tables.forEach(function(tbl) {
                 if (!Array.isArray(state.orders[tbl.key])) state.orders[tbl.key] = [];
                 if (state.serviceFees[tbl.key] === undefined) state.serviceFees[tbl.key] = 10;
-                if (!state.tableWaiters[tbl.key]) state.tableWaiters[tbl.key] = state.waiters[0] || 'Ofitsiant';
+                var zList = state.zoneWaiters[tbl.zone] || ["Ofitsiant"];
+                if (!state.tableWaiters[tbl.key]) state.tableWaiters[tbl.key] = zList[0];
             });
 
             if (state.tables.length > 0) state.selectedKey = state.tables[0].key;
@@ -431,12 +459,12 @@
         function saveStorage() {
             try {
                 localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
-                localStorage.setItem('ros_menu', JSON.stringify(state.menu));
-                localStorage.setItem('ros_orders_v4', JSON.stringify(state.orders));
+                localStorage.setItem('ros_menu_v2', JSON.stringify(state.menu));
+                localStorage.setItem('ros_orders_v5', JSON.stringify(state.orders));
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
-                localStorage.setItem('ros_waiters_list', JSON.stringify(state.waiters));
+                localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
                 localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
-                localStorage.setItem('ros_kds_v1', JSON.stringify(state.kdsTickets));
+                localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
                 localStorage.setItem('ros_history_v6', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
@@ -488,32 +516,47 @@
         function renderWaitersSelect() {
             var sel = document.getElementById('waiter-select');
             sel.innerHTML = '';
-            state.waiters.forEach(function(w) {
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : "Asosiy zal";
+            var list = state.zoneWaiters[zone] || ["Ofitsiant"];
+
+            list.forEach(function(w) {
                 var opt = document.createElement('option');
                 opt.value = w;
                 opt.innerText = w;
                 sel.appendChild(opt);
             });
-            var currentW = state.tableWaiters[state.selectedKey] || state.waiters[0];
-            sel.value = currentW;
+
+            if (!state.tableWaiters[state.selectedKey] || !list.includes(state.tableWaiters[state.selectedKey])) {
+                state.tableWaiters[state.selectedKey] = list[0];
+            }
+            sel.value = state.tableWaiters[state.selectedKey];
         }
 
         function updateWaiterSelection() {
             var sel = document.getElementById('waiter-select');
             state.tableWaiters[state.selectedKey] = sel.value;
             saveStorage();
+            renderTables();
             renderOrder();
         }
 
         function addNewWaiterPrompt() {
-            var name = prompt("Yangi ofitsiant ismini kiriting:");
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : "Asosiy zal";
+
+            var name = prompt(zone + " uchun yangi ofitsiant ismini kiriting:");
             if (!name) return;
             name = name.trim();
-            if (state.waiters.includes(name)) return alert("Bu ofitsiant allaqachon mavjud!");
-            state.waiters.push(name);
+
+            if (!state.zoneWaiters[zone]) state.zoneWaiters[zone] = [];
+            if (state.zoneWaiters[zone].includes(name)) return alert("Bu ofitsiant allaqachon mavjud!");
+
+            state.zoneWaiters[zone].push(name);
             state.tableWaiters[state.selectedKey] = name;
             saveStorage();
             renderWaitersSelect();
+            renderTables();
             renderOrder();
         }
 
@@ -595,7 +638,8 @@
             state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
             state.orders[newKey] = [];
             state.serviceFees[newKey] = 10;
-            state.tableWaiters[newKey] = state.waiters[0] || 'Ofitsiant';
+            var zList = state.zoneWaiters[selectedZone] || ["Ofitsiant"];
+            state.tableWaiters[newKey] = zList[0];
 
             saveStorage();
             selectTable(newKey);
@@ -630,7 +674,7 @@
             state.menu.forEach(function(item, index) {
                 var div = document.createElement('div');
                 div.className = 'menu-item';
-                div.innerHTML = '<span><b>' + item.name + '</b> - ' + item.price.toLocaleString() + ' so\'m</span>';
+                div.innerHTML = '<span><b>' + item.name + '</b> <span class="item-badge">' + (item.dept || 'Oshxona') + '</span><br><small style="color:#555;">' + item.price.toLocaleString() + ' so\'m</small></span>';
 
                 var addBtn = document.createElement('button');
                 addBtn.className = 'add-btn';
@@ -648,12 +692,18 @@
 
             if (!state.orders[state.selectedKey]) state.orders[state.selectedKey] = [];
             var currentOrders = state.orders[state.selectedKey];
-            var existing = currentOrders.find(function(o) { return o.name === item.name; });
+            var existing = currentOrders.find(function(o) { return o.name === item.name && !o.note; });
 
             if (existing) {
                 existing.qty++;
             } else {
-                currentOrders.push({ name: item.name, price: item.price, qty: 1 });
+                currentOrders.push({
+                    name: item.name,
+                    price: item.price,
+                    dept: item.dept || 'Issiq taomlar',
+                    qty: 1,
+                    note: ''
+                });
             }
 
             saveStorage();
@@ -691,6 +741,21 @@
             renderOrder();
         }
 
+        // Taomga oshpaz uchun eslatma (izoh) yozish
+        function addNoteToItem(itemIndex) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
+
+            var existingNote = currentOrders[itemIndex].note || '';
+            var userNote = prompt("Oshpaz uchun eslatma (masalan: Piyozi kam bo'lsin, Sho'r bo'lmasin):", existingNote);
+            if (userNote !== null) {
+                currentOrders[itemIndex].note = userNote.trim();
+                activeDropdownIndex = null;
+                saveStorage();
+                renderOrder();
+            }
+        }
+
         function getCurrentCalculations() {
             var subtotal = 0;
             var currentOrders = state.orders[state.selectedKey] || [];
@@ -724,7 +789,7 @@
                     serveBtn.style.display = 'none';
                 } else if (kdsItem.status === 'ready') {
                     kdsStatusBadge = ' <small style="color:#27ae60; font-weight:bold;">[🔔 TAYYOR! Olib keting]</small>';
-                    serveBtn.style.display = 'block'; // Zalda "Topshirildi" tugmasi chiqadi
+                    serveBtn.style.display = 'block';
                 }
             } else {
                 serveBtn.style.display = 'none';
@@ -736,18 +801,21 @@
                 calc.orders.forEach(function(order, idx) {
                     var itemSubtotal = order.price * order.qty;
                     var isMenuOpen = (activeDropdownIndex === idx);
+                    var noteHtml = order.note ? '<div class="order-note-tag">📌 ' + order.note + '</div>' : '';
 
                     var row = document.createElement('div');
                     row.className = 'order-item-row';
                     row.innerHTML = 
                         '<div class="order-item-info">' +
                             '<b>' + order.name + ' <span style="color:#2980b9;">&times; ' + order.qty + '</span></b>' +
+                            noteHtml +
                             '<div class="order-subtext">' + order.price.toLocaleString() + ' so\'mdan = ' + itemSubtotal.toLocaleString() + ' so\'m</div>' +
                         '</div>' +
                         '<button class="order-item-menu-btn" onclick="toggleItemDropdown(' + idx + ', event)">⋮</button>' +
                         '<div class="order-item-dropdown" style="display: ' + (isMenuOpen ? 'block' : 'none') + ';">' +
                             '<button onclick="changeOrderQty(' + idx + ', 1)">➕ Bitta qo\'shish (+1)</button>' +
                             '<button onclick="changeOrderQty(' + idx + ', -1)">➖ Bitta kamaytirish (-1)</button>' +
+                            '<button onclick="addNoteToItem(' + idx + ')">📝 Eslatma / Izoh yozish</button>' +
                             '<button class="btn-del-action" onclick="removeOrderItem(' + idx + ')">🗑 Butunlay o\'chirish</button>' +
                         '</div>';
                     list.appendChild(row);
@@ -759,7 +827,6 @@
             document.getElementById('order-title').innerHTML = title + ' buyurtmasi' + kdsStatusBadge;
         }
 
-        // Ofitsiant taomni oshxonadan olganda bosadigan amal
         function serveOrderToGuests() {
             var curTicket = state.kdsTickets.find(function(t) { return t.tableKey === state.selectedKey && t.status === 'ready'; });
             if (curTicket) {
@@ -811,6 +878,20 @@
             alert("Buyurtma oshxonaga yuborildi!");
         }
 
+        // KDS SEXLAR BO'YICHA FILTR
+        function filterKdsDepartment(dept) {
+            currentKdsDept = dept;
+            var buttons = document.querySelectorAll('.kds-dept-btn');
+            buttons.forEach(function(b) {
+                if (b.innerText.includes(dept) || (dept === 'Barchasi' && b.innerText.includes('Barcha'))) {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
+            renderKDS();
+        }
+
         // KDS RENDER
         function renderKDS() {
             var container = document.getElementById('kds-orders-container');
@@ -823,13 +904,28 @@
                 return;
             }
 
+            var displayedCards = 0;
+
             activeTickets.forEach(function(ticket) {
+                // Sex bo'yicha saralash
+                var filteredItems = ticket.items.filter(function(item) {
+                    if (currentKdsDept === 'Barchasi') return true;
+                    return item.dept === currentKdsDept;
+                });
+
+                if (filteredItems.length === 0) return;
+                displayedCards++;
+
                 var card = document.createElement('div');
                 card.className = 'kds-card ' + ticket.status;
 
                 var itemsHtml = '';
-                ticket.items.forEach(function(i) {
-                    itemsHtml += '<li><span>' + i.name + '</span> <b>&times; ' + i.qty + '</b></li>';
+                filteredItems.forEach(function(i) {
+                    var noteText = i.note ? '<div class="kds-item-note">📌 ' + i.note + '</div>' : '';
+                    itemsHtml += '<li>' +
+                                    '<div class="kds-item-main"><span>' + i.name + ' <small style="color:#777;">(' + (i.dept || 'Oshxona') + ')</small></span> <b>&times; ' + i.qty + '</b></div>' +
+                                    noteText +
+                                 '</li>';
                 });
 
                 var statusText = ticket.status === 'waiting' ? '🟡 Kutilmoqda' : (ticket.status === 'cooking' ? '🔵 Pishirilmoqda' : '🟢 Tayyor bo\'ldi');
@@ -855,6 +951,10 @@
 
                 container.appendChild(card);
             });
+
+            if (displayedCards === 0) {
+                container.innerHTML = '<p style="color:#7f8c8d; text-align:center; grid-column: 1/-1; padding: 30px;">' + currentKdsDept + ' sexi uchun faol buyurtmalar mavjud emas.</p>';
+            }
         }
 
         function changeKdsStatus(ticketId, newStatus) {
@@ -886,7 +986,10 @@
         function confirmPayment(method) {
             var calc = getCurrentCalculations();
             var itemNames = [];
-            calc.orders.forEach(function(i) { itemNames.push(i.name + ' (x' + i.qty + ')'); });
+            calc.orders.forEach(function(i) {
+                var notePart = i.note ? ' [' + i.note + ']' : '';
+                itemNames.push(i.name + notePart + ' (x' + i.qty + ')');
+            });
 
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
             var zone = curTbl ? curTbl.zone : '-';
@@ -956,7 +1059,6 @@
             document.getElementById('stat-card').innerText = card.toLocaleString() + ' so\'m';
             document.getElementById('stat-payme').innerText = payme.toLocaleString() + ' so\'m';
 
-            // Ofitsiantlar tahlili qutilari
             var wBox = document.getElementById('waiter-summary-boxes');
             wBox.innerHTML = '';
             for (var waiter in waiterStats) {
@@ -1016,7 +1118,8 @@
 
             calc.orders.forEach(function(item) {
                 var itemTotal = item.price * item.qty;
-                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
+                var notePart = item.note ? ' (' + item.note + ')' : '';
+                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + notePart + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
             });
 
             document.getElementById('rc-subtotal').innerText = calc.subtotal.toLocaleString();
@@ -1032,6 +1135,7 @@
             state.menu.forEach(function(item, index) {
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td><b>' + item.name + '</b></td>' +
+                               '<td><span class="item-badge">' + (item.dept || 'Issiq taomlar') + '</span></td>' +
                                '<td>' + item.price.toLocaleString() + ' so\'m</td>' +
                                '<td class="manage-actions">' +
                                    '<button class="btn-action-edit" onclick="editMenuItem(' + index + ')">✏️</button>' +
@@ -1045,10 +1149,11 @@
             var item = state.menu[index];
             var newName = prompt("Yangi nom:", item.name);
             if (!newName) return;
+            var newDept = prompt("Sex (Issiq taomlar, Mangal, Bar):", item.dept || 'Issiq taomlar');
             var newPrice = parseInt(prompt("Yangi narx:", item.price));
             if (isNaN(newPrice) || newPrice <= 0) return alert("Xato narx!");
 
-            state.menu[index] = { name: newName.trim(), price: newPrice };
+            state.menu[index] = { name: newName.trim(), price: newPrice, dept: newDept || 'Issiq taomlar' };
             saveStorage();
             renderMenu();
             renderManageMenu();
@@ -1065,9 +1170,10 @@
 
         function addMenuFromModal() {
             var n = document.getElementById('modal-new-name').value.trim();
+            var d = document.getElementById('modal-new-dept').value;
             var p = parseInt(document.getElementById('modal-new-price').value);
             if (!n || isNaN(p) || p <= 0) return alert("To'g'ri kiriting!");
-            state.menu.push({ name: n, price: p });
+            state.menu.push({ name: n, dept: d, price: p });
             saveStorage();
             renderMenu();
             renderManageMenu();
