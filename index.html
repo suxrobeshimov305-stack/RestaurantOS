@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Stop-list va Kassa Tizimi</title>
+    <title>RestaurantOS - Professional Kassa, KDS va Split-Bill</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -25,44 +25,48 @@
         .zone-btn.active { background: #2c3e50; color: white; }
 
         .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-        .table-btn { padding: 14px 10px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 14px; text-align: center; position: relative; }
+        .table-btn { padding: 12px 10px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 13px; text-align: center; position: relative; }
         .free { background-color: #27ae60; }
         .busy { background-color: #e74c3c; }
         .reserved { background-color: #f39c12; }
         .selected { border-color: #34495e !important; box-shadow: 0 0 10px rgba(52, 73, 94, 0.8); }
 
         @keyframes pulse-ready {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.9); border-color: #2ecc71; }
-            70% { box-shadow: 0 0 0 12px rgba(46, 204, 113, 0); border-color: #27ae60; }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); border-color: #2ecc71; }
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.9); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
-        .table-ready-alert {
-            animation: pulse-ready 1.2s infinite;
-            background-color: #1abc9c !important;
-            border-color: #f1c40f !important;
-        }
+        .table-ready-alert { animation: pulse-ready 1.2s infinite; background-color: #1abc9c !important; }
         
-        /* Menyu taomlari va Stop-list dizayni */
-        .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; background: #fafafa; border-radius: 6px; transition: 0.2s; }
+        @keyframes pulse-late {
+            0% { border-color: #e74c3c; box-shadow: 0 0 5px #e74c3c; }
+            50% { border-color: #fff; box-shadow: 0 0 15px #e74c3c; }
+            100% { border-color: #e74c3c; box-shadow: 0 0 5px #e74c3c; }
+        }
+        .table-late-alert { animation: pulse-late 1s infinite; }
+
+        /* Menyu va Stop-list */
+        .menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; background: #fafafa; border-radius: 6px; }
         .menu-item.stopped { background: #fee2e2; border: 1px solid #fca5a5; opacity: 0.75; }
-        .item-badge { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; margin-left: 6px; font-weight: normal; }
+        .item-badge { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; margin-left: 6px; }
         .badge-stop { background: #ef4444; color: white; font-weight: bold; }
         
-        .add-btn { background: #3498db; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .add-btn:hover { background: #2980b9; }
-        .add-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        .portion-box { display: flex; gap: 4px; margin-top: 4px; }
+        .portion-btn { background: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .portion-btn.btn-half { background: #9b59b6; }
+        .portion-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
         .order-box { margin-top: 15px; padding: 15px; background: #ecf0f1; border-radius: 6px; }
         .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border-bottom: 1px solid #dcdde1; position: relative; }
         .order-item-row:last-child { border-bottom: none; }
         .order-item-info { flex: 1; }
-        .order-item-info b { font-size: 15px; color: #2c3e50; }
+        .order-item-info b { font-size: 14px; color: #2c3e50; }
         .order-subtext { font-size: 12px; color: #57606f; margin-top: 2px; }
         .order-note-tag { display: inline-block; font-size: 11px; background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; margin-top: 3px; font-weight: bold; }
 
-        .order-item-menu-btn { background: transparent; border: none; font-size: 18px; color: #747d8c; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-        .order-item-dropdown { display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #ced6e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50; overflow: hidden; min-width: 170px; }
-        .order-item-dropdown button { display: flex; align-items: center; width: 100%; background: none; border: none; padding: 8px 12px; text-align: left; font-size: 13px; cursor: pointer; color: #2f3542; }
+        .order-item-menu-btn { background: transparent; border: none; font-size: 18px; color: #747d8c; cursor: pointer; padding: 4px 8px; }
+        .order-item-dropdown { display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #ced6e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50; min-width: 170px; }
+        .order-item-dropdown button { display: flex; align-items: center; width: 100%; background: none; border: none; padding: 8px 12px; font-size: 13px; cursor: pointer; color: #2f3542; }
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
 
@@ -73,8 +77,8 @@
 
         .btn-ready-serve { display: none; width: 100%; background: #2ecc71; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; animation: pulse-ready 1.2s infinite; }
 
-        .table-tools-bar { display: flex; gap: 6px; margin-top: 10px; }
-        .btn-tool { flex: 1; padding: 7px; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; color: #2c3e50; }
+        .table-tools-bar { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .btn-tool { flex: 1; padding: 7px 4px; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; color: #2c3e50; text-align: center; }
         .btn-tool:hover { background: #f1f2f6; }
 
         .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
@@ -110,6 +114,7 @@
         .kds-card { background: white; border-radius: 8px; border-top: 5px solid #f39c12; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
         .kds-card.cooking { border-top-color: #3498db; }
         .kds-card.ready { border-top-color: #27ae60; background: #f9fff9; }
+        .kds-card.late { border: 2px solid #e74c3c; }
         .kds-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
         .kds-header b { font-size: 15px; color: #2c3e50; }
         .kds-time { font-size: 12px; color: #7f8c8d; }
@@ -140,34 +145,36 @@
 
         /* Modallar */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 540px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+        .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 520px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #7f8c8d; }
         .payment-options { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-        .payment-btn { padding: 14px; border: 2px solid #ddd; background: #fff; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .payment-btn { padding: 12px; border: 2px solid #ddd; background: #fff; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .payment-btn:hover { border-color: #27ae60; background: #f0fff4; }
 
         .split-pay-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 10px; display: none; }
         .split-pay-box input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 4px; }
 
         .manage-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .manage-table th, .manage-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
-        .manage-actions { display: flex; gap: 6px; justify-content: flex-end; }
-        .btn-action-edit { background: #f39c12; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; }
-        .btn-action-del { background: #e74c3c; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; }
-        .btn-action-stop { background: #64748b; color: white; border: none; padding: 5px 9px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; }
+        .manage-table th, .manage-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
+        .manage-actions { display: flex; gap: 4px; justify-content: flex-end; }
+        .btn-action-edit { background: #f39c12; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .btn-action-del { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .btn-action-stop { background: #64748b; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; }
         .btn-action-stop.active-stop { background: #ef4444; }
 
         .modal-add-box { display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #eee; flex-wrap: wrap; }
         .modal-add-box input, .modal-add-box select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .modal-add-box button { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
+        /* Chop etish qismi (Chek va Oshxona slip) */
         @media print {
             body * { visibility: hidden; }
-            #receipt-area, #receipt-area * { visibility: visible; }
+            #receipt-area, #receipt-area *, #kitchen-slip-area, #kitchen-slip-area * { visibility: visible; }
             #receipt-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+            #kitchen-slip-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
         }
-        #receipt-area { display: none; width: 280px; padding: 15px; border: 1px dashed #000; font-family: monospace; }
+        #receipt-area, #kitchen-slip-area { display: none; width: 280px; padding: 15px; border: 1px dashed #000; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -177,7 +184,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Stop-list, Bron, KDS va Kassa Tizimi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Kassa, KDS, Sklad va Split-Bill</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -230,14 +237,15 @@
                         <span id="res-info-text"></span>
                         <div style="margin-top:8px; display:flex; gap:6px;">
                             <button onclick="checkInReservation()" style="background:#27ae60; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Mehmon keldi (Ochish)</button>
-                            <button onclick="cancelReservation()" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Bronni bekor qilish</button>
+                            <button onclick="cancelReservation()" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Bekor qilish</button>
                         </div>
                     </div>
 
-                    <!-- Stol operatsiyalari -->
+                    <!-- Stol asboblari -->
                     <div class="table-tools-bar">
-                        <button class="btn-tool" onclick="openTransferModal()">🔁 Bo'sh stolga ko'chirish</button>
-                        <button class="btn-tool" onclick="openReservationModal()">📅 Stolni bron qilish</button>
+                        <button class="btn-tool" onclick="openTransferModal()">🔁 Ko'chirish</button>
+                        <button class="btn-tool" onclick="openReservationModal()">📅 Bron qilish</button>
+                        <button class="btn-tool" style="background:#eef2ff; color:#4338ca; border-color:#c7d2fe;" onclick="openSplitBillModal()">✂️ Bo'lib to'lash</button>
                     </div>
 
                     <h3 style="margin-top:12px;">Joriy hisob:</h3>
@@ -248,7 +256,7 @@
                         <div>
                             <span>Ofitsiant: </span>
                             <select id="waiter-select" onchange="updateWaiterSelection()"></select>
-                            <button onclick="addNewWaiterPrompt()" style="padding:2px 6px; font-size:12px; cursor:pointer;" title="Yangi ofitsiant qo'shish">+</button>
+                            <button onclick="addNewWaiterPrompt()" style="padding:2px 6px; font-size:12px; cursor:pointer;">+</button>
                         </div>
                         <div>
                             <span>Xizmat: </span>
@@ -283,7 +291,7 @@
                         <button class="print-btn" id="btn-print" type="button">Chek chiqarish</button>
                         <button class="close-btn" id="btn-open-pay-modal" type="button">Hisobni yopish</button>
                     </div>
-                    <button class="delete-btn" id="btn-delete-table" type="button">🗑 Ushbu stolni o'chirish</button>
+                    <button class="delete-btn" id="btn-delete-table" type="button">🔒 O'chirish (Admin PIN)</button>
                 </div>
             </div>
 
@@ -332,7 +340,7 @@
         <div class="card full-width">
             <div class="card-header">
                 <h2>Oshxona Buyurtmalari (Jonli KDS)</h2>
-                <div style="font-size:13px; color:#555;">🟡 Yangi | 🔵 Pishirilmoqda | 🟢 Tayyor</div>
+                <div style="font-size:13px; color:#555;">🟡 Yangi | 🔵 Pishirilmoqda | 🟢 Tayyor | ⚠️ 25+ min kechikish</div>
             </div>
 
             <div class="kds-dept-bar" id="kds-dept-bar">
@@ -355,7 +363,7 @@
             </div>
 
             <div class="add-form" style="margin-top:0; border-top:none; padding-top:0;">
-                <input type="text" id="new-stock-name" placeholder="Masalliq nomi (masalan: Pomidor)" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:2; min-width:140px;">
+                <input type="text" id="new-stock-name" placeholder="Masalliq nomi" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:2; min-width:140px;">
                 <input type="number" id="new-stock-qty" placeholder="Miqdori" step="0.1" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:90px;">
                 <select id="new-stock-unit" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:90px;">
                     <option value="kg">kg</option>
@@ -369,7 +377,40 @@
         </div>
     </div>
 
-    <!-- STOLNI KO'CHIRISH MODALI -->
+    <!-- MODAL: CHEKNI BO'LIB TO'LASH (SPLIT BILL) -->
+    <div class="modal-overlay" id="split-bill-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>✂️ Chekni Bo'lib To'lash (Mehmon ulushi)</h3>
+                <button class="close-modal-btn" onclick="closeSplitBillModal()">&times;</button>
+            </div>
+            <p style="font-size:13px; color:#555; margin-top:8px;">Hozir ketayotgan mehmon yegan taomlarni belgilang:</p>
+            <div id="split-bill-items-list" style="margin:10px 0; max-height:220px; overflow-y:auto;"></div>
+            
+            <div style="border-top:1px dashed #cbd5e1; padding-top:8px; margin-top:8px;">
+                <b>Ushbu mehmon hisobi: <span id="split-bill-total" style="color:#27ae60; font-size:17px;">0</span> so'm</b>
+            </div>
+
+            <div style="text-align:center; background:#f8f9fa; padding:8px; border-radius:6px; margin-top:10px;">
+                <span style="font-size:12px; font-weight:bold;">Ofitsiantni baholang:</span>
+                <div class="rating-stars" id="split-stars-box" style="font-size:24px; margin:4px 0;">
+                    <span class="star selected" onclick="setSplitRating(1)">★</span>
+                    <span class="star selected" onclick="setSplitRating(2)">★</span>
+                    <span class="star selected" onclick="setSplitRating(3)">★</span>
+                    <span class="star selected" onclick="setSplitRating(4)">★</span>
+                    <span class="star selected" onclick="setSplitRating(5)">★</span>
+                </div>
+            </div>
+
+            <div class="payment-options" style="margin-top:10px;">
+                <button class="payment-btn" onclick="confirmSplitBillPayment('Naqd')">💵 Naqd bilan to'lash</button>
+                <button class="payment-btn" onclick="confirmSplitBillPayment('Karta (Terminal)')">💳 Karta bilan to'lash</button>
+                <button class="payment-btn" onclick="confirmSplitBillPayment('Payme / Click')">📲 Payme bilan to'lash</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: KO'CHIRISH -->
     <div class="modal-overlay" id="transfer-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -384,7 +425,7 @@
         </div>
     </div>
 
-    <!-- BRON QILISH MODALI -->
+    <!-- MODAL: BRON -->
     <div class="modal-overlay" id="reserve-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -392,15 +433,15 @@
                 <button class="close-modal-btn" onclick="closeReservationModal()">&times;</button>
             </div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
-                <input type="text" id="res-name-input" placeholder="Mijoz ismi (masalan: Alisher aka)" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
-                <input type="text" id="res-phone-input" placeholder="Telefon raqami (masalan: +998 90 123 45 67)" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
-                <input type="text" id="res-time-input" placeholder="Kelish vaqti (masalan: Bugun 18:30)" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
+                <input type="text" id="res-name-input" placeholder="Mijoz ismi" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
+                <input type="text" id="res-phone-input" placeholder="Telefon raqami" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
+                <input type="text" id="res-time-input" placeholder="Kelish vaqti (masalan: 18:30)" style="padding:10px; border:1px solid #ccc; border-radius:6px;">
                 <button onclick="saveReservation()" class="btn-green">Bronni Saqlash</button>
             </div>
         </div>
     </div>
 
-    <!-- To'lov va Baholash modali -->
+    <!-- MODAL: TO'LOV VA BAHOLASH -->
     <div class="modal-overlay" id="pay-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -411,7 +452,6 @@
             <p style="margin-top:15px; font-size:15px;">To'lanishi kerak: <b id="pay-modal-amount" style="color:#27ae60; font-size:18px;">0 so'm</b></p>
             <div id="pay-modal-disc-info" style="font-size:13px; color:#e67e22; margin-bottom:10px;"></div>
 
-            <!-- Ofitsiantni majburiy baholash -->
             <div style="text-align:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:12px; border:1px solid #e2e8f0;">
                 <span style="font-size:13px; font-weight:bold; color:#2c3e50;">Ofitsiant xizmatini baholang (Majburiy):</span>
                 <div class="rating-stars" id="stars-box">
@@ -424,7 +464,6 @@
                 <small id="rating-label" style="color:#e74c3c; font-weight:bold;">⚠️ Iltimos, yulduzcha bosing!</small>
             </div>
 
-            <!-- To'lov turlari -->
             <div class="payment-options">
                 <button class="payment-btn" onclick="confirmPayment('Naqd')">💵 To'liq Naqd pul</button>
                 <button class="payment-btn" onclick="confirmPayment('Karta (Terminal)')">💳 To'liq Karta (Terminal)</button>
@@ -432,7 +471,6 @@
                 <button class="payment-btn" style="border-color:#3498db; background:#f0f7ff;" onclick="toggleSplitPayBox()">🔀 Aralash to'lov (Naqd + Karta)</button>
             </div>
 
-            <!-- Aralash to'lov qutisi -->
             <div class="split-pay-box" id="split-pay-box">
                 <label style="font-size:13px; color:#555;">Naqd berilgan summa (so'm):</label>
                 <input type="number" id="split-cash-input" placeholder="0" oninput="calculateSplitRemaining()">
@@ -444,14 +482,13 @@
         </div>
     </div>
 
-    <!-- Menyu modali (Stop-list boshqaruvi bilan) -->
+    <!-- MODAL: MENYU VA STOP-LIST -->
     <div class="modal-overlay" id="menu-modal">
         <div class="modal-card">
             <div class="modal-header">
                 <h3>Menyuni Boshqarish & Stop-list</h3>
                 <button class="close-modal-btn" id="btn-close-menu-modal">&times;</button>
             </div>
-            <p style="font-size:12px; color:#64748b; margin-top:8px;">Taom tugasa, Stop tugmasini bosing. U buyurtmaga qo'shilmaydi.</p>
             <table class="manage-table">
                 <thead>
                     <tr><th>Taom</th><th>Sex</th><th>Narxi</th><th style="text-align: right;">Amallar</th></tr>
@@ -465,13 +502,13 @@
                     <option value="Mangal">Mangal</option>
                     <option value="Bar">Bar</option>
                 </select>
-                <input type="number" id="modal-new-price" placeholder="Narxi (so'm)">
+                <input type="number" id="modal-new-price" placeholder="Narxi (1 porsiya)">
                 <button id="modal-btn-add" type="button">+ Qo'shish</button>
             </div>
         </div>
     </div>
 
-    <!-- Chop etish cheki -->
+    <!-- CHOP ETISH: MIJOZ CHEKI -->
     <div id="receipt-area">
         <center>
             <h3>RESTAURANT OS</h3>
@@ -488,15 +525,31 @@
         <div style="font-size:12px; margin-bottom: 4px;" id="rc-disc-row">Chegirma (<span id="rc-disc-pct">0</span>%): -<span id="rc-disc">0</span> so'm</div>
         <div style="font-size:12px; margin-bottom: 8px;">Xizmat haqi (<span id="rc-fee-pct">0</span>%): <span id="rc-service">0</span> so'm</div>
         <h4>JAMI: <span id="rc-total">0</span> so'm</h4>
-        <div style="font-size:11px; margin-top:4px;" id="rc-method-detail"></div>
+    </div>
+
+    <!-- CHOP ETISH: OSHXONA BILETI (KITCHEN SLIP) -->
+    <div id="kitchen-slip-area">
+        <center>
+            <h3>👨‍🍳 OSHXONA BILETI</h3>
+            <p id="ks-time"></p>
+            <h2 id="ks-table" style="margin:5px 0;"></h2>
+            <p>Ofitsiant: <b id="ks-waiter"></b></p>
+            <hr>
+        </center>
+        <div id="ks-items" style="font-size:14px; font-weight:bold;"></div>
+        <hr>
+        <center><small>RestaurantOS KDS Dispatcher</small></center>
     </div>
 
     <script>
+        var ADMIN_PIN = "0000"; // Xavfsizlik PIN kodi
         var zones = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
         var currentZoneFilter = "Barchasi";
         var currentKdsDept = "Barchasi";
         var activeDropdownIndex = null;
         var selectedRating = 0;
+        var splitSelectedRating = 5;
+        var splitBillSelection = {};
 
         var recipeCard = {
             "Osh": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
@@ -514,6 +567,7 @@
                 "VIP xona": ["Shaxzod"]
             },
             tableWaiters: {},
+            tableOpenTimes: {}, // Buyurtma ochilgan vaqtlar (Taymer uchun)
             reservations: {},
             tables: [
                 { key: "Asosiy zal-1", zone: "Asosiy zal", number: 1 },
@@ -588,7 +642,7 @@
                 var t = localStorage.getItem('ros_tables_v3');
                 if (t) { var pT = JSON.parse(t); if (Array.isArray(pT) && pT.length > 0) state.tables = pT; }
 
-                var m = localStorage.getItem('ros_menu_v3');
+                var m = localStorage.getItem('ros_menu_v4');
                 if (m) { var pM = JSON.parse(m); if (Array.isArray(pM) && pM.length > 0) state.menu = pM; }
 
                 var o = localStorage.getItem('ros_orders_v5');
@@ -602,6 +656,9 @@
 
                 var tw = localStorage.getItem('ros_table_waiters');
                 if (tw) { var pTW = JSON.parse(tw); if (pTW && typeof pTW === 'object') state.tableWaiters = pTW; }
+
+                var tot = localStorage.getItem('ros_open_times');
+                if (tot) { var pTot = JSON.parse(tot); if (pTot && typeof pTot === 'object') state.tableOpenTimes = pTot; }
 
                 var res = localStorage.getItem('ros_reservations');
                 if (res) { var pRes = JSON.parse(res); if (pRes && typeof pRes === 'object') state.reservations = pRes; }
@@ -618,7 +675,7 @@
                 var tc = localStorage.getItem('ros_customers');
                 if (tc) { var pTC = JSON.parse(tc); if (pTC && typeof pTC === 'object') state.tableCustomers = pTC; }
 
-                var h = localStorage.getItem('ros_history_v9');
+                var h = localStorage.getItem('ros_history_v10');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
                 console.error("Xotira yuklashda xato:", e);
@@ -639,17 +696,18 @@
         function saveStorage() {
             try {
                 localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
-                localStorage.setItem('ros_menu_v3', JSON.stringify(state.menu));
+                localStorage.setItem('ros_menu_v4', JSON.stringify(state.menu));
                 localStorage.setItem('ros_orders_v5', JSON.stringify(state.orders));
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
                 localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
                 localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
+                localStorage.setItem('ros_open_times', JSON.stringify(state.tableOpenTimes));
                 localStorage.setItem('ros_reservations', JSON.stringify(state.reservations));
                 localStorage.setItem('ros_discounts_v2', JSON.stringify(state.tableDiscounts));
                 localStorage.setItem('ros_customers', JSON.stringify(state.tableCustomers));
                 localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
                 localStorage.setItem('ros_stock_v1', JSON.stringify(state.stock));
-                localStorage.setItem('ros_history_v9', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v10', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
             }
@@ -710,132 +768,11 @@
             sBadge.style.display = hasLowStock ? 'inline-block' : 'none';
         }
 
-        function renderStock() {
-            var container = document.getElementById('stock-container');
-            container.innerHTML = '';
-
-            state.stock.forEach(function(item, idx) {
-                var isLow = (item.unit === 'dona' ? item.qty <= 10 : item.qty <= 3.0);
-                var card = document.createElement('div');
-                card.className = 'stock-card ' + (isLow ? 'low' : '');
-                card.innerHTML = 
-                    '<div>' +
-                        '<b>' + item.name + '</b>' + (isLow ? ' <span style="color:#dc2626; font-size:12px;">⚠️ Kam qoldi!</span>' : '') +
-                        '<div class="qty">' + item.qty.toFixed(item.unit === 'dona' ? 0 : 2) + ' ' + item.unit + '</div>' +
-                    '</div>' +
-                    '<div class="stock-card-actions">' +
-                        '<input type="number" id="stock-add-val-' + idx + '" placeholder="+Kirim" step="0.5">' +
-                        '<button onclick="addStockQty(' + idx + ')">+Qo\'shish</button>' +
-                    '</div>';
-                container.appendChild(card);
-            });
-        }
-
-        function addStockQty(idx) {
-            var input = document.getElementById('stock-add-val-' + idx);
-            var val = parseFloat(input.value);
-            if (isNaN(val) || val <= 0) return alert("To'g'ri miqdor kiriting!");
-
-            state.stock[idx].qty += val;
-            saveStorage();
-            updateBadges();
-            renderStock();
-        }
-
-        function addNewStockItem() {
-            var n = document.getElementById('new-stock-name').value.trim();
-            var q = parseFloat(document.getElementById('new-stock-qty').value);
-            var u = document.getElementById('new-stock-unit').value;
-
-            if (!n || isNaN(q) || q < 0) return alert("Iltimos, nom va miqdorni to'g'ri kiriting!");
-            state.stock.push({ id: Date.now(), name: n, qty: q, unit: u });
-
-            saveStorage();
-            updateBadges();
-            renderStock();
-
-            document.getElementById('new-stock-name').value = '';
-            document.getElementById('new-stock-qty').value = '';
-        }
-
-        function deductIngredientsFromStock(ordersList) {
-            ordersList.forEach(function(order) {
-                var recipe = recipeCard[order.name];
-                if (recipe) {
-                    recipe.forEach(function(ing) {
-                        var totalNeeded = ing.qty * order.qty;
-                        var stockItem = state.stock.find(function(s) { return s.name.toLowerCase() === ing.item.toLowerCase(); });
-                        if (stockItem) {
-                            stockItem.qty = Math.max(0, stockItem.qty - totalNeeded);
-                        }
-                    });
-                }
-            });
-            saveStorage();
-            updateBadges();
-        }
-
-        function renderWaitersSelect() {
-            var sel = document.getElementById('waiter-select');
-            sel.innerHTML = '';
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var zone = curTbl ? curTbl.zone : "Asosiy zal";
-            var list = state.zoneWaiters[zone] || ["Ofitsiant"];
-
-            list.forEach(function(w) {
-                var opt = document.createElement('option');
-                opt.value = w;
-                opt.innerText = w;
-                sel.appendChild(opt);
-            });
-
-            if (!state.tableWaiters[state.selectedKey] || !list.includes(state.tableWaiters[state.selectedKey])) {
-                state.tableWaiters[state.selectedKey] = list[0];
-            }
-            sel.value = state.tableWaiters[state.selectedKey];
-        }
-
-        function updateWaiterSelection() {
-            var sel = document.getElementById('waiter-select');
-            state.tableWaiters[state.selectedKey] = sel.value;
-            saveStorage();
-            renderTables();
-            renderOrder();
-        }
-
-        function addNewWaiterPrompt() {
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var zone = curTbl ? curTbl.zone : "Asosiy zal";
-
-            var name = prompt(zone + " uchun yangi ofitsiant ismini kiriting:");
-            if (!name) return;
-            name = name.trim();
-
-            if (!state.zoneWaiters[zone]) state.zoneWaiters[zone] = [];
-            if (state.zoneWaiters[zone].includes(name)) return alert("Bu ofitsiant allaqachon mavjud!");
-
-            state.zoneWaiters[zone].push(name);
-            state.tableWaiters[state.selectedKey] = name;
-            saveStorage();
-            renderWaitersSelect();
-            renderTables();
-            renderOrder();
-        }
-
-        function renderZoneFilters() {
-            var bar = document.getElementById('zone-filter-bar');
-            bar.innerHTML = '';
-            zones.forEach(function(zone) {
-                var btn = document.createElement('button');
-                btn.className = 'zone-btn' + (zone === currentZoneFilter ? ' active' : '');
-                btn.innerText = zone;
-                btn.onclick = function() {
-                    currentZoneFilter = zone;
-                    renderZoneFilters();
-                    renderTables();
-                };
-                bar.appendChild(btn);
-            });
+        /* --- STOLLAR VA TAYMERLAR (1-funksiya) --- */
+        function getElapsedMinutes(key) {
+            var start = state.tableOpenTimes[key];
+            if (!start) return 0;
+            return Math.floor((Date.now() - start) / 60000);
         }
 
         function renderTables() {
@@ -861,16 +798,29 @@
                     return t.tableKey === tbl.key && t.status === 'ready';
                 });
 
-                var statusText = isReady ? '🔔 TAYYOR!' : (isBusy ? '(Band)' : (isRes ? '🟡 (Bron)' : '(Bo\'sh)'));
-                var baseClass = isReady ? 'table-ready-alert' : (isBusy ? 'busy' : (isRes ? 'reserved' : 'free'));
+                var elapsed = isBusy ? getElapsedMinutes(tbl.key) : 0;
+                var isLate = isBusy && elapsed >= 25; // 25+ min kechikish
+
+                var statusText = isReady ? '🔔 TAYYOR!' : (isBusy ? (isLate ? '⚠️ ' + elapsed + ' daq (Kechikmoqda)' : '⏱ ' + elapsed + ' daq (Band)') : (isRes ? '🟡 (Bron)' : '(Bo\'sh)'));
+                var baseClass = isReady ? 'table-ready-alert' : (isBusy ? (isLate ? 'busy table-late-alert' : 'busy') : (isRes ? 'reserved' : 'free'));
                 var waiterName = state.tableWaiters[tbl.key] ? ' <span style="font-size:11px;opacity:0.85;">[' + state.tableWaiters[tbl.key] + ']</span>' : '';
 
                 btn.className = 'table-btn ' + baseClass + (tbl.key === state.selectedKey ? ' selected' : '');
-                btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b> ' + statusText + '<br>' + waiterName;
+                btn.innerHTML = tbl.zone + '<br><b>Stol ' + tbl.number + '</b><br>' + statusText + '<br>' + waiterName;
                 btn.onclick = function() { selectTable(tbl.key); };
                 container.appendChild(btn);
             });
         }
+
+        // Har 30 soniyada stollar taymerini qayta chizish
+        setInterval(function() {
+            if (document.getElementById('view-hall').style.display !== 'none') {
+                renderTables();
+            }
+            if (document.getElementById('view-kds').style.display !== 'none') {
+                renderKDS();
+            }
+        }, 30000);
 
         function selectTable(key) {
             state.selectedKey = key;
@@ -885,73 +835,7 @@
             renderOrder();
         }
 
-        function updateServiceFee() {
-            var sel = document.getElementById('service-fee-rate');
-            state.serviceFees[state.selectedKey] = parseInt(sel.value) || 0;
-            saveStorage();
-            renderOrder();
-        }
-
-        function updateDiscountManual() {
-            var sel = document.getElementById('cust-discount');
-            state.tableDiscounts[state.selectedKey] = sel.value;
-            saveStorage();
-            renderOrder();
-        }
-
-        document.getElementById('cust-phone').addEventListener('input', function(e) {
-            state.tableCustomers[state.selectedKey] = e.target.value.trim();
-            saveStorage();
-        });
-
-        function addNewTable() {
-            var selectedZone = document.getElementById('new-table-zone').value;
-            var maxNum = 0;
-            state.tables.forEach(function(t) {
-                if (t.zone === selectedZone && t.number > maxNum) maxNum = t.number;
-            });
-            var nextNum = maxNum + 1;
-            var newKey = selectedZone + '-' + nextNum;
-
-            state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
-            state.orders[newKey] = [];
-            state.serviceFees[newKey] = 10;
-            state.tableDiscounts[newKey] = 'auto';
-            state.tableCustomers[newKey] = '';
-            var zList = state.zoneWaiters[selectedZone] || ["Ofitsiant"];
-            state.tableWaiters[newKey] = zList[0];
-
-            saveStorage();
-            selectTable(newKey);
-        }
-
-        function deleteCurrentTable() {
-            if (state.tables.length <= 1) return alert("Kamida 1 ta stol qolishi shart!");
-            var curOrders = state.orders[state.selectedKey] || [];
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var tblName = curTbl ? curTbl.zone + ' ' + curTbl.number + '-stol' : 'Stol';
-
-            if (curOrders.length > 0) {
-                var pass = prompt("DIQQAT! " + tblName + "da to'lanmagan hisob bor. O'chirish uchun OCHIRISH so'zini yozing:");
-                if (pass !== 'OCHIRISH') return alert("O'chirish bekor qilindi.");
-            } else {
-                if (!confirm(tblName + " o'chirilsinmi?")) return;
-            }
-
-            state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
-            delete state.orders[state.selectedKey];
-            delete state.serviceFees[state.selectedKey];
-            delete state.tableWaiters[state.selectedKey];
-            delete state.tableDiscounts[state.selectedKey];
-            delete state.tableCustomers[state.selectedKey];
-            delete state.reservations[state.selectedKey];
-
-            state.selectedKey = state.tables[0].key;
-            saveStorage();
-            selectTable(state.selectedKey);
-        }
-
-        /* --- STOP-LIST MANTIG'I BILAN MENYU CHIQARISH --- */
+        /* --- MENYU VA PORSIYA TANLOVI (2-funksiya) --- */
         function renderMenu() {
             var container = document.getElementById('menu-container');
             container.innerHTML = '';
@@ -960,34 +844,49 @@
                 var isStopped = !!item.isStopped;
                 div.className = 'menu-item' + (isStopped ? ' stopped' : '');
 
-                var stopTag = isStopped ? '<span class="item-badge badge-stop">⛔ Tugagan (Stop-list)</span>' : '';
-                div.innerHTML = '<span><b>' + item.name + '</b> <span class="item-badge">' + (item.dept || 'Oshxona') + '</span> ' + stopTag + '<br><small style="color:#555;">' + item.price.toLocaleString() + ' so\'m</small></span>';
+                var stopTag = isStopped ? '<span class="item-badge badge-stop">⛔ Stopda</span>' : '';
+                var halfPrice = Math.round(item.price * 0.7);
 
-                var addBtn = document.createElement('button');
-                addBtn.className = 'add-btn';
-                addBtn.innerText = isStopped ? "Tugagan" : "Qo'shish";
-                addBtn.disabled = isStopped;
-                addBtn.onclick = function() { addMenuItemByIndex(index); };
+                div.innerHTML = 
+                    '<div>' +
+                        '<b>' + item.name + '</b> <span class="item-badge">' + (item.dept || 'Oshxona') + '</span> ' + stopTag + '<br>' +
+                        '<small style="color:#555;">1 pors: ' + item.price.toLocaleString() + ' | 0.7 pors: ' + halfPrice.toLocaleString() + ' so\'m</small>' +
+                        '<div class="portion-box">' +
+                            '<button class="portion-btn" ' + (isStopped ? 'disabled' : '') + ' onclick="addMenuItemWithPortion(' + index + ', 1.0)">+ 1 pors</button>' +
+                            '<button class="portion-btn btn-half" ' + (isStopped ? 'disabled' : '') + ' onclick="addMenuItemWithPortion(' + index + ', 0.7)">+ 0.7 pors</button>' +
+                        '</div>' +
+                    '</div>';
 
-                div.appendChild(addBtn);
                 container.appendChild(div);
             });
         }
 
-        function addMenuItemByIndex(index) {
+        function addMenuItemWithPortion(index, portion) {
             var item = state.menu[index];
             if (!item || item.isStopped) return;
 
             if (!state.orders[state.selectedKey]) state.orders[state.selectedKey] = [];
             var currentOrders = state.orders[state.selectedKey];
-            var existing = currentOrders.find(function(o) { return o.name === item.name && !o.note; });
+
+            // Birinchi taom qo'shilganda taymer boshlanadi
+            if (currentOrders.length === 0) {
+                state.tableOpenTimes[state.selectedKey] = Date.now();
+            }
+
+            var pLabel = portion === 1.0 ? '1 pors' : '0.7 pors';
+            var finalPrice = portion === 1.0 ? item.price : Math.round(item.price * 0.7);
+            var itemName = item.name + ' (' + pLabel + ')';
+
+            var existing = currentOrders.find(function(o) { return o.name === itemName && !o.note; });
 
             if (existing) {
                 existing.qty++;
             } else {
                 currentOrders.push({
-                    name: item.name,
-                    price: item.price,
+                    name: itemName,
+                    rawName: item.name,
+                    price: finalPrice,
+                    portion: portion,
                     dept: item.dept || 'Issiq taomlar',
                     qty: 1,
                     note: ''
@@ -999,57 +898,310 @@
             renderOrder();
         }
 
-        function toggleItemDropdown(idx, event) {
-            event.stopPropagation();
-            activeDropdownIndex = (activeDropdownIndex === idx) ? null : idx;
-            renderOrder();
+        /* --- OSHXONA CHIPTASI CHOP ETISH (4-funksiya) --- */
+        function printKitchenSlip(ticket) {
+            document.getElementById('ks-time').innerText = ticket.time;
+            document.getElementById('ks-table').innerText = ticket.zone + ' #' + ticket.tableNum;
+            document.getElementById('ks-waiter').innerText = ticket.waiter || 'Ofitsiant';
+
+            var ksBox = document.getElementById('ks-items');
+            ksBox.innerHTML = '';
+            ticket.items.forEach(function(i) {
+                var notePart = i.note ? '<br><small>📌 ' + i.note + '</small>' : '';
+                ksBox.innerHTML += '<div style="margin-bottom:6px;">' + i.name + ' &times; ' + i.qty + notePart + '</div>';
+            });
+
+            window.print();
         }
 
-        function changeOrderQty(itemIndex, delta) {
-            var currentOrders = state.orders[state.selectedKey] || [];
-            if (!currentOrders[itemIndex]) return;
+        function sendOrderToKitchen() {
+            var curOrders = state.orders[state.selectedKey] || [];
+            if (curOrders.length === 0) return alert("Oshxonaga yuborish uchun buyurtma mavjud emas!");
 
-            currentOrders[itemIndex].qty += delta;
-            if (currentOrders[itemIndex].qty <= 0) currentOrders.splice(itemIndex, 1);
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
 
-            activeDropdownIndex = null;
+            var d = new Date();
+            var timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            var itemsCopy = JSON.parse(JSON.stringify(curOrders));
+
+            var newTicket = {
+                id: Date.now(),
+                tableKey: state.selectedKey,
+                zone: curTbl ? curTbl.zone : '-',
+                tableNum: curTbl ? curTbl.number : '-',
+                waiter: waiter,
+                time: timeStr,
+                timestamp: Date.now(),
+                items: itemsCopy,
+                status: 'waiting'
+            };
+
+            var existingTicket = state.kdsTickets.find(function(t) { 
+                return t.tableKey === state.selectedKey && t.status !== 'done'; 
+            });
+
+            if (existingTicket) {
+                existingTicket.items = itemsCopy;
+                existingTicket.time = timeStr;
+                existingTicket.waiter = waiter;
+            } else {
+                state.kdsTickets.unshift(newTicket);
+            }
+
             saveStorage();
-            renderTables();
+            updateBadges();
             renderOrder();
+            
+            if (confirm("Buyurtma oshxonaga uzatildi! Oshpaz uchun kvitansiya (bilet) chiqarilsinmi?")) {
+                printKitchenSlip(newTicket);
+            }
         }
 
-        function removeOrderItem(itemIndex) {
-            var currentOrders = state.orders[state.selectedKey] || [];
-            if (!currentOrders[itemIndex]) return;
+        /* --- KDS OSHXONA RENDER --- */
+        function renderKDS() {
+            var container = document.getElementById('kds-orders-container');
+            container.innerHTML = '';
 
-            currentOrders.splice(itemIndex, 1);
-            activeDropdownIndex = null;
-            saveStorage();
-            renderTables();
-            renderOrder();
-        }
+            var activeTickets = state.kdsTickets.filter(function(t) { return t.status !== 'done'; });
 
-        function addNoteToItem(itemIndex) {
-            var currentOrders = state.orders[state.selectedKey] || [];
-            if (!currentOrders[itemIndex]) return;
+            if (activeTickets.length === 0) {
+                container.innerHTML = '<p style="color:#7f8c8d; text-align:center; grid-column: 1/-1; padding: 30px;">Hozircha faol buyurtmalar yo\'q.</p>';
+                return;
+            }
 
-            var existingNote = currentOrders[itemIndex].note || '';
-            var userNote = prompt("Oshpaz uchun eslatma (masalan: Ko'k choy bo'lsin, Piyozi kam):", existingNote);
-            if (userNote !== null) {
-                currentOrders[itemIndex].note = userNote.trim();
-                activeDropdownIndex = null;
-
-                var activeTicket = state.kdsTickets.find(function(t) { 
-                    return t.tableKey === state.selectedKey && t.status !== 'done'; 
+            activeTickets.forEach(function(ticket) {
+                var filteredItems = ticket.items.filter(function(item) {
+                    if (currentKdsDept === 'Barchasi') return true;
+                    return item.dept === currentKdsDept;
                 });
-                if (activeTicket) {
-                    activeTicket.items = JSON.parse(JSON.stringify(currentOrders));
+
+                if (filteredItems.length === 0) return;
+
+                var elapsed = Math.floor((Date.now() - (ticket.timestamp || Date.now())) / 60000);
+                var isLate = elapsed >= 25;
+
+                var card = document.createElement('div');
+                card.className = 'kds-card ' + ticket.status + (isLate ? ' late' : '');
+
+                var itemsHtml = '';
+                filteredItems.forEach(function(i) {
+                    var noteText = i.note ? '<div class="kds-item-note">📌 ' + i.note + '</div>' : '';
+                    itemsHtml += '<li>' +
+                                    '<div class="kds-item-main"><span>' + i.name + '</span> <b>&times; ' + i.qty + '</b></div>' +
+                                    noteText +
+                                 '</li>';
+                });
+
+                var statusText = ticket.status === 'waiting' ? '🟡 Kutilmoqda' : (ticket.status === 'cooking' ? '🔵 Pishirilmoqda' : '🟢 Tayyor');
+
+                var actionsHtml = '';
+                if (ticket.status === 'waiting') {
+                    actionsHtml = '<button class="kds-btn btn-kds-cook" onclick="changeKdsStatus(' + ticket.id + ', \'cooking\')">Boshlash</button>';
+                } else if (ticket.status === 'cooking') {
+                    actionsHtml = '<button class="kds-btn btn-kds-ready" onclick="changeKdsStatus(' + ticket.id + ', \'ready\')">Tayyor</button>';
+                } else {
+                    actionsHtml = '<button class="kds-btn btn-kds-done" onclick="changeKdsStatus(' + ticket.id + ', \'done\')">Topshirildi</button>';
                 }
 
+                card.innerHTML = 
+                    '<div>' +
+                        '<div class="kds-header">' +
+                            '<div><b>' + ticket.zone + ' | Stol ' + ticket.tableNum + '</b><br><small style="color:#555;">' + statusText + ' (' + (ticket.waiter || '') + ')</small></div>' +
+                            '<span class="kds-time">🕒 ' + ticket.time + (isLate ? ' <b style="color:#e74c3c;">(' + elapsed + ' daq!)</b>' : '') + '</span>' +
+                        '</div>' +
+                        '<ul class="kds-items">' + itemsHtml + '</ul>' +
+                    '</div>' +
+                    '<div class="kds-actions">' + actionsHtml + '</div>';
+
+                container.appendChild(card);
+            });
+        }
+
+        function changeKdsStatus(ticketId, newStatus) {
+            var ticket = state.kdsTickets.find(function(t) { return t.id === ticketId; });
+            if (ticket) {
+                ticket.status = newStatus;
                 saveStorage();
+                updateBadges();
+                renderKDS();
+                renderTables();
                 renderOrder();
-                if (document.getElementById('view-kds').style.display === 'block') renderKDS();
+
+                if (newStatus === 'ready') {
+                    showNotification(ticket.zone + ' - Stol #' + ticket.tableNum + ' (' + (ticket.waiter || '') + ') taomlari tayyor bo\'ldi!');
+                }
             }
+        }
+
+        /* --- CHEKNI BO'LIB TO'LASH / SPLIT BILL (5-funksiya) --- */
+        function openSplitBillModal() {
+            var curOrders = state.orders[state.selectedKey] || [];
+            if (curOrders.length === 0) return alert("Bu stolda buyurtma yo'q!");
+
+            splitBillSelection = {};
+            splitSelectedRating = 5;
+            setSplitRating(5);
+            renderSplitBillModalItems();
+            document.getElementById('split-bill-modal').style.display = 'flex';
+        }
+
+        function closeSplitBillModal() {
+            document.getElementById('split-bill-modal').style.display = 'none';
+        }
+
+        function setSplitRating(val) {
+            splitSelectedRating = val;
+            var stars = document.querySelectorAll('#split-stars-box .star');
+            stars.forEach(function(s, idx) {
+                if (idx < val) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+        }
+
+        function renderSplitBillModalItems() {
+            var container = document.getElementById('split-bill-items-list');
+            container.innerHTML = '';
+            var curOrders = state.orders[state.selectedKey] || [];
+            var totalPart = 0;
+
+            curOrders.forEach(function(item, idx) {
+                var selectedQty = splitBillSelection[idx] || 0;
+                totalPart += (item.price * selectedQty);
+
+                var row = document.createElement('div');
+                row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #eee;";
+                row.innerHTML = 
+                    '<div><b>' + item.name + '</b> (' + item.price.toLocaleString() + ' so\'m)<br><small style="color:#777;">Jami stolda: ' + item.qty + ' ta</small></div>' +
+                    '<div style="display:flex; align-items:center; gap:8px;">' +
+                        '<button onclick="changeSplitItemQty(' + idx + ', -1)" style="padding:2px 8px; font-weight:bold; cursor:pointer;">-</button>' +
+                        '<b style="color:#27ae60;">' + selectedQty + '</b>' +
+                        '<button onclick="changeSplitItemQty(' + idx + ', 1)" style="padding:2px 8px; font-weight:bold; cursor:pointer;">+</button>' +
+                    '</div>';
+                container.appendChild(row);
+            });
+
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(totalPart * (feePct / 100));
+            var totalWithFee = totalPart + feeAmount;
+            document.getElementById('split-bill-total').innerText = totalWithFee.toLocaleString();
+        }
+
+        function changeSplitItemQty(idx, delta) {
+            var curOrders = state.orders[state.selectedKey] || [];
+            var maxQty = curOrders[idx].qty;
+            var current = splitBillSelection[idx] || 0;
+            var next = current + delta;
+
+            if (next >= 0 && next <= maxQty) {
+                splitBillSelection[idx] = next;
+                renderSplitBillModalItems();
+            }
+        }
+
+        function confirmSplitBillPayment(method) {
+            var curOrders = state.orders[state.selectedKey] || [];
+            var paidItems = [];
+            var totalPart = 0;
+
+            for (var idx in splitBillSelection) {
+                var count = splitBillSelection[idx];
+                if (count > 0) {
+                    var orig = curOrders[idx];
+                    paidItems.push({ name: orig.name, price: orig.price, qty: count, note: orig.note, portion: orig.portion, rawName: orig.rawName });
+                    totalPart += (orig.price * count);
+                    orig.qty -= count;
+                }
+            }
+
+            if (paidItems.length === 0) return alert("To'lash uchun kamida bitta taom tanlang!");
+
+            // Nol bo'lgan taomlarni tozalash
+            state.orders[state.selectedKey] = curOrders.filter(function(o) { return o.qty > 0; });
+            if (state.orders[state.selectedKey].length === 0) {
+                delete state.tableOpenTimes[state.selectedKey];
+            }
+
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(totalPart * (feePct / 100));
+            var grandTotal = totalPart + feeAmount;
+
+            deductIngredientsFromStock(paidItems);
+
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+            var d = new Date();
+            var names = paidItems.map(function(p) { return p.name + ' (x' + p.qty + ')'; }).join('; ');
+
+            state.history.unshift({
+                time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: d.toLocaleDateString(),
+                zone: curTbl ? curTbl.zone : '-',
+                tableNum: curTbl ? curTbl.number : '-',
+                waiter: waiter,
+                customer: 'Bo\'lib to\'lash',
+                rating: splitSelectedRating,
+                items: names,
+                method: method + ' (Alohida)',
+                discount: 0,
+                serviceFee: feeAmount,
+                total: grandTotal
+            });
+
+            saveStorage();
+            closeSplitBillModal();
+            renderTables();
+            renderOrder();
+            renderReports();
+            alert("Mehmon o'z hissasini to'ladi! Qolgan hisob stolda qoldi.");
+        }
+
+        /* --- ADMIN PIN BILAN HIMOYALASH (3-funksiya) --- */
+        function deleteCurrentTable() {
+            var pin = prompt("Admin PIN-kodini kiriting (Standart: 0000):");
+            if (pin !== ADMIN_PIN) {
+                return alert("Xato PIN-kod! O'chirish rad etildi.");
+            }
+
+            if (state.tables.length <= 1) return alert("Kamida 1 ta stol qolishi shart!");
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var tblName = curTbl ? curTbl.zone + ' ' + curTbl.number + '-stol' : 'Stol';
+
+            if (!confirm(tblName + " butunlay o'chirilsinmi?")) return;
+
+            state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
+            delete state.orders[state.selectedKey];
+            delete state.serviceFees[state.selectedKey];
+            delete state.tableWaiters[state.selectedKey];
+            delete state.tableDiscounts[state.selectedKey];
+            delete state.tableCustomers[state.selectedKey];
+            delete state.tableOpenTimes[state.selectedKey];
+            delete state.reservations[state.selectedKey];
+
+            state.selectedKey = state.tables[0].key;
+            saveStorage();
+            selectTable(state.selectedKey);
+        }
+
+        /* --- QO'SHIMCHA YORDAMCHI FUNKSIYALAR --- */
+        function deductIngredientsFromStock(ordersList) {
+            ordersList.forEach(function(order) {
+                var baseName = order.rawName || order.name.split(' (')[0];
+                var recipe = recipeCard[baseName];
+                var portMult = order.portion || 1.0;
+
+                if (recipe) {
+                    recipe.forEach(function(ing) {
+                        var totalNeeded = ing.qty * order.qty * portMult;
+                        var stockItem = state.stock.find(function(s) { return s.name.toLowerCase() === ing.item.toLowerCase(); });
+                        if (stockItem) {
+                            stockItem.qty = Math.max(0, stockItem.qty - totalNeeded);
+                        }
+                    });
+                }
+            });
+            saveStorage();
+            updateBadges();
         }
 
         function getCurrentCalculations() {
@@ -1061,34 +1213,20 @@
             var discPct = 0;
 
             if (discVal === 'auto') {
-                if (subtotal > 200000) {
-                    discPct = 10;
-                } else if (subtotal > 100000) {
-                    discPct = 5;
-                } else {
-                    discPct = 0;
-                }
+                if (subtotal > 200000) discPct = 10;
+                else if (subtotal > 100000) discPct = 5;
+                else discPct = 0;
             } else {
                 discPct = parseInt(discVal) || 0;
             }
 
             var discAmount = Math.round(subtotal * (discPct / 100));
             var discountedSubtotal = subtotal - discAmount;
-
             var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
             var feeAmount = Math.round(discountedSubtotal * (feePct / 100));
             var total = discountedSubtotal + feeAmount;
 
-            return { 
-                subtotal: subtotal, 
-                discPct: discPct, 
-                discAmount: discAmount, 
-                discountedSubtotal: discountedSubtotal, 
-                feePct: feePct, 
-                feeAmount: feeAmount, 
-                total: total, 
-                orders: currentOrders 
-            };
+            return { subtotal: subtotal, discPct: discPct, discAmount: discAmount, discountedSubtotal: discountedSubtotal, feePct: feePct, feeAmount: feeAmount, total: total, orders: currentOrders };
         }
 
         function renderOrder() {
@@ -1114,13 +1252,13 @@
 
             if (kdsItem) {
                 if (kdsItem.status === 'waiting') {
-                    kdsStatusBadge = ' <small style="color:#f39c12;">[Oshxonada: Kutilmoqda]</small>';
+                    kdsStatusBadge = ' <small style="color:#f39c12;">[Kutilmoqda]</small>';
                     serveBtn.style.display = 'none';
                 } else if (kdsItem.status === 'cooking') {
-                    kdsStatusBadge = ' <small style="color:#3498db;">[Oshxonada: Pishirilmoqda]</small>';
+                    kdsStatusBadge = ' <small style="color:#3498db;">[Pishirilmoqda]</small>';
                     serveBtn.style.display = 'none';
                 } else if (kdsItem.status === 'ready') {
-                    kdsStatusBadge = ' <small style="color:#27ae60; font-weight:bold;">[🔔 TAYYOR! Olib keting]</small>';
+                    kdsStatusBadge = ' <small style="color:#27ae60; font-weight:bold;">[🔔 TAYYOR!]</small>';
                     serveBtn.style.display = 'block';
                 }
             } else {
@@ -1147,8 +1285,8 @@
                         '<div class="order-item-dropdown" style="display: ' + (isMenuOpen ? 'block' : 'none') + ';">' +
                             '<button onclick="changeOrderQty(' + idx + ', 1)">➕ Bitta qo\'shish (+1)</button>' +
                             '<button onclick="changeOrderQty(' + idx + ', -1)">➖ Bitta kamaytirish (-1)</button>' +
-                            '<button onclick="addNoteToItem(' + idx + ')">📝 Eslatma / Izoh yozish</button>' +
-                            '<button class="btn-del-action" onclick="removeOrderItem(' + idx + ')">🗑 Butunlay o\'chirish</button>' +
+                            '<button onclick="addNoteToItem(' + idx + ')">📝 Izoh yozish</button>' +
+                            '<button class="btn-del-action" onclick="removeOrderItem(' + idx + ')">🗑 O\'chirish</button>' +
                         '</div>';
                     list.appendChild(row);
                 });
@@ -1160,106 +1298,58 @@
             document.getElementById('order-title').innerHTML = title + ' buyurtmasi' + kdsStatusBadge;
         }
 
-        /* --- FAQAT BO'SH STOLLARGA KO'CHIRISH --- */
-        function openTransferModal() {
-            var curOrders = state.orders[state.selectedKey] || [];
-            if (curOrders.length === 0) return alert("Ushbu stolda hali buyurtma yo'q, ko'chirish shart emas!");
-
-            var sel = document.getElementById('transfer-target-select');
-            sel.innerHTML = '';
-
-            var freeTables = state.tables.filter(function(tbl) {
-                var isBusy = (state.orders[tbl.key] || []).length > 0;
-                var isRes = !!state.reservations[tbl.key];
-                return tbl.key !== state.selectedKey && !isBusy && !isRes;
-            });
-
-            if (freeTables.length === 0) {
-                return alert("Ayni paytda zalda birorta ham bo'sh stol yo'q!");
-            }
-
-            freeTables.forEach(function(tbl) {
-                var opt = document.createElement('option');
-                opt.value = tbl.key;
-                opt.innerText = tbl.zone + ' - Stol ' + tbl.number + ' (Bo\'sh)';
-                sel.appendChild(opt);
-            });
-
-            document.getElementById('transfer-modal').style.display = 'flex';
+        function toggleItemDropdown(idx, event) {
+            event.stopPropagation();
+            activeDropdownIndex = (activeDropdownIndex === idx) ? null : idx;
+            renderOrder();
         }
 
-        function closeTransferModal() {
-            document.getElementById('transfer-modal').style.display = 'none';
+        function changeOrderQty(itemIndex, delta) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
+
+            currentOrders[itemIndex].qty += delta;
+            if (currentOrders[itemIndex].qty <= 0) currentOrders.splice(itemIndex, 1);
+            if (currentOrders.length === 0) delete state.tableOpenTimes[state.selectedKey];
+
+            activeDropdownIndex = null;
+            saveStorage();
+            renderTables();
+            renderOrder();
         }
 
-        function confirmTransferTable() {
-            var targetKey = document.getElementById('transfer-target-select').value;
-            if (!targetKey) return;
+        function removeOrderItem(itemIndex) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
 
-            var curOrders = state.orders[state.selectedKey] || [];
-            state.orders[targetKey] = JSON.parse(JSON.stringify(curOrders));
+            currentOrders.splice(itemIndex, 1);
+            if (currentOrders.length === 0) delete state.tableOpenTimes[state.selectedKey];
+            activeDropdownIndex = null;
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
 
-            var targetTbl = state.tables.find(function(t) { return t.key === targetKey; });
-            state.kdsTickets.forEach(function(t) {
-                if (t.tableKey === state.selectedKey && t.status !== 'done') {
-                    t.tableKey = targetKey;
-                    t.zone = targetTbl.zone;
-                    t.tableNum = targetTbl.number;
+        function addNoteToItem(itemIndex) {
+            var currentOrders = state.orders[state.selectedKey] || [];
+            if (!currentOrders[itemIndex]) return;
+
+            var existingNote = currentOrders[itemIndex].note || '';
+            var userNote = prompt("Oshpaz uchun eslatma (masalan: Piyozi kam bo'lsin):", existingNote);
+            if (userNote !== null) {
+                currentOrders[itemIndex].note = userNote.trim();
+                activeDropdownIndex = null;
+
+                var activeTicket = state.kdsTickets.find(function(t) { 
+                    return t.tableKey === state.selectedKey && t.status !== 'done'; 
+                });
+                if (activeTicket) {
+                    activeTicket.items = JSON.parse(JSON.stringify(currentOrders));
                 }
-            });
 
-            state.orders[state.selectedKey] = [];
-            state.tableCustomers[targetKey] = state.tableCustomers[state.selectedKey] || '';
-            state.tableCustomers[state.selectedKey] = '';
-
-            saveStorage();
-            closeTransferModal();
-            selectTable(targetKey);
-            alert("Buyurtma " + targetTbl.zone + " #" + targetTbl.number + " stolga muvaffaqiyatli ko'chirildi!");
-        }
-
-        /* --- BRON QILISH MANTIG'I --- */
-        function openReservationModal() {
-            var res = state.reservations[state.selectedKey] || {};
-            document.getElementById('res-name-input').value = res.name || '';
-            document.getElementById('res-phone-input').value = res.phone || '';
-            document.getElementById('res-time-input').value = res.time || '';
-            document.getElementById('reserve-modal').style.display = 'flex';
-        }
-
-        function closeReservationModal() {
-            document.getElementById('reserve-modal').style.display = 'none';
-        }
-
-        function saveReservation() {
-            var name = document.getElementById('res-name-input').value.trim();
-            var phone = document.getElementById('res-phone-input').value.trim();
-            var time = document.getElementById('res-time-input').value.trim();
-
-            if (!name) return alert("Iltimos, mijoz ismini kiriting!");
-
-            state.reservations[state.selectedKey] = { name: name, phone: phone, time: time };
-            saveStorage();
-            closeReservationModal();
-            renderTables();
-            renderOrder();
-            alert("Stol bron qilindi!");
-        }
-
-        function checkInReservation() {
-            delete state.reservations[state.selectedKey];
-            saveStorage();
-            renderTables();
-            renderOrder();
-            alert("Mehmon qabul qilindi. Stol buyurtma uchun ochildi!");
-        }
-
-        function cancelReservation() {
-            if (confirm("Rostdan ham ushbu bronni bekor qilmoqchimisiz?")) {
-                delete state.reservations[state.selectedKey];
                 saveStorage();
-                renderTables();
                 renderOrder();
+                if (document.getElementById('view-kds').style.display === 'block') renderKDS();
             }
         }
 
@@ -1272,7 +1362,7 @@
                 renderTables();
                 renderOrder();
                 if (document.getElementById('view-kds').style.display === 'block') renderKDS();
-                alert("Taom topshirildi deb belgilandi. Stol odatiy band holatiga qaytdi.");
+                alert("Taom topshirildi!");
             }
         }
 
@@ -1283,138 +1373,7 @@
             }
         });
 
-        function sendOrderToKitchen() {
-            var curOrders = state.orders[state.selectedKey] || [];
-            if (curOrders.length === 0) return alert("Oshxonaga yuborish uchun buyurtma mavjud emas!");
-
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var zone = curTbl ? curTbl.zone : '-';
-            var num = curTbl ? curTbl.number : '-';
-            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
-
-            var d = new Date();
-            var timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            var itemsCopy = JSON.parse(JSON.stringify(curOrders));
-
-            var existingTicket = state.kdsTickets.find(function(t) { 
-                return t.tableKey === state.selectedKey && t.status !== 'done'; 
-            });
-
-            if (existingTicket) {
-                existingTicket.items = itemsCopy;
-                existingTicket.time = timeStr;
-                existingTicket.waiter = waiter;
-            } else {
-                state.kdsTickets.unshift({
-                    id: Date.now(),
-                    tableKey: state.selectedKey,
-                    zone: zone,
-                    tableNum: num,
-                    waiter: waiter,
-                    time: timeStr,
-                    items: itemsCopy,
-                    status: 'waiting'
-                });
-            }
-
-            saveStorage();
-            updateBadges();
-            renderOrder();
-            alert("Oshxonaga muvaffaqiyatli uzatildi / yangilandi!");
-        }
-
-        function filterKdsDepartment(dept) {
-            currentKdsDept = dept;
-            var buttons = document.querySelectorAll('.kds-dept-btn');
-            buttons.forEach(function(b) {
-                if (b.innerText.includes(dept) || (dept === 'Barchasi' && b.innerText.includes('Barcha'))) {
-                    b.classList.add('active');
-                } else {
-                    b.classList.remove('active');
-                }
-            });
-            renderKDS();
-        }
-
-        function renderKDS() {
-            var container = document.getElementById('kds-orders-container');
-            container.innerHTML = '';
-
-            var activeTickets = state.kdsTickets.filter(function(t) { return t.status !== 'done'; });
-
-            if (activeTickets.length === 0) {
-                container.innerHTML = '<p style="color:#7f8c8d; text-align:center; grid-column: 1/-1; padding: 30px;">Hozircha oshxonada faol buyurtmalar yo\'q.</p>';
-                return;
-            }
-
-            var displayedCards = 0;
-
-            activeTickets.forEach(function(ticket) {
-                var filteredItems = ticket.items.filter(function(item) {
-                    if (currentKdsDept === 'Barchasi') return true;
-                    return item.dept === currentKdsDept;
-                });
-
-                if (filteredItems.length === 0) return;
-                displayedCards++;
-
-                var card = document.createElement('div');
-                card.className = 'kds-card ' + ticket.status;
-
-                var itemsHtml = '';
-                filteredItems.forEach(function(i) {
-                    var noteText = i.note ? '<div class="kds-item-note">📌 ' + i.note + '</div>' : '';
-                    itemsHtml += '<li>' +
-                                    '<div class="kds-item-main"><span>' + i.name + ' <small style="color:#777;">(' + (i.dept || 'Oshxona') + ')</small></span> <b>&times; ' + i.qty + '</b></div>' +
-                                    noteText +
-                                 '</li>';
-                });
-
-                var statusText = ticket.status === 'waiting' ? '🟡 Kutilmoqda' : (ticket.status === 'cooking' ? '🔵 Pishirilmoqda' : '🟢 Tayyor bo\'ldi');
-
-                var actionsHtml = '';
-                if (ticket.status === 'waiting') {
-                    actionsHtml = '<button class="kds-btn btn-kds-cook" onclick="changeKdsStatus(' + ticket.id + ', \'cooking\')">Pishirishni boshlash</button>';
-                } else if (ticket.status === 'cooking') {
-                    actionsHtml = '<button class="kds-btn btn-kds-ready" onclick="changeKdsStatus(' + ticket.id + ', \'ready\')">Tayyor bo\'ldi (Ofitsiantga bildirish)</button>';
-                } else {
-                    actionsHtml = '<button class="kds-btn btn-kds-done" onclick="changeKdsStatus(' + ticket.id + ', \'done\')">Ofitsiant olib ketdi (Yopish)</button>';
-                }
-
-                card.innerHTML = 
-                    '<div>' +
-                        '<div class="kds-header">' +
-                            '<div><b>' + ticket.zone + ' | Stol ' + ticket.tableNum + '</b><br><small style="color:#555;">' + statusText + ' (' + (ticket.waiter || 'Ofitsiant') + ')</small></div>' +
-                            '<span class="kds-time">🕒 ' + ticket.time + '</span>' +
-                        '</div>' +
-                        '<ul class="kds-items">' + itemsHtml + '</ul>' +
-                    '</div>' +
-                    '<div class="kds-actions">' + actionsHtml + '</div>';
-
-                container.appendChild(card);
-            });
-
-            if (displayedCards === 0) {
-                container.innerHTML = '<p style="color:#7f8c8d; text-align:center; grid-column: 1/-1; padding: 30px;">' + currentKdsDept + ' sexi uchun faol buyurtmalar mavjud emas.</p>';
-            }
-        }
-
-        function changeKdsStatus(ticketId, newStatus) {
-            var ticket = state.kdsTickets.find(function(t) { return t.id === ticketId; });
-            if (ticket) {
-                ticket.status = newStatus;
-                saveStorage();
-                updateBadges();
-                renderKDS();
-                renderTables();
-                renderOrder();
-
-                if (newStatus === 'ready') {
-                    showNotification(ticket.zone + ' - Stol #' + ticket.tableNum + ' (' + (ticket.waiter || '') + ') taomlari tayyor bo\'ldi!');
-                }
-            }
-        }
-
+        /* --- TO'LOV MANTIG'I --- */
         function setRating(val) {
             selectedRating = val;
             var stars = document.querySelectorAll('#stars-box .star');
@@ -1469,24 +1428,16 @@
         document.getElementById('btn-close-pay-modal').onclick = function() { payModal.style.display = 'none'; };
 
         function confirmPayment(method) {
-            if (selectedRating === 0) {
-                return alert("Iltimos, avval ofitsiant xizmatiga yulduzcha bosing (1 dan 5 gacha)!");
-            }
-
+            if (selectedRating === 0) return alert("Ofitsiant xizmatiga yulduzcha bosing!");
             var calc = getCurrentCalculations();
             executeFinalPayment(method, calc.total, 0, 0);
         }
 
         function confirmSplitPayment() {
-            if (selectedRating === 0) {
-                return alert("Iltimos, avval ofitsiant xizmatiga yulduzcha bosing (1 dan 5 gacha)!");
-            }
-
+            if (selectedRating === 0) return alert("Ofitsiant xizmatiga yulduzcha bosing!");
             var calc = getCurrentCalculations();
             var cashVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
-            if (cashVal <= 0 || cashVal >= calc.total) {
-                return alert("Naqd pul summasini to'g'ri kiriting (0 dan katta va umumiy summadan kam bo'lishi kerak)!");
-            }
+            if (cashVal <= 0 || cashVal >= calc.total) return alert("Naqd pul summasini to'g'ri kiriting!");
 
             var cardVal = calc.total - cashVal;
             var methodStr = "Aralash (Naqd: " + cashVal.toLocaleString() + " | Karta: " + cardVal.toLocaleString() + ")";
@@ -1534,6 +1485,7 @@
             state.orders[state.selectedKey] = [];
             state.tableDiscounts[state.selectedKey] = 'auto';
             state.tableCustomers[state.selectedKey] = '';
+            delete state.tableOpenTimes[state.selectedKey];
             delete state.reservations[state.selectedKey];
 
             document.getElementById('cust-phone').value = '';
@@ -1563,9 +1515,9 @@
                 if (rec.method.includes('Aralash')) {
                     cash += (rec.splitCash || 0);
                     card += (rec.splitCard || 0);
-                } else if (rec.method === 'Naqd') {
+                } else if (rec.method.includes('Naqd')) {
                     cash += rec.total;
-                } else if (rec.method === 'Karta (Terminal)') {
+                } else if (rec.method.includes('Karta')) {
                     card += rec.total;
                 } else {
                     payme += rec.total;
@@ -1777,6 +1729,268 @@
             document.getElementById('modal-new-price').value = '';
         }
 
+        function renderStock() {
+            var container = document.getElementById('stock-container');
+            container.innerHTML = '';
+
+            state.stock.forEach(function(item, idx) {
+                var isLow = (item.unit === 'dona' ? item.qty <= 10 : item.qty <= 3.0);
+                var card = document.createElement('div');
+                card.className = 'stock-card ' + (isLow ? 'low' : '');
+                card.innerHTML = 
+                    '<div>' +
+                        '<b>' + item.name + '</b>' + (isLow ? ' <span style="color:#dc2626; font-size:12px;">⚠️ Kam qoldi!</span>' : '') +
+                        '<div class="qty">' + item.qty.toFixed(item.unit === 'dona' ? 0 : 2) + ' ' + item.unit + '</div>' +
+                    '</div>' +
+                    '<div class="stock-card-actions">' +
+                        '<input type="number" id="stock-add-val-' + idx + '" placeholder="+Kirim" step="0.5">' +
+                        '<button onclick="addStockQty(' + idx + ')">+Qo\'shish</button>' +
+                    '</div>';
+                container.appendChild(card);
+            });
+        }
+
+        function addStockQty(idx) {
+            var input = document.getElementById('stock-add-val-' + idx);
+            var val = parseFloat(input.value);
+            if (isNaN(val) || val <= 0) return alert("To'g'ri miqdor kiriting!");
+
+            state.stock[idx].qty += val;
+            saveStorage();
+            updateBadges();
+            renderStock();
+        }
+
+        function addNewStockItem() {
+            var n = document.getElementById('new-stock-name').value.trim();
+            var q = parseFloat(document.getElementById('new-stock-qty').value);
+            var u = document.getElementById('new-stock-unit').value;
+
+            if (!n || isNaN(q) || q < 0) return alert("Iltimos, nom va miqdorni to'g'ri kiriting!");
+            state.stock.push({ id: Date.now(), name: n, qty: q, unit: u });
+
+            saveStorage();
+            updateBadges();
+            renderStock();
+
+            document.getElementById('new-stock-name').value = '';
+            document.getElementById('new-stock-qty').value = '';
+        }
+
+        function renderWaitersSelect() {
+            var sel = document.getElementById('waiter-select');
+            sel.innerHTML = '';
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : "Asosiy zal";
+            var list = state.zoneWaiters[zone] || ["Ofitsiant"];
+
+            list.forEach(function(w) {
+                var opt = document.createElement('option');
+                opt.value = w;
+                opt.innerText = w;
+                sel.appendChild(opt);
+            });
+
+            if (!state.tableWaiters[state.selectedKey] || !list.includes(state.tableWaiters[state.selectedKey])) {
+                state.tableWaiters[state.selectedKey] = list[0];
+            }
+            sel.value = state.tableWaiters[state.selectedKey];
+        }
+
+        function updateWaiterSelection() {
+            var sel = document.getElementById('waiter-select');
+            state.tableWaiters[state.selectedKey] = sel.value;
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
+        function addNewWaiterPrompt() {
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : "Asosiy zal";
+
+            var name = prompt(zone + " uchun yangi ofitsiant ismini kiriting:");
+            if (!name) return;
+            name = name.trim();
+
+            if (!state.zoneWaiters[zone]) state.zoneWaiters[zone] = [];
+            if (state.zoneWaiters[zone].includes(name)) return alert("Bu ofitsiant allaqachon mavjud!");
+
+            state.zoneWaiters[zone].push(name);
+            state.tableWaiters[state.selectedKey] = name;
+            saveStorage();
+            renderWaitersSelect();
+            renderTables();
+            renderOrder();
+        }
+
+        function renderZoneFilters() {
+            var bar = document.getElementById('zone-filter-bar');
+            bar.innerHTML = '';
+            zones.forEach(function(zone) {
+                var btn = document.createElement('button');
+                btn.className = 'zone-btn' + (zone === currentZoneFilter ? ' active' : '');
+                btn.innerText = zone;
+                btn.onclick = function() {
+                    currentZoneFilter = zone;
+                    renderZoneFilters();
+                    renderTables();
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        function updateServiceFee() {
+            var sel = document.getElementById('service-fee-rate');
+            state.serviceFees[state.selectedKey] = parseInt(sel.value) || 0;
+            saveStorage();
+            renderOrder();
+        }
+
+        function updateDiscountManual() {
+            var sel = document.getElementById('cust-discount');
+            state.tableDiscounts[state.selectedKey] = sel.value;
+            saveStorage();
+            renderOrder();
+        }
+
+        document.getElementById('cust-phone').addEventListener('input', function(e) {
+            state.tableCustomers[state.selectedKey] = e.target.value.trim();
+            saveStorage();
+        });
+
+        function addNewTable() {
+            var selectedZone = document.getElementById('new-table-zone').value;
+            var maxNum = 0;
+            state.tables.forEach(function(t) {
+                if (t.zone === selectedZone && t.number > maxNum) maxNum = t.number;
+            });
+            var nextNum = maxNum + 1;
+            var newKey = selectedZone + '-' + nextNum;
+
+            state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
+            state.orders[newKey] = [];
+            state.serviceFees[newKey] = 10;
+            state.tableDiscounts[newKey] = 'auto';
+            state.tableCustomers[newKey] = '';
+            var zList = state.zoneWaiters[selectedZone] || ["Ofitsiant"];
+            state.tableWaiters[newKey] = zList[0];
+
+            saveStorage();
+            selectTable(newKey);
+        }
+
+        /* --- MODALLAR BOSHQARUVI --- */
+        function openTransferModal() {
+            var curOrders = state.orders[state.selectedKey] || [];
+            if (curOrders.length === 0) return alert("Ushbu stolda hali buyurtma yo'q!");
+
+            var sel = document.getElementById('transfer-target-select');
+            sel.innerHTML = '';
+
+            var freeTables = state.tables.filter(function(tbl) {
+                var isBusy = (state.orders[tbl.key] || []).length > 0;
+                var isRes = !!state.reservations[tbl.key];
+                return tbl.key !== state.selectedKey && !isBusy && !isRes;
+            });
+
+            if (freeTables.length === 0) return alert("Ayni paytda bo'sh stol yo'q!");
+
+            freeTables.forEach(function(tbl) {
+                var opt = document.createElement('option');
+                opt.value = tbl.key;
+                opt.innerText = tbl.zone + ' - Stol ' + tbl.number + ' (Bo\'sh)';
+                sel.appendChild(opt);
+            });
+
+            document.getElementById('transfer-modal').style.display = 'flex';
+        }
+
+        function closeTransferModal() { document.getElementById('transfer-modal').style.display = 'none'; }
+
+        function confirmTransferTable() {
+            var targetKey = document.getElementById('transfer-target-select').value;
+            if (!targetKey) return;
+
+            var curOrders = state.orders[state.selectedKey] || [];
+            state.orders[targetKey] = JSON.parse(JSON.stringify(curOrders));
+            state.tableOpenTimes[targetKey] = state.tableOpenTimes[state.selectedKey] || Date.now();
+
+            var targetTbl = state.tables.find(function(t) { return t.key === targetKey; });
+            state.kdsTickets.forEach(function(t) {
+                if (t.tableKey === state.selectedKey && t.status !== 'done') {
+                    t.tableKey = targetKey;
+                    t.zone = targetTbl.zone;
+                    t.tableNum = targetTbl.number;
+                }
+            });
+
+            state.orders[state.selectedKey] = [];
+            delete state.tableOpenTimes[state.selectedKey];
+            state.tableCustomers[targetKey] = state.tableCustomers[state.selectedKey] || '';
+            state.tableCustomers[state.selectedKey] = '';
+
+            saveStorage();
+            closeTransferModal();
+            selectTable(targetKey);
+            alert("Ko'chirildi!");
+        }
+
+        function openReservationModal() {
+            var res = state.reservations[state.selectedKey] || {};
+            document.getElementById('res-name-input').value = res.name || '';
+            document.getElementById('res-phone-input').value = res.phone || '';
+            document.getElementById('res-time-input').value = res.time || '';
+            document.getElementById('reserve-modal').style.display = 'flex';
+        }
+
+        function closeReservationModal() { document.getElementById('reserve-modal').style.display = 'none'; }
+
+        function saveReservation() {
+            var name = document.getElementById('res-name-input').value.trim();
+            var phone = document.getElementById('res-phone-input').value.trim();
+            var time = document.getElementById('res-time-input').value.trim();
+
+            if (!name) return alert("Mijoz ismini kiriting!");
+
+            state.reservations[state.selectedKey] = { name: name, phone: phone, time: time };
+            saveStorage();
+            closeReservationModal();
+            renderTables();
+            renderOrder();
+            alert("Bron qilindi!");
+        }
+
+        function checkInReservation() {
+            delete state.reservations[state.selectedKey];
+            saveStorage();
+            renderTables();
+            renderOrder();
+            alert("Mehmon qabul qilindi!");
+        }
+
+        function cancelReservation() {
+            if (confirm("Bron bekor qilinsinmi?")) {
+                delete state.reservations[state.selectedKey];
+                saveStorage();
+                renderTables();
+                renderOrder();
+            }
+        }
+
+        function filterKdsDepartment(dept) {
+            currentKdsDept = dept;
+            var buttons = document.querySelectorAll('.kds-dept-btn');
+            buttons.forEach(function(b) {
+                if (b.innerText.includes(dept) || (dept === 'Barchasi' && b.innerText.includes('Barcha'))) {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
+            renderKDS();
+        }
+
         var menuModal = document.getElementById('menu-modal');
         document.getElementById('btn-open-menu-manager').onclick = function() {
             renderManageMenu();
@@ -1789,6 +2003,7 @@
             if (e.target === payModal) payModal.style.display = 'none';
             if (e.target === document.getElementById('transfer-modal')) closeTransferModal();
             if (e.target === document.getElementById('reserve-modal')) closeReservationModal();
+            if (e.target === document.getElementById('split-bill-modal')) closeSplitBillModal();
         };
 
         document.getElementById('modal-btn-add').addEventListener('click', addMenuFromModal);
