@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Kassa, KDS va Sklad Tizimi</title>
+    <title>RestaurantOS - To'liq Tizim (Kassa, KDS, Sklad, Chegirma)</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -60,8 +60,8 @@
         .order-item-dropdown button:hover { background: #f1f2f6; }
         .order-item-dropdown button.btn-del-action { color: #e74c3c; border-top: 1px solid #eee; }
 
-        .service-fee-panel { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .service-fee-panel select { padding: 4px 8px; border-radius: 4px; border: 1px solid #bdc3c7; }
+        .service-fee-panel { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #bdc3c7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .service-fee-panel select, .service-fee-panel input { padding: 4px 8px; border-radius: 4px; border: 1px solid #bdc3c7; }
         .calc-details { margin-top: 8px; font-size: 13px; color: #555; }
         .total-display { font-size: 18px; margin-top: 6px; color: #2c3e50; }
 
@@ -109,7 +109,7 @@
         .btn-kds-ready { background: #27ae60; }
         .btn-kds-done { background: #7f8c8d; }
 
-        /* Sklad / Omborxona dizayni */
+        /* Sklad / Omborxona */
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
         .stock-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
         .stock-card.low { border-color: #ef4444; background: #fef2f2; }
@@ -120,7 +120,7 @@
         .stock-card-actions input { width: 70px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px; }
         .stock-card-actions button { background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        /* Toast ogohlantirish */
+        /* Toast bildirishnoma */
         #notification-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-msg { background: #2c3e50; color: white; padding: 14px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border-left: 5px solid #2ecc71; font-size: 14px; pointer-events: auto; animation: slideIn 0.3s ease-out; max-width: 320px; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -158,7 +158,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Kassa, Oshxona va Sklad Boshqaruv Tizimi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Kassa, KDS, Sklad va Mijozlar Chegirmasi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -208,6 +208,7 @@
                     <h3>Joriy hisob:</h3>
                     <div id="order-list"></div>
 
+                    <!-- Ofitsiant va xizmat haqi -->
                     <div class="service-fee-panel">
                         <div>
                             <span>Ofitsiant: </span>
@@ -223,6 +224,17 @@
                                 <option value="20">20%</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Mijoz va Chegirma -->
+                    <div style="margin-top:10px; display:flex; gap:6px;">
+                        <input type="text" id="cust-phone" placeholder="Mijoz tel: 901234567" style="flex:1; padding:5px 8px; border:1px solid #bdc3c7; border-radius:4px;">
+                        <select id="cust-discount" onchange="updateDiscount()" style="padding:5px 8px; border-radius:4px; border:1px solid #bdc3c7;">
+                            <option value="0">Chegirma: 0%</option>
+                            <option value="5">VIP: 5%</option>
+                            <option value="10">VIP: 10%</option>
+                            <option value="15">VIP: 15%</option>
+                        </select>
                     </div>
 
                     <div class="calc-details" id="calc-details">Taomlar: 0 so'm | Xizmat: 0 so'm</div>
@@ -271,7 +283,7 @@
 
                 <table class="history-table">
                     <thead>
-                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Ofitsiant</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
+                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Ofitsiant</th><th>Mijoz</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
                     </thead>
                     <tbody id="history-rows"></tbody>
                 </table>
@@ -298,7 +310,7 @@
         </div>
     </div>
 
-    <!-- 3. SKLAD (OMBORXONA) REJIMI -->
+    <!-- 3. SKLAD (OMBORXONA) -->
     <div id="view-stock" style="display:none; margin-top:20px;">
         <div class="card full-width">
             <div class="card-header">
@@ -306,7 +318,6 @@
                 <div style="font-size:13px; color:#555;">Hisob yopilganda masalliqlar avtomatik yechiladi (Spisaniye)</div>
             </div>
 
-            <!-- Yangi masalliq qo'shish -->
             <div class="add-form" style="margin-top:0; border-top:none; padding-top:0;">
                 <input type="text" id="new-stock-name" placeholder="Masalliq nomi (masalan: Pomidor)" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:2; min-width:140px;">
                 <input type="number" id="new-stock-qty" placeholder="Miqdori" step="0.1" style="padding:8px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:90px;">
@@ -372,11 +383,13 @@
             <p id="rc-date"></p>
             <p><b id="rc-table"></b></p>
             <p style="font-size:12px;">Ofitsiant: <span id="rc-waiter"></span></p>
+            <p style="font-size:12px;" id="rc-cust-box">Mijoz: <span id="rc-cust"></span></p>
             <hr>
         </center>
         <div id="rc-items"></div>
         <hr>
         <div style="font-size:12px; margin-bottom: 4px;">Taomlar: <span id="rc-subtotal">0</span> so'm</div>
+        <div style="font-size:12px; margin-bottom: 4px;" id="rc-disc-row">Chegirma (<span id="rc-disc-pct">0</span>%): -<span id="rc-disc">0</span> so'm</div>
         <div style="font-size:12px; margin-bottom: 8px;">Xizmat haqi (<span id="rc-fee-pct">0</span>%): <span id="rc-service">0</span> so'm</div>
         <h4>JAMI: <span id="rc-total">0</span> so'm</h4>
     </div>
@@ -387,7 +400,6 @@
         var currentKdsDept = "Barchasi";
         var activeDropdownIndex = null;
 
-        // Tex-karta (1 porsiya taomga ketadigan masalliqlar)
         var recipeCard = {
             "Osh": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
             "Shashlik": [ { item: "Go'sht", qty: 0.25 }, { item: "Piyoz", qty: 0.05 } ],
@@ -433,6 +445,8 @@
             ],
             orders: {},
             serviceFees: {},
+            tableDiscounts: {},
+            tableCustomers: {},
             kdsTickets: [],
             history: []
         };
@@ -496,7 +510,13 @@
                 var s = localStorage.getItem('ros_stock_v1');
                 if (s) { var pS = JSON.parse(s); if (Array.isArray(pS)) state.stock = pS; }
 
-                var h = localStorage.getItem('ros_history_v6');
+                var td = localStorage.getItem('ros_discounts');
+                if (td) { var pTD = JSON.parse(td); if (pTD && typeof pTD === 'object') state.tableDiscounts = pTD; }
+
+                var tc = localStorage.getItem('ros_customers');
+                if (tc) { var pTC = JSON.parse(tc); if (pTC && typeof pTC === 'object') state.tableCustomers = pTC; }
+
+                var h = localStorage.getItem('ros_history_v7');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
                 console.error("Xotira yuklashda xato:", e);
@@ -505,6 +525,8 @@
             state.tables.forEach(function(tbl) {
                 if (!Array.isArray(state.orders[tbl.key])) state.orders[tbl.key] = [];
                 if (state.serviceFees[tbl.key] === undefined) state.serviceFees[tbl.key] = 10;
+                if (state.tableDiscounts[tbl.key] === undefined) state.tableDiscounts[tbl.key] = 0;
+                if (state.tableCustomers[tbl.key] === undefined) state.tableCustomers[tbl.key] = '';
                 var zList = state.zoneWaiters[tbl.zone] || ["Ofitsiant"];
                 if (!state.tableWaiters[tbl.key]) state.tableWaiters[tbl.key] = zList[0];
             });
@@ -520,9 +542,11 @@
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
                 localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
                 localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
+                localStorage.setItem('ros_discounts', JSON.stringify(state.tableDiscounts));
+                localStorage.setItem('ros_customers', JSON.stringify(state.tableCustomers));
                 localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
                 localStorage.setItem('ros_stock_v1', JSON.stringify(state.stock));
-                localStorage.setItem('ros_history_v6', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v7', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
             }
@@ -578,13 +602,11 @@
                 rBadge.style.display = 'none';
             }
 
-            // Sklad ogohlantirishi (kam qolgan masalliqlar)
             var hasLowStock = state.stock.some(function(item) { return item.qty <= 3; });
             var sBadge = document.getElementById('stock-badge');
             sBadge.style.display = hasLowStock ? 'inline-block' : 'none';
         }
 
-        // Sklad boshqaruvi
         function renderStock() {
             var container = document.getElementById('stock-container');
             container.innerHTML = '';
@@ -633,7 +655,6 @@
             document.getElementById('new-stock-qty').value = '';
         }
 
-        // Avtomatik masalliq ayirish (Spisaniye)
         function deductIngredientsFromStock(ordersList) {
             ordersList.forEach(function(order) {
                 var recipe = recipeCard[order.name];
@@ -752,6 +773,9 @@
             activeDropdownIndex = null;
             var fee = state.serviceFees[key] !== undefined ? state.serviceFees[key] : 10;
             document.getElementById('service-fee-rate').value = fee;
+            var disc = state.tableDiscounts[key] !== undefined ? state.tableDiscounts[key] : 0;
+            document.getElementById('cust-discount').value = disc;
+            document.getElementById('cust-phone').value = state.tableCustomers[key] || '';
             renderWaitersSelect();
             renderTables();
             renderOrder();
@@ -763,6 +787,18 @@
             saveStorage();
             renderOrder();
         }
+
+        function updateDiscount() {
+            var sel = document.getElementById('cust-discount');
+            state.tableDiscounts[state.selectedKey] = parseInt(sel.value) || 0;
+            saveStorage();
+            renderOrder();
+        }
+
+        document.getElementById('cust-phone').addEventListener('input', function(e) {
+            state.tableCustomers[state.selectedKey] = e.target.value.trim();
+            saveStorage();
+        });
 
         function addNewTable() {
             var selectedZone = document.getElementById('new-table-zone').value;
@@ -776,6 +812,8 @@
             state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
             state.orders[newKey] = [];
             state.serviceFees[newKey] = 10;
+            state.tableDiscounts[newKey] = 0;
+            state.tableCustomers[newKey] = '';
             var zList = state.zoneWaiters[selectedZone] || ["Ofitsiant"];
             state.tableWaiters[newKey] = zList[0];
 
@@ -800,6 +838,8 @@
             delete state.orders[state.selectedKey];
             delete state.serviceFees[state.selectedKey];
             delete state.tableWaiters[state.selectedKey];
+            delete state.tableDiscounts[state.selectedKey];
+            delete state.tableCustomers[state.selectedKey];
 
             state.selectedKey = state.tables[0].key;
             saveStorage();
@@ -907,11 +947,24 @@
             var currentOrders = state.orders[state.selectedKey] || [];
             currentOrders.forEach(function(o) { subtotal += (o.price * o.qty); });
 
-            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
-            var feeAmount = Math.round(subtotal * (feePct / 100));
-            var total = subtotal + feeAmount;
+            var discPct = state.tableDiscounts[state.selectedKey] !== undefined ? state.tableDiscounts[state.selectedKey] : 0;
+            var discAmount = Math.round(subtotal * (discPct / 100));
+            var discountedSubtotal = subtotal - discAmount;
 
-            return { subtotal: subtotal, feePct: feePct, feeAmount: feeAmount, total: total, orders: currentOrders };
+            var feePct = state.serviceFees[state.selectedKey] !== undefined ? state.serviceFees[state.selectedKey] : 10;
+            var feeAmount = Math.round(discountedSubtotal * (feePct / 100));
+            var total = discountedSubtotal + feeAmount;
+
+            return { 
+                subtotal: subtotal, 
+                discPct: discPct, 
+                discAmount: discAmount, 
+                discountedSubtotal: discountedSubtotal, 
+                feePct: feePct, 
+                feeAmount: feeAmount, 
+                total: total, 
+                orders: currentOrders 
+            };
         }
 
         function renderOrder() {
@@ -968,7 +1021,8 @@
                 });
             }
 
-            document.getElementById('calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' so\'m | Xizmat (' + calc.feePct + '%): ' + calc.feeAmount.toLocaleString() + ' so\'m';
+            var discText = calc.discPct > 0 ? ' | Chegirma (' + calc.discPct + '%): -' + calc.discAmount.toLocaleString() + ' so\'m' : '';
+            document.getElementById('calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' so\'m' + discText + ' | Xizmat (' + calc.feePct + '%): ' + calc.feeAmount.toLocaleString() + ' so\'m';
             document.getElementById('total-price').innerText = calc.total.toLocaleString();
             document.getElementById('order-title').innerHTML = title + ' buyurtmasi' + kdsStatusBadge;
         }
@@ -993,7 +1047,6 @@
             }
         });
 
-        // OSHXONAGA YUBORISH
         function sendOrderToKitchen() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Oshxonaga yuborish uchun buyurtma mavjud emas!");
@@ -1126,7 +1179,6 @@
             }
         }
 
-        // To'lov darchasi
         var payModal = document.getElementById('pay-modal');
         document.getElementById('btn-open-pay-modal').onclick = function() {
             var calc = getCurrentCalculations();
@@ -1148,6 +1200,7 @@
             var zone = curTbl ? curTbl.zone : '-';
             var num = curTbl ? curTbl.number : '-';
             var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+            var custPhone = state.tableCustomers[state.selectedKey] || '-';
 
             var d = new Date();
             state.history.unshift({
@@ -1156,21 +1209,26 @@
                 zone: zone,
                 tableNum: num,
                 waiter: waiter,
+                customer: custPhone,
                 items: itemNames.join('; '),
                 method: method,
+                discount: calc.discAmount,
                 serviceFee: calc.feeAmount,
                 total: calc.total
             });
 
-            // 1. OMBORDAN MASALLIQLARNI AVTOMATIK YECHISH (SPISANIYE)
             deductIngredientsFromStock(calc.orders);
 
-            // 2. KDS chiptasini yopish
             state.kdsTickets.forEach(function(t) {
                 if (t.tableKey === state.selectedKey) t.status = 'done';
             });
 
             state.orders[state.selectedKey] = [];
+            state.tableDiscounts[state.selectedKey] = 0;
+            state.tableCustomers[state.selectedKey] = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-discount').value = 0;
+
             activeDropdownIndex = null;
             payModal.style.display = 'none';
 
@@ -1206,6 +1264,7 @@
                                '<td>' + rec.zone + '</td>' +
                                '<td>Stol ' + rec.tableNum + '</td>' +
                                '<td><b>' + w + '</b></td>' +
+                               '<td>' + (rec.customer || '-') + '</td>' +
                                '<td>' + rec.items + '</td>' +
                                '<td>' + (rec.method || 'Naqd') + '</td>' +
                                '<td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
@@ -1234,7 +1293,7 @@
             if (state.history.length === 0) return alert("Hozircha yopilgan hisoblar yo'q!");
 
             var csvContent = "\uFEFF";
-            csvContent += "Sana va Vaqt,Zona,Stol,Ofitsiant,Buyurtma taomlari,To'lov turi,Xizmat haqi (so'm),Jami summa (so'm)\n";
+            csvContent += "Sana va Vaqt,Zona,Stol,Ofitsiant,Mijoz,Buyurtma taomlari,To'lov turi,Chegirma (so'm),Xizmat haqi (so'm),Jami summa (so'm)\n";
 
             state.history.forEach(function(r) {
                 var row = [
@@ -1242,8 +1301,10 @@
                     '"' + r.zone + '"',
                     '"Stol ' + r.tableNum + '"',
                     '"' + (r.waiter || 'Ofitsiant') + '"',
+                    '"' + (r.customer || '-') + '"',
                     '"' + r.items.replace(/"/g, '""') + '"',
                     '"' + (r.method || 'Naqd') + '"',
+                    r.discount || 0,
                     r.serviceFee || 0,
                     r.total
                 ];
@@ -1271,6 +1332,15 @@
             document.getElementById('rc-date').innerText = new Date().toLocaleString();
             document.getElementById('rc-table').innerText = title;
             document.getElementById('rc-waiter').innerText = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+            
+            var cPhone = state.tableCustomers[state.selectedKey];
+            if (cPhone) {
+                document.getElementById('rc-cust-box').style.display = 'block';
+                document.getElementById('rc-cust').innerText = cPhone;
+            } else {
+                document.getElementById('rc-cust-box').style.display = 'none';
+            }
+
             var rcBox = document.getElementById('rc-items');
             rcBox.innerHTML = '';
 
@@ -1281,6 +1351,16 @@
             });
 
             document.getElementById('rc-subtotal').innerText = calc.subtotal.toLocaleString();
+            
+            var discRow = document.getElementById('rc-disc-row');
+            if (calc.discPct > 0) {
+                discRow.style.display = 'block';
+                document.getElementById('rc-disc-pct').innerText = calc.discPct;
+                document.getElementById('rc-disc').innerText = calc.discAmount.toLocaleString();
+            } else {
+                discRow.style.display = 'none';
+            }
+
             document.getElementById('rc-fee-pct').innerText = calc.feePct;
             document.getElementById('rc-service').innerText = calc.feeAmount.toLocaleString();
             document.getElementById('rc-total').innerText = calc.total.toLocaleString();
