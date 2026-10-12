@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - Professional Kassa, KDS va Split-Bill</title>
+    <title>RestaurantOS - To'liq Kassa, KDS va Sklad Tizimi</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -52,7 +52,7 @@
         .badge-stop { background: #ef4444; color: white; font-weight: bold; }
         
         .portion-box { display: flex; gap: 4px; margin-top: 4px; }
-        .portion-btn { background: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .portion-btn { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .portion-btn.btn-half { background: #9b59b6; }
         .portion-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
@@ -152,8 +152,10 @@
         .payment-btn { padding: 12px; border: 2px solid #ddd; background: #fff; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .payment-btn:hover { border-color: #27ae60; background: #f0fff4; }
 
-        .split-pay-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 10px; display: none; }
-        .split-pay-box input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 4px; }
+        /* Aralash to'lov qutisi */
+        .split-pay-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; padding: 14px; margin-top: 10px; display: none; }
+        .split-pay-box input { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 4px; }
+        .split-status-bar { background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 8px; }
 
         .manage-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .manage-table th, .manage-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
@@ -167,14 +169,12 @@
         .modal-add-box input, .modal-add-box select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 110px; }
         .modal-add-box button { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        /* Chop etish qismi (Chek va Oshxona slip) */
         @media print {
             body * { visibility: hidden; }
-            #receipt-area, #receipt-area *, #kitchen-slip-area, #kitchen-slip-area * { visibility: visible; }
+            #receipt-area, #receipt-area * { visibility: visible; }
             #receipt-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-            #kitchen-slip-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
         }
-        #receipt-area, #kitchen-slip-area { display: none; width: 280px; padding: 15px; border: 1px dashed #000; font-family: monospace; }
+        #receipt-area { display: none; width: 280px; padding: 15px; border: 1px dashed #000; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -184,7 +184,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Kassa, KDS, Sklad va Split-Bill</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatlashtirilgan Kassa, KDS va Sklad Tizimi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -377,7 +377,7 @@
         </div>
     </div>
 
-    <!-- MODAL: CHEKNI BO'LIB TO'LASH (SPLIT BILL) -->
+    <!-- MODAL: CHEKNI BO'LIB TO'LASH -->
     <div class="modal-overlay" id="split-bill-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -441,7 +441,7 @@
         </div>
     </div>
 
-    <!-- MODAL: TO'LOV VA BAHOLASH -->
+    <!-- MODAL: TO'LOV VA ARALASH TO'LOV QOLDIG'I -->
     <div class="modal-overlay" id="pay-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -465,19 +465,30 @@
             </div>
 
             <div class="payment-options">
-                <button class="payment-btn" onclick="confirmPayment('Naqd')">💵 To'liq Naqd pul</button>
-                <button class="payment-btn" onclick="confirmPayment('Karta (Terminal)')">💳 To'liq Karta (Terminal)</button>
-                <button class="payment-btn" onclick="confirmPayment('Payme / Click')">📲 To'liq Payme / Click</button>
-                <button class="payment-btn" style="border-color:#3498db; background:#f0f7ff;" onclick="toggleSplitPayBox()">🔀 Aralash to'lov (Naqd + Karta)</button>
+                <button class="payment-btn" onclick="confirmPayment('Naqd')">💵 To'liq Naqd pul bilan yopish</button>
+                <button class="payment-btn" onclick="confirmPayment('Karta (Terminal)')">💳 To'liq Karta (Terminal) bilan yopish</button>
+                <button class="payment-btn" onclick="confirmPayment('Payme / Click')">📲 To'liq Payme / Click bilan yopish</button>
+                <button class="payment-btn" style="border-color:#3498db; background:#f0f7ff;" onclick="toggleSplitPayBox()">🔀 Aralash to'lov (Qisman naqd, qolgani karta)</button>
             </div>
 
+            <!-- Aralash to'lov qutisi va jonli qoldiq ko'rsatish -->
             <div class="split-pay-box" id="split-pay-box">
-                <label style="font-size:13px; color:#555;">Naqd berilgan summa (so'm):</label>
-                <input type="number" id="split-cash-input" placeholder="0" oninput="calculateSplitRemaining()">
-                <div style="font-size:13px; margin-top:6px; color:#2980b9;">
-                    Kartadan olinadigan qoldiq: <b id="split-card-amount">0 so'm</b>
+                <h4 style="margin:0 0 6px 0; color:#2c3e50;">Aralash to'lov hisobi:</h4>
+                <label style="font-size:13px; color:#555;">Kiritilayotgan qism (Naqd):</label>
+                <input type="number" id="split-part-input" placeholder="Summani kiriting (masalan: 40000)" oninput="updateSplitStatusLive()">
+                
+                <div class="split-status-bar">
+                    <div style="font-size:13px; color:#27ae60;">Kiritilayotgan to'lov: <b id="split-paid-live">0 so'm</b></div>
+                    <div style="font-size:15px; color:#e74c3c; font-weight:bold; margin-top:4px;">
+                        QOLGAN SUMMA: <span id="split-remaining-live">0 so'm</span>
+                    </div>
+                    <small style="color:#64748b; font-size:11px;">Ushbu qoldiq ikkinchi to'lov turi (karta) orqali yopiladi.</small>
                 </div>
-                <button class="btn-green" style="margin-top:10px;" onclick="confirmSplitPayment()">Aralash to'lovni tasdiqlash</button>
+
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button class="btn-green" style="flex:1;" onclick="confirmSplitPartial('Naqd + Karta')">Naqd berdi + Qolgani Karta</button>
+                    <button class="btn-green" style="flex:1; background:#9b59b6;" onclick="confirmSplitPartial('Naqd + Payme')">Naqd berdi + Qolgani Payme</button>
+                </div>
             </div>
         </div>
     </div>
@@ -525,24 +536,11 @@
         <div style="font-size:12px; margin-bottom: 4px;" id="rc-disc-row">Chegirma (<span id="rc-disc-pct">0</span>%): -<span id="rc-disc">0</span> so'm</div>
         <div style="font-size:12px; margin-bottom: 8px;">Xizmat haqi (<span id="rc-fee-pct">0</span>%): <span id="rc-service">0</span> so'm</div>
         <h4>JAMI: <span id="rc-total">0</span> so'm</h4>
-    </div>
-
-    <!-- CHOP ETISH: OSHXONA BILETI (KITCHEN SLIP) -->
-    <div id="kitchen-slip-area">
-        <center>
-            <h3>👨‍🍳 OSHXONA BILETI</h3>
-            <p id="ks-time"></p>
-            <h2 id="ks-table" style="margin:5px 0;"></h2>
-            <p>Ofitsiant: <b id="ks-waiter"></b></p>
-            <hr>
-        </center>
-        <div id="ks-items" style="font-size:14px; font-weight:bold;"></div>
-        <hr>
-        <center><small>RestaurantOS KDS Dispatcher</small></center>
+        <div style="font-size:12px; margin-top:6px; color:#2c3e50;" id="rc-pay-breakdown"></div>
     </div>
 
     <script>
-        var ADMIN_PIN = "0000"; // Xavfsizlik PIN kodi
+        var ADMIN_PIN = "0000";
         var zones = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
         var currentZoneFilter = "Barchasi";
         var currentKdsDept = "Barchasi";
@@ -567,7 +565,7 @@
                 "VIP xona": ["Shaxzod"]
             },
             tableWaiters: {},
-            tableOpenTimes: {}, // Buyurtma ochilgan vaqtlar (Taymer uchun)
+            tableOpenTimes: {},
             reservations: {},
             tables: [
                 { key: "Asosiy zal-1", zone: "Asosiy zal", number: 1 },
@@ -642,7 +640,7 @@
                 var t = localStorage.getItem('ros_tables_v3');
                 if (t) { var pT = JSON.parse(t); if (Array.isArray(pT) && pT.length > 0) state.tables = pT; }
 
-                var m = localStorage.getItem('ros_menu_v4');
+                var m = localStorage.getItem('ros_menu_v5');
                 if (m) { var pM = JSON.parse(m); if (Array.isArray(pM) && pM.length > 0) state.menu = pM; }
 
                 var o = localStorage.getItem('ros_orders_v5');
@@ -675,7 +673,7 @@
                 var tc = localStorage.getItem('ros_customers');
                 if (tc) { var pTC = JSON.parse(tc); if (pTC && typeof pTC === 'object') state.tableCustomers = pTC; }
 
-                var h = localStorage.getItem('ros_history_v10');
+                var h = localStorage.getItem('ros_history_v11');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
                 console.error("Xotira yuklashda xato:", e);
@@ -696,7 +694,7 @@
         function saveStorage() {
             try {
                 localStorage.setItem('ros_tables_v3', JSON.stringify(state.tables));
-                localStorage.setItem('ros_menu_v4', JSON.stringify(state.menu));
+                localStorage.setItem('ros_menu_v5', JSON.stringify(state.menu));
                 localStorage.setItem('ros_orders_v5', JSON.stringify(state.orders));
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
                 localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
@@ -707,7 +705,7 @@
                 localStorage.setItem('ros_customers', JSON.stringify(state.tableCustomers));
                 localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
                 localStorage.setItem('ros_stock_v1', JSON.stringify(state.stock));
-                localStorage.setItem('ros_history_v10', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v11', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
             }
@@ -768,7 +766,6 @@
             sBadge.style.display = hasLowStock ? 'inline-block' : 'none';
         }
 
-        /* --- STOLLAR VA TAYMERLAR (1-funksiya) --- */
         function getElapsedMinutes(key) {
             var start = state.tableOpenTimes[key];
             if (!start) return 0;
@@ -799,7 +796,7 @@
                 });
 
                 var elapsed = isBusy ? getElapsedMinutes(tbl.key) : 0;
-                var isLate = isBusy && elapsed >= 25; // 25+ min kechikish
+                var isLate = isBusy && elapsed >= 25;
 
                 var statusText = isReady ? '🔔 TAYYOR!' : (isBusy ? (isLate ? '⚠️ ' + elapsed + ' daq (Kechikmoqda)' : '⏱ ' + elapsed + ' daq (Band)') : (isRes ? '🟡 (Bron)' : '(Bo\'sh)'));
                 var baseClass = isReady ? 'table-ready-alert' : (isBusy ? (isLate ? 'busy table-late-alert' : 'busy') : (isRes ? 'reserved' : 'free'));
@@ -812,14 +809,9 @@
             });
         }
 
-        // Har 30 soniyada stollar taymerini qayta chizish
         setInterval(function() {
-            if (document.getElementById('view-hall').style.display !== 'none') {
-                renderTables();
-            }
-            if (document.getElementById('view-kds').style.display !== 'none') {
-                renderKDS();
-            }
+            if (document.getElementById('view-hall').style.display !== 'none') renderTables();
+            if (document.getElementById('view-kds').style.display !== 'none') renderKDS();
         }, 30000);
 
         function selectTable(key) {
@@ -835,7 +827,7 @@
             renderOrder();
         }
 
-        /* --- MENYU VA PORSIYA TANLOVI (2-funksiya) --- */
+        /* --- MENYU: FAQAT OSHGA PORSIYA, QOLGANIGA ODDIY QO'SHISH --- */
         function renderMenu() {
             var container = document.getElementById('menu-container');
             container.innerHTML = '';
@@ -845,45 +837,90 @@
                 div.className = 'menu-item' + (isStopped ? ' stopped' : '');
 
                 var stopTag = isStopped ? '<span class="item-badge badge-stop">⛔ Stopda</span>' : '';
-                var halfPrice = Math.round(item.price * 0.7);
+                var isPortionFood = item.name.toLowerCase().includes('osh'); // Faqat Osh uchun porsiyalar
+
+                var buttonsHtml = '';
+                if (isPortionFood) {
+                    var price07 = Math.round(item.price * 0.7);
+                    var price05 = Math.round(item.price * 0.5);
+                    buttonsHtml = 
+                        '<div class="portion-box">' +
+                            '<button class="portion-btn" ' + (isStopped ? 'disabled' : '') + ' onclick="addItemWithPortion(' + index + ', 1.0)">+ 1 pors</button>' +
+                            '<button class="portion-btn btn-half" ' + (isStopped ? 'disabled' : '') + ' onclick="addItemWithPortion(' + index + ', 0.7)">+ 0.7</button>' +
+                            '<button class="portion-btn btn-half" ' + (isStopped ? 'disabled' : '') + ' onclick="addItemWithPortion(' + index + ', 0.5)">+ 0.5</button>' +
+                        '</div>';
+                } else {
+                    buttonsHtml = 
+                        '<div class="portion-box">' +
+                            '<button class="portion-btn" ' + (isStopped ? 'disabled' : '') + ' onclick="addRegularItem(' + index + ')">+ Qo\'shish</button>' +
+                        '</div>';
+                }
 
                 div.innerHTML = 
                     '<div>' +
                         '<b>' + item.name + '</b> <span class="item-badge">' + (item.dept || 'Oshxona') + '</span> ' + stopTag + '<br>' +
-                        '<small style="color:#555;">1 pors: ' + item.price.toLocaleString() + ' | 0.7 pors: ' + halfPrice.toLocaleString() + ' so\'m</small>' +
-                        '<div class="portion-box">' +
-                            '<button class="portion-btn" ' + (isStopped ? 'disabled' : '') + ' onclick="addMenuItemWithPortion(' + index + ', 1.0)">+ 1 pors</button>' +
-                            '<button class="portion-btn btn-half" ' + (isStopped ? 'disabled' : '') + ' onclick="addMenuItemWithPortion(' + index + ', 0.7)">+ 0.7 pors</button>' +
-                        '</div>' +
+                        '<small style="color:#555;">Narxi: ' + item.price.toLocaleString() + ' so\'m</small>' +
+                        buttonsHtml +
                     '</div>';
 
                 container.appendChild(div);
             });
         }
 
-        function addMenuItemWithPortion(index, portion) {
+        // Oddiy taomlar: 1 marta bossa 1 ta, 2 marta bossa 2 ta
+        function addRegularItem(index) {
             var item = state.menu[index];
             if (!item || item.isStopped) return;
 
             if (!state.orders[state.selectedKey]) state.orders[state.selectedKey] = [];
             var currentOrders = state.orders[state.selectedKey];
 
-            // Birinchi taom qo'shilganda taymer boshlanadi
             if (currentOrders.length === 0) {
                 state.tableOpenTimes[state.selectedKey] = Date.now();
             }
 
-            var pLabel = portion === 1.0 ? '1 pors' : '0.7 pors';
-            var finalPrice = portion === 1.0 ? item.price : Math.round(item.price * 0.7);
-            var itemName = item.name + ' (' + pLabel + ')';
-
-            var existing = currentOrders.find(function(o) { return o.name === itemName && !o.note; });
-
+            var existing = currentOrders.find(function(o) { return o.name === item.name && !o.note; });
             if (existing) {
                 existing.qty++;
             } else {
                 currentOrders.push({
-                    name: itemName,
+                    name: item.name,
+                    rawName: item.name,
+                    price: item.price,
+                    portion: 1.0,
+                    dept: item.dept || 'Oshxona',
+                    qty: 1,
+                    note: ''
+                });
+            }
+
+            saveStorage();
+            renderTables();
+            renderOrder();
+        }
+
+        // Osh kabi taomlar porsiyasi
+        function addItemWithPortion(index, portion) {
+            var item = state.menu[index];
+            if (!item || item.isStopped) return;
+
+            if (!state.orders[state.selectedKey]) state.orders[state.selectedKey] = [];
+            var currentOrders = state.orders[state.selectedKey];
+
+            if (currentOrders.length === 0) {
+                state.tableOpenTimes[state.selectedKey] = Date.now();
+            }
+
+            var pLabel = portion === 1.0 ? '1 pors' : (portion === 0.7 ? '0.7 pors' : '0.5 pors');
+            var finalPrice = Math.round(item.price * portion);
+            var fullName = item.name + ' (' + pLabel + ')';
+
+            var existing = currentOrders.find(function(o) { return o.name === fullName && !o.note; });
+            if (existing) {
+                existing.qty++;
+            } else {
+                currentOrders.push({
+                    name: fullName,
                     rawName: item.name,
                     price: finalPrice,
                     portion: portion,
@@ -898,22 +935,7 @@
             renderOrder();
         }
 
-        /* --- OSHXONA CHIPTASI CHOP ETISH (4-funksiya) --- */
-        function printKitchenSlip(ticket) {
-            document.getElementById('ks-time').innerText = ticket.time;
-            document.getElementById('ks-table').innerText = ticket.zone + ' #' + ticket.tableNum;
-            document.getElementById('ks-waiter').innerText = ticket.waiter || 'Ofitsiant';
-
-            var ksBox = document.getElementById('ks-items');
-            ksBox.innerHTML = '';
-            ticket.items.forEach(function(i) {
-                var notePart = i.note ? '<br><small>📌 ' + i.note + '</small>' : '';
-                ksBox.innerHTML += '<div style="margin-bottom:6px;">' + i.name + ' &times; ' + i.qty + notePart + '</div>';
-            });
-
-            window.print();
-        }
-
+        /* --- OSHXONAGA YUBORISH (Cheksiz, to'g'ridan-to'g'ri KDS ga) --- */
         function sendOrderToKitchen() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Oshxonaga yuborish uchun buyurtma mavjud emas!");
@@ -952,19 +974,15 @@
             saveStorage();
             updateBadges();
             renderOrder();
-            
-            if (confirm("Buyurtma oshxonaga uzatildi! Oshpaz uchun kvitansiya (bilet) chiqarilsinmi?")) {
-                printKitchenSlip(newTicket);
-            }
+            alert("✅ Buyurtma oshxonaga (KDS) yuborildi!");
         }
 
-        /* --- KDS OSHXONA RENDER --- */
+        /* --- KDS OSHXONA --- */
         function renderKDS() {
             var container = document.getElementById('kds-orders-container');
             container.innerHTML = '';
 
             var activeTickets = state.kdsTickets.filter(function(t) { return t.status !== 'done'; });
-
             if (activeTickets.length === 0) {
                 container.innerHTML = '<p style="color:#7f8c8d; text-align:center; grid-column: 1/-1; padding: 30px;">Hozircha faol buyurtmalar yo\'q.</p>';
                 return;
@@ -975,7 +993,6 @@
                     if (currentKdsDept === 'Barchasi') return true;
                     return item.dept === currentKdsDept;
                 });
-
                 if (filteredItems.length === 0) return;
 
                 var elapsed = Math.floor((Date.now() - (ticket.timestamp || Date.now())) / 60000);
@@ -987,14 +1004,10 @@
                 var itemsHtml = '';
                 filteredItems.forEach(function(i) {
                     var noteText = i.note ? '<div class="kds-item-note">📌 ' + i.note + '</div>' : '';
-                    itemsHtml += '<li>' +
-                                    '<div class="kds-item-main"><span>' + i.name + '</span> <b>&times; ' + i.qty + '</b></div>' +
-                                    noteText +
-                                 '</li>';
+                    itemsHtml += '<li><div class="kds-item-main"><span>' + i.name + '</span> <b>&times; ' + i.qty + '</b></div>' + noteText + '</li>';
                 });
 
                 var statusText = ticket.status === 'waiting' ? '🟡 Kutilmoqda' : (ticket.status === 'cooking' ? '🔵 Pishirilmoqda' : '🟢 Tayyor');
-
                 var actionsHtml = '';
                 if (ticket.status === 'waiting') {
                     actionsHtml = '<button class="kds-btn btn-kds-cook" onclick="changeKdsStatus(' + ticket.id + ', \'cooking\')">Boshlash</button>';
@@ -1034,7 +1047,188 @@
             }
         }
 
-        /* --- CHEKNI BO'LIB TO'LASH / SPLIT BILL (5-funksiya) --- */
+        /* --- ARALASH TO'LOV MANTIG'I (Qoldiqni aniq ko'rsatish) --- */
+        function toggleSplitPayBox() {
+            var box = document.getElementById('split-pay-box');
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+            updateSplitStatusLive();
+        }
+
+        function updateSplitStatusLive() {
+            var calc = getCurrentCalculations();
+            var inputVal = parseFloat(document.getElementById('split-part-input').value) || 0;
+            var remaining = Math.max(0, calc.total - inputVal);
+
+            document.getElementById('split-paid-live').innerText = inputVal.toLocaleString() + " so'm";
+            document.getElementById('split-remaining-live').innerText = remaining.toLocaleString() + " so'm";
+        }
+
+        function confirmSplitPartial(type) {
+            if (selectedRating === 0) return alert("Iltimos, avval ofitsiant xizmatiga yulduzcha bosing!");
+
+            var calc = getCurrentCalculations();
+            var cashVal = parseFloat(document.getElementById('split-part-input').value) || 0;
+
+            if (cashVal <= 0 || cashVal >= calc.total) {
+                return alert("Naqd pul summasini to'g'ri kiriting (0 dan katta va umumiy hisobdan kam bo'lishi kerak)!");
+            }
+
+            var cardVal = calc.total - cashVal;
+            var methodStr = "Aralash (Naqd: " + cashVal.toLocaleString() + " + " + (type.includes('Payme') ? 'Payme' : 'Karta') + ": " + cardVal.toLocaleString() + ")";
+
+            alert("To'lov qabul qilindi:\n- Naqd olindi: " + cashVal.toLocaleString() + " so'm\n- Qoldiq " + (type.includes('Payme') ? 'Payme' : 'Karta') + "dan yopildi: " + cardVal.toLocaleString() + " so'm\n\nHisob to'liq yopildi!");
+
+            executeFinalPayment(methodStr, calc.total, cashVal, cardVal);
+        }
+
+        /* --- TO'LIQ TO'LOV VA YOPISH --- */
+        function setRating(val) {
+            selectedRating = val;
+            var stars = document.querySelectorAll('#stars-box .star');
+            stars.forEach(function(s, idx) {
+                if (idx < val) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+            var labels = ["1 yulduz (Juda yomon)", "2 yulduz (Qoniqarsiz)", "3 yulduz (O'rtacha)", "4 yulduz (Yaxshi)", "5 yulduz (A'lo xizmat)"];
+            var lbl = document.getElementById('rating-label');
+            lbl.innerText = labels[val - 1];
+            lbl.style.color = "#27ae60";
+        }
+
+        var payModal = document.getElementById('pay-modal');
+        document.getElementById('btn-open-pay-modal').onclick = function() {
+            var calc = getCurrentCalculations();
+            if (calc.orders.length === 0) return alert("Bu stolda buyurtma yo'q!");
+
+            document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
+            
+            var discMsg = '';
+            if (calc.discPct > 0) {
+                discMsg = '🎉 ' + calc.discPct + '% chegirma qo\'llandi (-' + calc.discAmount.toLocaleString() + ' so\'m)';
+            }
+            document.getElementById('pay-modal-disc-info').innerText = discMsg;
+
+            selectedRating = 0;
+            var stars = document.querySelectorAll('#stars-box .star');
+            stars.forEach(function(s) { s.classList.remove('selected'); });
+            var lbl = document.getElementById('rating-label');
+            lbl.innerText = "⚠️ Iltimos, yulduzcha bosing!";
+            lbl.style.color = "#e74c3c";
+
+            document.getElementById('split-pay-box').style.display = 'none';
+            document.getElementById('split-part-input').value = '';
+
+            payModal.style.display = 'flex';
+        };
+        document.getElementById('btn-close-pay-modal').onclick = function() { payModal.style.display = 'none'; };
+
+        function confirmPayment(method) {
+            if (selectedRating === 0) return alert("Ofitsiant xizmatiga yulduzcha bosing!");
+            var calc = getCurrentCalculations();
+            executeFinalPayment(method, calc.total, 0, 0);
+        }
+
+        function executeFinalPayment(method, totalAmount, splitCash, splitCard) {
+            var calc = getCurrentCalculations();
+            var itemNames = [];
+            calc.orders.forEach(function(i) {
+                var notePart = i.note ? ' [' + i.note + ']' : '';
+                itemNames.push(i.name + notePart + ' (x' + i.qty + ')');
+            });
+
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            var zone = curTbl ? curTbl.zone : '-';
+            var num = curTbl ? curTbl.number : '-';
+            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+            var custPhone = state.tableCustomers[state.selectedKey] || '-';
+
+            var d = new Date();
+            state.history.unshift({
+                time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: d.toLocaleDateString(),
+                zone: zone,
+                tableNum: num,
+                waiter: waiter,
+                customer: custPhone,
+                rating: selectedRating,
+                items: itemNames.join('; '),
+                method: method,
+                splitCash: splitCash,
+                splitCard: splitCard,
+                discount: calc.discAmount,
+                serviceFee: calc.feeAmount,
+                total: totalAmount
+            });
+
+            deductIngredientsFromStock(calc.orders);
+
+            state.kdsTickets.forEach(function(t) {
+                if (t.tableKey === state.selectedKey) t.status = 'done';
+            });
+
+            // Chekni chop etish
+            renderReceiptForPrint(calc, method);
+
+            state.orders[state.selectedKey] = [];
+            state.tableDiscounts[state.selectedKey] = 'auto';
+            state.tableCustomers[state.selectedKey] = '';
+            delete state.tableOpenTimes[state.selectedKey];
+            delete state.reservations[state.selectedKey];
+
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-discount').value = 'auto';
+
+            activeDropdownIndex = null;
+            payModal.style.display = 'none';
+
+            saveStorage();
+            updateBadges();
+            renderTables();
+            renderOrder();
+            renderReports();
+            if (document.getElementById('view-stock').style.display === 'block') renderStock();
+
+            window.print();
+        }
+
+        function renderReceiptForPrint(calc, method) {
+            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
+            document.getElementById('rc-date').innerText = new Date().toLocaleString();
+            document.getElementById('rc-table').innerText = (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol');
+            document.getElementById('rc-waiter').innerText = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+
+            var cPhone = state.tableCustomers[state.selectedKey];
+            if (cPhone) {
+                document.getElementById('rc-cust-box').style.display = 'block';
+                document.getElementById('rc-cust').innerText = cPhone;
+            } else {
+                document.getElementById('rc-cust-box').style.display = 'none';
+            }
+
+            var rcBox = document.getElementById('rc-items');
+            rcBox.innerHTML = '';
+            calc.orders.forEach(function(item) {
+                var itemTotal = item.price * item.qty;
+                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
+            });
+
+            document.getElementById('rc-subtotal').innerText = calc.subtotal.toLocaleString();
+            var discRow = document.getElementById('rc-disc-row');
+            if (calc.discPct > 0) {
+                discRow.style.display = 'block';
+                document.getElementById('rc-disc-pct').innerText = calc.discPct;
+                document.getElementById('rc-disc').innerText = calc.discAmount.toLocaleString();
+            } else {
+                discRow.style.display = 'none';
+            }
+
+            document.getElementById('rc-fee-pct').innerText = calc.feePct;
+            document.getElementById('rc-service').innerText = calc.feeAmount.toLocaleString();
+            document.getElementById('rc-total').innerText = calc.total.toLocaleString();
+            document.getElementById('rc-pay-breakdown').innerHTML = 'To\'lov: <b>' + method + '</b>';
+        }
+
+        /* --- SPLIT BILL / CHEKNI BO'LIB TO'LASH --- */
         function openSplitBillModal() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Bu stolda buyurtma yo'q!");
@@ -1046,9 +1240,7 @@
             document.getElementById('split-bill-modal').style.display = 'flex';
         }
 
-        function closeSplitBillModal() {
-            document.getElementById('split-bill-modal').style.display = 'none';
-        }
+        function closeSplitBillModal() { document.getElementById('split-bill-modal').style.display = 'none'; }
 
         function setSplitRating(val) {
             splitSelectedRating = val;
@@ -1116,7 +1308,6 @@
 
             if (paidItems.length === 0) return alert("To'lash uchun kamida bitta taom tanlang!");
 
-            // Nol bo'lgan taomlarni tozalash
             state.orders[state.selectedKey] = curOrders.filter(function(o) { return o.qty > 0; });
             if (state.orders[state.selectedKey].length === 0) {
                 delete state.tableOpenTimes[state.selectedKey];
@@ -1156,18 +1347,14 @@
             alert("Mehmon o'z hissasini to'ladi! Qolgan hisob stolda qoldi.");
         }
 
-        /* --- ADMIN PIN BILAN HIMOYALASH (3-funksiya) --- */
+        /* --- XAVFSIZ ADMIN PIN --- */
         function deleteCurrentTable() {
             var pin = prompt("Admin PIN-kodini kiriting (Standart: 0000):");
-            if (pin !== ADMIN_PIN) {
-                return alert("Xato PIN-kod! O'chirish rad etildi.");
-            }
+            if (pin !== ADMIN_PIN) return alert("Xato PIN-kod! O'chirish rad etildi.");
 
             if (state.tables.length <= 1) return alert("Kamida 1 ta stol qolishi shart!");
             var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var tblName = curTbl ? curTbl.zone + ' ' + curTbl.number + '-stol' : 'Stol';
-
-            if (!confirm(tblName + " butunlay o'chirilsinmi?")) return;
+            if (!confirm(curTbl.zone + ' ' + curTbl.number + "-stol butunlay o'chirilsinmi?")) return;
 
             state.tables = state.tables.filter(function(t) { return t.key !== state.selectedKey; });
             delete state.orders[state.selectedKey];
@@ -1183,7 +1370,7 @@
             selectTable(state.selectedKey);
         }
 
-        /* --- QO'SHIMCHA YORDAMCHI FUNKSIYALAR --- */
+        /* --- HISOB-KITOB VA QO'SHIMCHA FUNKSIYALAR --- */
         function deductIngredientsFromStock(ordersList) {
             ordersList.forEach(function(order) {
                 var baseName = order.rawName || order.name.split(' (')[0];
@@ -1373,135 +1560,6 @@
             }
         });
 
-        /* --- TO'LOV MANTIG'I --- */
-        function setRating(val) {
-            selectedRating = val;
-            var stars = document.querySelectorAll('#stars-box .star');
-            stars.forEach(function(s, idx) {
-                if (idx < val) s.classList.add('selected');
-                else s.classList.remove('selected');
-            });
-            var labels = ["1 yulduz (Juda yomon)", "2 yulduz (Qoniqarsiz)", "3 yulduz (O'rtacha)", "4 yulduz (Yaxshi)", "5 yulduz (A'lo xizmat)"];
-            var lbl = document.getElementById('rating-label');
-            lbl.innerText = labels[val - 1];
-            lbl.style.color = "#27ae60";
-        }
-
-        function toggleSplitPayBox() {
-            var box = document.getElementById('split-pay-box');
-            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-            calculateSplitRemaining();
-        }
-
-        function calculateSplitRemaining() {
-            var calc = getCurrentCalculations();
-            var cashVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
-            var remaining = Math.max(0, calc.total - cashVal);
-            document.getElementById('split-card-amount').innerText = remaining.toLocaleString() + " so'm";
-        }
-
-        var payModal = document.getElementById('pay-modal');
-        document.getElementById('btn-open-pay-modal').onclick = function() {
-            var calc = getCurrentCalculations();
-            if (calc.orders.length === 0) return alert("Bu stolda buyurtma yo'q!");
-
-            document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
-            
-            var discMsg = '';
-            if (calc.discPct > 0) {
-                discMsg = '🎉 ' + calc.discPct + '% chegirma qo\'llandi (-' + calc.discAmount.toLocaleString() + ' so\'m)';
-            }
-            document.getElementById('pay-modal-disc-info').innerText = discMsg;
-
-            selectedRating = 0;
-            var stars = document.querySelectorAll('#stars-box .star');
-            stars.forEach(function(s) { s.classList.remove('selected'); });
-            var lbl = document.getElementById('rating-label');
-            lbl.innerText = "⚠️ Iltimos, yulduzcha bosing!";
-            lbl.style.color = "#e74c3c";
-
-            document.getElementById('split-pay-box').style.display = 'none';
-            document.getElementById('split-cash-input').value = '';
-
-            payModal.style.display = 'flex';
-        };
-        document.getElementById('btn-close-pay-modal').onclick = function() { payModal.style.display = 'none'; };
-
-        function confirmPayment(method) {
-            if (selectedRating === 0) return alert("Ofitsiant xizmatiga yulduzcha bosing!");
-            var calc = getCurrentCalculations();
-            executeFinalPayment(method, calc.total, 0, 0);
-        }
-
-        function confirmSplitPayment() {
-            if (selectedRating === 0) return alert("Ofitsiant xizmatiga yulduzcha bosing!");
-            var calc = getCurrentCalculations();
-            var cashVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
-            if (cashVal <= 0 || cashVal >= calc.total) return alert("Naqd pul summasini to'g'ri kiriting!");
-
-            var cardVal = calc.total - cashVal;
-            var methodStr = "Aralash (Naqd: " + cashVal.toLocaleString() + " | Karta: " + cardVal.toLocaleString() + ")";
-            executeFinalPayment(methodStr, calc.total, cashVal, cardVal);
-        }
-
-        function executeFinalPayment(method, totalAmount, splitCash, splitCard) {
-            var calc = getCurrentCalculations();
-            var itemNames = [];
-            calc.orders.forEach(function(i) {
-                var notePart = i.note ? ' [' + i.note + ']' : '';
-                itemNames.push(i.name + notePart + ' (x' + i.qty + ')');
-            });
-
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var zone = curTbl ? curTbl.zone : '-';
-            var num = curTbl ? curTbl.number : '-';
-            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
-            var custPhone = state.tableCustomers[state.selectedKey] || '-';
-
-            var d = new Date();
-            state.history.unshift({
-                time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                date: d.toLocaleDateString(),
-                zone: zone,
-                tableNum: num,
-                waiter: waiter,
-                customer: custPhone,
-                rating: selectedRating,
-                items: itemNames.join('; '),
-                method: method,
-                splitCash: splitCash,
-                splitCard: splitCard,
-                discount: calc.discAmount,
-                serviceFee: calc.feeAmount,
-                total: totalAmount
-            });
-
-            deductIngredientsFromStock(calc.orders);
-
-            state.kdsTickets.forEach(function(t) {
-                if (t.tableKey === state.selectedKey) t.status = 'done';
-            });
-
-            state.orders[state.selectedKey] = [];
-            state.tableDiscounts[state.selectedKey] = 'auto';
-            state.tableCustomers[state.selectedKey] = '';
-            delete state.tableOpenTimes[state.selectedKey];
-            delete state.reservations[state.selectedKey];
-
-            document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-discount').value = 'auto';
-
-            activeDropdownIndex = null;
-            payModal.style.display = 'none';
-
-            saveStorage();
-            updateBadges();
-            renderTables();
-            renderOrder();
-            renderReports();
-            if (document.getElementById('view-stock').style.display === 'block') renderStock();
-        }
-
         function renderReports() {
             var tot = 0, cash = 0, card = 0, payme = 0;
             var waiterStats = {};
@@ -1618,49 +1676,10 @@
         function printReceipt() {
             var calc = getCurrentCalculations();
             if (calc.orders.length === 0) return alert("Buyurtma yo'q!");
-
-            var curTbl = state.tables.find(function(t) { return t.key === state.selectedKey; });
-            var title = curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol';
-
-            document.getElementById('rc-date').innerText = new Date().toLocaleString();
-            document.getElementById('rc-table').innerText = title;
-            document.getElementById('rc-waiter').innerText = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
-            
-            var cPhone = state.tableCustomers[state.selectedKey];
-            if (cPhone) {
-                document.getElementById('rc-cust-box').style.display = 'block';
-                document.getElementById('rc-cust').innerText = cPhone;
-            } else {
-                document.getElementById('rc-cust-box').style.display = 'none';
-            }
-
-            var rcBox = document.getElementById('rc-items');
-            rcBox.innerHTML = '';
-
-            calc.orders.forEach(function(item) {
-                var itemTotal = item.price * item.qty;
-                var notePart = item.note ? ' (' + item.note + ')' : '';
-                rcBox.innerHTML += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>' + item.name + notePart + ' x ' + item.qty + '</span><span>' + itemTotal.toLocaleString() + ' so\'m</span></div>';
-            });
-
-            document.getElementById('rc-subtotal').innerText = calc.subtotal.toLocaleString();
-            
-            var discRow = document.getElementById('rc-disc-row');
-            if (calc.discPct > 0) {
-                discRow.style.display = 'block';
-                document.getElementById('rc-disc-pct').innerText = calc.discPct;
-                document.getElementById('rc-disc').innerText = calc.discAmount.toLocaleString();
-            } else {
-                discRow.style.display = 'none';
-            }
-
-            document.getElementById('rc-fee-pct').innerText = calc.feePct;
-            document.getElementById('rc-service').innerText = calc.feeAmount.toLocaleString();
-            document.getElementById('rc-total').innerText = calc.total.toLocaleString();
+            renderReceiptForPrint(calc, "Ko'rish uchun chek");
             window.print();
         }
 
-        /* --- MENYUNI BOSHQARISH VA STOP-LIST TOGGLE --- */
         function renderManageMenu() {
             var tbody = document.getElementById('manage-menu-rows');
             tbody.innerHTML = '';
@@ -1766,7 +1785,7 @@
             var q = parseFloat(document.getElementById('new-stock-qty').value);
             var u = document.getElementById('new-stock-unit').value;
 
-            if (!n || isNaN(q) || q < 0) return alert("Iltimos, nom va miqdorni to'g'ri kiriting!");
+            if (!n || isNaN(q) || q < 0) return alert("Nom va miqdorni to'g'ri kiriting!");
             state.stock.push({ id: Date.now(), name: n, qty: q, unit: u });
 
             saveStorage();
@@ -1880,7 +1899,6 @@
             selectTable(newKey);
         }
 
-        /* --- MODALLAR BOSHQARUVI --- */
         function openTransferModal() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Ushbu stolda hali buyurtma yo'q!");
