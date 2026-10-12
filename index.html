@@ -23,7 +23,7 @@
         *, *::before, *::after { box-sizing: border-box; }
         html, body { min-height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "Manrope", system-ui, sans-serif; font-size: 14px; }
 
-        /* 1. LOGIN */
+        /* LOGIN */
         #auth-screen { display: grid; place-items: center; min-height: 100vh; padding: 20px; }
         .login-wrap { width: 100%; max-width: 320px; display: grid; gap: 12px; }
         .login-card { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -32,14 +32,15 @@
         .btn-login { background: var(--accent); color: white; border: none; padding: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
         .btn-login:hover { background: var(--accent-hover); }
 
-        /* 2. LAYOUT */
-        #app-screen { display: none; min-height: 100vh; grid-template-columns: 200px 1fr; }
+        /* ASOSIY LAYOUT */
+        #app-screen { display: none; min-height: 100vh; grid-template-columns: 210px 1fr; }
         .sidebar { background: var(--card); border-right: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; padding: 16px 12px; }
         .logo-box { padding: 10px 8px; font-weight: 800; font-size: 18px; color: var(--accent); border-bottom: 2px solid var(--ink); margin-bottom: 10px; }
         .nav-link { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; border: 1.5px solid transparent; font-weight: 700; color: var(--ink); cursor: pointer; text-decoration: none; }
         .nav-link:hover { background: var(--fill); }
         .nav-link.active { background: var(--fill); border-color: var(--accent); color: var(--accent); }
-        .nav-badge { background: var(--red); color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: 800; }
+        .nav-badge-ready { background: var(--green); color: white; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: 800; animation: pulse-ready 1.2s infinite; }
+        .nav-badge-kds { background: var(--red); color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: 800; }
 
         .main-content { display: grid; grid-template-rows: auto 1fr; background: var(--bg); }
         .topbar { background: var(--card); border-bottom: 2px solid var(--ink); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
@@ -50,12 +51,13 @@
         .view-panel { display: none; }
         .view-panel.active { display: block; }
 
-        /* KARTALAR VA GRID */
+        /* DASHBOARD */
         .dash-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
         .metric-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; display: grid; gap: 4px; }
         .metric-card span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
         .metric-card b { font-size: 20px; font-weight: 800; color: var(--ink); }
 
+        /* STOLLAR */
         .hall-grid { display: grid; grid-template-columns: 320px 1fr 340px; gap: 16px; align-items: start; }
         .panel-box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         
@@ -81,7 +83,7 @@
             border-color: #f1c40f !important;
         }
 
-        /* Menyu */
+        /* MENYU */
         .menu-list { display: grid; gap: 8px; max-height: 520px; overflow-y: auto; }
         .menu-row { background: var(--fill); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         .menu-row.stopped { background: #fee2e2; border-color: #fca5a5; opacity: 0.7; }
@@ -100,19 +102,16 @@
         .btn-split-bill { background: var(--fill); border: 1.5px solid var(--accent); color: var(--accent); }
         .btn-serve-done { display: none; width: 100%; background: var(--green); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; animation: pulse-ready 1.2s infinite; }
 
-        /* Qisman to'lov ko'rsatkichi */
-        .partial-pay-indicator { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-top: 6px; font-size: 12px; }
-
-        /* KDS Grid */
+        /* KDS */
         .kds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
         .kds-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         .kds-card.ready { border-color: var(--green); background: #f0fdf4; }
 
-        /* Bildirishnoma (Toast) */
+        /* TOAST */
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-item { background: var(--ink); color: white; padding: 14px 20px; border-radius: 8px; border-left: 5px solid var(--green); font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); pointer-events: auto; }
 
-        /* Modallar */
+        /* MODALLAR */
         .modal-mask { display: none; position: fixed; inset: 0; background: rgba(19, 35, 46, 0.6); z-index: 1000; place-items: center; padding: 20px; }
         .modal-box { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; width: 100%; max-width: 480px; padding: 20px; max-height: 85vh; overflow-y: auto; }
         .rating-stars { display: flex; gap: 8px; font-size: 32px; justify-content: center; margin: 10px 0; cursor: pointer; user-select: none; }
@@ -149,11 +148,20 @@
         <aside class="sidebar">
             <div class="logo-box">RestaurantOS</div>
             <div class="nav-link active" onclick="switchNav('dash', this)"><span>📊 Boshqaruv</span></div>
-            <div class="nav-link" onclick="switchNav('hall', this)"><span>🛎 Stollar & Kassa</span></div>
+            
+            <!-- STOLLAR & KASSA (TAYYOR BO'LGAN BILDIRIShNOMA BILAN) -->
+            <div class="nav-link" id="nav-hall-btn" onclick="switchNav('hall', this)">
+                <span>🛎 Stollar & Kassa</span>
+                <span id="ready-badge-hall" class="nav-badge-ready" style="display:none;">0 ta tayyor</span>
+            </div>
+
             <div class="nav-link" onclick="switchNav('orders', this)"><span>📋 Buyurtmalar</span></div>
-            <div class="nav-link" onclick="switchNav('kds', this)"><span>👨‍🍳 Oshxona (KDS)</span> <span id="kds-badge" class="nav-badge" style="display:none;">0</span></div>
+            <div class="nav-link" onclick="switchNav('kds', this)">
+                <span>👨‍🍳 Oshxona (KDS)</span> 
+                <span id="kds-badge" class="nav-badge-kds" style="display:none;">0</span>
+            </div>
             <div class="nav-link" onclick="switchNav('menu', this)"><span>🍲 Menyu & Stop</span></div>
-            <div class="nav-link" onclick="switchNav('stock', this)"><span>📦 Sklad (Ombor)</span> <span id="stock-badge" class="nav-badge" style="display:none;">!</span></div>
+            <div class="nav-link" onclick="switchNav('stock', this)"><span>📦 Sklad (Ombor)</span> <span id="stock-badge" class="nav-badge-kds" style="display:none;">!</span></div>
             <div class="nav-link" onclick="switchNav('staff', this)"><span>👥 Xodimlar reytingi</span></div>
             <div class="nav-link" onclick="switchNav('settings', this)" style="border-top:1px solid var(--line); margin-top:8px;"><span>🔒 Sozlamalar (Admin)</span></div>
         </aside>
@@ -231,8 +239,7 @@
                                 <b style="font-size:18px; color:var(--ink);" id="cur-total-price">0 so'm</b>
                             </div>
 
-                            <div id="cur-partial-box" class="partial-pay-indicator" style="display:none;"></div>
-
+                            <!-- Taom tayyor bo'lganda chiqadigan tugma -->
                             <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taomni oshxonadan oldim (Mijozga berildi)</button>
 
                             <button class="btn-action-wide btn-kds-send" onclick="sendOrderToKitchenDirect()">👨‍🍳 Oshxonaga yuborish</button>
@@ -276,7 +283,6 @@
                 <div id="view-menu" class="view-panel">
                     <div class="panel-box">
                         <h3>Menyu ro'yxati va Stop-list</h3>
-                        <p style="font-size:12px; color:var(--muted); margin:0 0 10px 0;">Yangi taom qo'shish yoki o'chirish uchun «Sozlamalar» bo'limiga kiring.</p>
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
@@ -304,18 +310,18 @@
                     </div>
                 </div>
 
-                <!-- 8. SOZLAMALAR -->
+                <!-- 8. SOZLAMALAR (ADMIN PIN) -->
                 <div id="view-settings" class="view-panel">
                     <div id="admin-pin-prompt" class="panel-box" style="max-width:380px; margin:40px auto; text-align:center;">
                         <h3>🔒 Administrator Tekshiruvi</h3>
-                        <p style="font-size:12px; color:var(--muted);">Menyu, xodimlar va stollarni boshqarish uchun PIN-kodni kiriting.</p>
+                        <p style="font-size:12px; color:var(--muted);">PIN-kodni kiriting.</p>
                         <input type="password" id="settings-pin-input" class="login-input" placeholder="PIN-kod (0000)" style="margin-bottom:10px; text-align:center; font-size:18px; letter-spacing:4px;">
                         <button class="btn-login" style="width:100%;" onclick="unlockAdminSettings()">Tasdiqlash</button>
                     </div>
 
                     <div id="admin-settings-content" style="display:none; gap:20px;">
                         <div class="panel-box">
-                            <h3>🍲 Menyuni boshqarish (Taom qo'shish / O'chirish)</h3>
+                            <h3>🍲 Menyuni boshqarish (Qo'shish / O'chirish)</h3>
                             <div style="display:flex; gap:8px; margin:8px 0; flex-wrap:wrap;">
                                 <input type="text" id="adm-new-food-name" placeholder="Taom nomi" style="flex:2; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
                                 <select id="adm-new-food-dept" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
@@ -324,7 +330,7 @@
                                     <option value="Bar">Bar</option>
                                 </select>
                                 <input type="number" id="adm-new-food-price" placeholder="Narxi (1 pors)" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
-                                <button class="btn-login" onclick="adminAddFood()">+ Taom qo'shish</button>
+                                <button class="btn-login" onclick="adminAddFood()">+ Qo'shish</button>
                             </div>
                             <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
                                 <thead>
@@ -337,7 +343,7 @@
                         </div>
 
                         <div class="panel-box">
-                            <h3>👥 Xodimlarni boshqarish (Ofitsiant qo'shish / O'chirish)</h3>
+                            <h3>👥 Xodimlarni boshqarish (Ofitsiant)</h3>
                             <div style="display:flex; gap:8px; margin:8px 0;">
                                 <select id="adm-staff-zone" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
                                     <option value="Asosiy zal">Asosiy zal</option>
@@ -346,13 +352,13 @@
                                     <option value="VIP xona">VIP xona</option>
                                 </select>
                                 <input type="text" id="adm-staff-name" placeholder="Ofitsiant ismi" style="flex:2; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
-                                <button class="btn-login" onclick="adminAddStaff()">+ Xodim qo'shish</button>
+                                <button class="btn-login" onclick="adminAddStaff()">+ Qo'shish</button>
                             </div>
                             <div id="adm-staff-list" style="margin-top:10px; display:grid; gap:8px;"></div>
                         </div>
 
                         <div class="panel-box">
-                            <h3>🗑 Stollarni butunlay o'chirish yoki qo'shish</h3>
+                            <h3>🗑 Stollarni o'chirish / qo'shish</h3>
                             <div style="display:flex; gap:8px; margin:8px 0;">
                                 <select id="adm-new-table-zone" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
                                     <option value="Asosiy zal">Asosiy zal</option>
@@ -376,7 +382,7 @@
         </main>
     </div>
 
-    <!-- MODAL: TO'LOV VA ARALASH TO'LOV -->
+    <!-- MODAL: TO'LOV VA QULAY ARALASH TO'LOV -->
     <div class="modal-mask" id="modal-pay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -384,16 +390,11 @@
                 <button onclick="closeModal('modal-pay')" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
             </div>
             
-            <div style="background:var(--fill); padding:10px; border-radius:8px; margin-top:10px;">
-                <div style="display:flex; justify-content:space-between;"><span>Jami hisob:</span> <b id="pay-modal-total">0 so'm</b></div>
-                <div style="display:flex; justify-content:space-between; color:var(--green); margin-top:2px;"><span>Avval to'langan:</span> <b id="pay-modal-already-paid">0 so'm</b></div>
-                <div style="display:flex; justify-content:space-between; color:var(--red); font-size:16px; margin-top:4px; border-top:1px dashed var(--line); padding-top:4px;">
-                    <span>TO'LANISHI KERAK:</span> <b id="pay-modal-amount">0 so'm</b>
-                </div>
-            </div>
+            <p style="font-size:16px; margin:12px 0 6px 0;">To'lov summasi: <b id="pay-modal-amount" style="color:var(--accent); font-size:20px;">0 so'm</b></p>
+            <div id="pay-modal-disc" style="font-size:12px; color:var(--yellow); margin-bottom:8px;"></div>
 
             <!-- Yulduzchalar -->
-            <div style="text-align:center; background:#fff; border:1px solid var(--line); padding:8px; border-radius:8px; margin-top:10px;">
+            <div style="text-align:center; background:var(--fill); padding:8px; border-radius:8px;">
                 <span style="font-size:12px; font-weight:700;">Ofitsiant xizmatini baholang:</span>
                 <div class="rating-stars" id="pay-stars">
                     <span class="star" onclick="setPayRating(1)">★</span>
@@ -405,26 +406,33 @@
                 <small id="pay-rating-txt" style="color:var(--red); font-weight:700;">⚠️ Yulduzcha tanlang!</small>
             </div>
 
-            <!-- To'lov usullari -->
-            <div style="display:grid; gap:8px; margin-top:12px;">
-                <button class="btn-login" onclick="execFullRemainingPay('Naqd')">💵 Qoldiqni to'liq Naqd bilan yopish</button>
-                <button class="btn-login" style="background:#2980b9;" onclick="execFullRemainingPay('Karta')">💳 Qoldiqni to'liq Karta bilan yopish</button>
-                <button class="btn-login" style="background:#8e44ad;" onclick="execFullRemainingPay('Payme')">📲 Qoldiqni to'liq Payme bilan yopish</button>
-                <button class="btn-split-bill" onclick="toggleSplitBox()">🔀 Qisman to'lash (Masalan: 20 000 berdi, qolgani qoladi)</button>
+            <!-- TO'LOV USULLARI -->
+            <div style="display:grid; gap:8px; margin-top:14px;">
+                <button class="btn-login" onclick="execFullPay('Naqd')">💵 To'liq Naqd pul bilan yopish</button>
+                <button class="btn-login" style="background:#2980b9;" onclick="execFullPay('Karta')">💳 To'liq Karta bilan yopish</button>
+                <button class="btn-login" style="background:#8e44ad;" onclick="execFullPay('Payme')">📲 To'liq Payme bilan yopish</button>
+                <button class="btn-split-bill" onclick="toggleSplitBox()">🔀 Aralash to'lov (Naqd + Karta)</button>
             </div>
 
-            <!-- Qisman to'lov qutisi -->
-            <div id="split-box" style="display:none; margin-top:10px; padding:12px; border:2px dashed var(--line); border-radius:8px; background:#fff;">
-                <label style="font-size:12px; font-weight:700;">Hozir berilayotgan summa (so'm):</label>
-                <input type="number" id="split-input-val" class="login-input" placeholder="Masalan: 20000" oninput="calcSplitLive()">
+            <!-- BITTA URINIShDA ARALASH TO'LOV KIKRITISH -->
+            <div id="split-box" style="display:none; margin-top:12px; padding:12px; border:2px dashed var(--line); border-radius:8px; background:#fff;">
+                <h4 style="margin:0 0 8px 0; color:var(--ink);">Aralash to'lovni taqsimlash:</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💵 Naqd to'langan:</label>
+                        <input type="number" id="split-cash-input" class="login-input" placeholder="0" oninput="calcSplitLive('cash')">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💳 Karta to'langan:</label>
+                        <input type="number" id="split-card-input" class="login-input" placeholder="0" oninput="calcSplitLive('card')">
+                    </div>
+                </div>
                 
-                <div style="margin:8px 0; font-size:14px; font-weight:700; color:var(--red);">
-                    Yana qoladigan qarz: <span id="split-rem-val">0 so'm</span>
+                <div id="split-hint-text" style="margin:8px 0; font-size:12px; font-weight:700; color:var(--accent);">
+                    Naqd summani yozing, qoldig'i kartaga avtomatik o'tadi.
                 </div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn-login" style="flex:1;" onclick="execPartialPayment('Naqd')">💵 Naqd oldim (Qoldiq stolda qolsin)</button>
-                    <button class="btn-login" style="flex:1; background:#2980b9;" onclick="execPartialPayment('Karta')">💳 Karta oldim (Qoldiq stolda qolsin)</button>
-                </div>
+
+                <button class="btn-login" style="width:100%;" onclick="execInstantSplitPay()">Tasdiqlash va Chek chiqarish</button>
             </div>
         </div>
     </div>
@@ -491,7 +499,6 @@
             currentKdsDept: 'Barchasi',
             payRating: 0,
             splitBillSelection: {},
-            tablePaidAmounts: {},
             tables: [
                 { key: 'Asosiy zal-1', zone: 'Asosiy zal', number: 1 },
                 { key: 'Asosiy zal-2', zone: 'Asosiy zal', number: 2 },
@@ -569,7 +576,6 @@
             var u = (document.getElementById('login-user').value || '').trim();
             var p = (document.getElementById('login-pass').value || '').trim();
             
-            // Xavfsiz solishtirish
             if ((u.toLowerCase() === 'admin') && (p === String(state.adminPin) || p === '0000')) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'grid';
@@ -621,7 +627,7 @@
 
         function loadStorage() {
             try {
-                var d = localStorage.getItem('ros_fix_split_v2');
+                var d = localStorage.getItem('ros_fast_split_v3');
                 if (d) {
                     var parsed = JSON.parse(d);
                     if (parsed.tables) state.tables = parsed.tables;
@@ -632,23 +638,22 @@
                     if (parsed.zoneWaiters) state.zoneWaiters = parsed.zoneWaiters;
                     if (parsed.adminPin) state.adminPin = String(parsed.adminPin);
                     if (parsed.reservations) state.reservations = parsed.reservations;
-                    if (parsed.tablePaidAmounts) state.tablePaidAmounts = parsed.tablePaidAmounts;
                 }
             } catch(e){}
 
             state.tables.forEach(function(t){
                 if (!state.orders[t.key]) state.orders[t.key] = [];
-                if (state.tablePaidAmounts[t.key] === undefined) state.tablePaidAmounts[t.key] = 0;
                 if (!state.tableWaiters[t.key]) {
                     var z = state.zoneWaiters[t.zone] || ["Ofitsiant"];
                     state.tableWaiters[t.key] = z[0];
                 }
             });
+            updateBadges();
         }
 
         function saveStorage() {
             try {
-                localStorage.setItem('ros_fix_split_v2', JSON.stringify({
+                localStorage.setItem('ros_fast_split_v3', JSON.stringify({
                     tables: state.tables,
                     orders: state.orders,
                     history: state.history,
@@ -656,17 +661,32 @@
                     menu: state.menu,
                     zoneWaiters: state.zoneWaiters,
                     adminPin: String(state.adminPin),
-                    reservations: state.reservations,
-                    tablePaidAmounts: state.tablePaidAmounts
+                    reservations: state.reservations
                 }));
             } catch(e){}
             updateBadges();
         }
 
+        // TAYYOR BO'LGAN TAOMLAR VA KDS NISHONLARI
         function updateBadges() {
             var activeKds = state.kdsTickets.filter(function(t){ return t.status !== 'done'; }).length;
             var kb = document.getElementById('kds-badge');
             if (activeKds > 0) { kb.innerText = activeKds; kb.style.display = 'inline-block'; } else { kb.style.display = 'none'; }
+
+            // ZAL BO'LIMIGA XABAR: Nechta stolda taom tayyor?
+            var readyTablesCount = 0;
+            state.tables.forEach(function(tbl){
+                var isReady = state.kdsTickets.some(function(ticket){ return ticket.tableKey === tbl.key && ticket.status === 'ready'; });
+                if (isReady) readyTablesCount++;
+            });
+
+            var rh = document.getElementById('ready-badge-hall');
+            if (readyTablesCount > 0) {
+                rh.innerText = readyTablesCount + " ta tayyor!";
+                rh.style.display = 'inline-block';
+            } else {
+                rh.style.display = 'none';
+            }
         }
 
         /* 1. DASHBOARD */
@@ -721,15 +741,12 @@
                 var isRes = !!state.reservations[t.key];
                 var isReady = state.kdsTickets.some(function(ticket){ return ticket.tableKey === t.key && ticket.status === 'ready'; });
 
-                var paidSoFar = state.tablePaidAmounts[t.key] || 0;
-                var partialTxt = paidSoFar > 0 ? '<br><span style="background:#fef08a;color:#854d0e;padding:1px 4px;border-radius:4px;font-size:10px;">To\'langan: ' + paidSoFar.toLocaleString() + '</span>' : '';
-
                 var statusCls = isReady ? 'ready-alert' : (isBusy ? 'busy' : (isRes ? 'reserved' : 'free'));
                 var statusTxt = isReady ? '🔔 TAYYOR!' : (isBusy ? '(Band)' : (isRes ? '🟡 (Bron)' : '(Bo\'sh)'));
 
                 var tile = document.createElement('div');
                 tile.className = 'table-tile ' + statusCls + (state.selectedKey === t.key ? ' selected' : '');
-                tile.innerHTML = t.zone + '<br><b>Stol ' + t.number + '</b><br>' + statusTxt + partialTxt + '<br><small>[' + (state.tableWaiters[t.key]||'Ofitsiant') + ']</small>';
+                tile.innerHTML = t.zone + '<br><b>Stol ' + t.number + '</b><br>' + statusTxt + '<br><small>[' + (state.tableWaiters[t.key]||'Ofitsiant') + ']</small>';
                 tile.onclick = function(){
                     state.selectedKey = t.key;
                     renderHallTables();
@@ -801,17 +818,14 @@
             renderCurOrder();
         }
 
-        function getTableTotalAmounts(key) {
-            var curOrders = state.orders[key] || [];
+        function getCurrentCalculations() {
+            var curOrders = state.orders[state.selectedKey] || [];
             var subtotal = 0;
             curOrders.forEach(function(o){ subtotal += (o.price * o.qty); });
             var feePct = parseInt(document.getElementById('cur-fee-sel')?.value) || 10;
             var feeAmt = Math.round(subtotal * (feePct / 100));
             var grandTotal = subtotal + feeAmt;
-            var alreadyPaid = state.tablePaidAmounts[key] || 0;
-            var remaining = Math.max(0, grandTotal - alreadyPaid);
-
-            return { subtotal: subtotal, feePct: feePct, feeAmt: feeAmt, grandTotal: grandTotal, alreadyPaid: alreadyPaid, remaining: remaining };
+            return { subtotal: subtotal, feePct: feePct, feeAmt: feeAmt, total: grandTotal };
         }
 
         function renderCurOrder() {
@@ -833,17 +847,9 @@
                 '</div>';
             });
 
-            var calc = getTableTotalAmounts(state.selectedKey);
+            var calc = getCurrentCalculations();
             document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Xizmat (' + calc.feePct + '%): ' + calc.feeAmt.toLocaleString() + ' so\'m';
-            document.getElementById('cur-total-price').innerText = calc.grandTotal.toLocaleString() + ' so\'m';
-
-            var pBox = document.getElementById('cur-partial-box');
-            if (calc.alreadyPaid > 0) {
-                pBox.style.display = 'block';
-                pBox.innerHTML = '<b>To\'langan:</b> ' + calc.alreadyPaid.toLocaleString() + ' so\'m | <b style="color:var(--red);">QOLGAN QARZ:</b> ' + calc.remaining.toLocaleString() + ' so\'m';
-            } else {
-                pBox.style.display = 'none';
-            }
+            document.getElementById('cur-total-price').innerText = calc.total.toLocaleString() + ' so\'m';
 
             var wSel = document.getElementById('cur-waiter-sel');
             wSel.innerHTML = '';
@@ -903,11 +909,11 @@
                 renderHallTables();
                 renderCurOrder();
                 if (document.getElementById('view-kds').style.display === 'block') renderKDS();
-                alert("Taom mehmonlarga topshirildi!");
+                alert("Taom mehmonlarga topshirildi deb belgilandi!");
             }
         }
 
-        /* KDS OSHXONA */
+        /* KDS OSHXONA VA XABARNOMA */
         function setKdsFilter(dept) {
             state.currentKdsDept = dept;
             document.querySelectorAll('#kds-dept-bar button').forEach(function(b){
@@ -942,9 +948,9 @@
                 if (ticket.status === 'waiting') {
                     btnActionHtml = '<button class="btn-login" onclick="advanceKds('+ticket.id+', \'cooking\')">🔵 Pishirishni boshlash</button>';
                 } else if (ticket.status === 'cooking') {
-                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Zalga xabar)</button>';
+                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Zalga xabar berish)</button>';
                 } else {
-                    btnActionHtml = '<span style="color:var(--green); font-weight:700;">🔔 Zalga xabar berilgan!</span>';
+                    btnActionHtml = '<span style="color:var(--green); font-weight:700;">🔔 Zalga xabar yuborilgan!</span>';
                 }
 
                 card.innerHTML = '<div>' +
@@ -1021,7 +1027,7 @@
         }
 
         function adminDelFood(idx) {
-            if (confirm(state.menu[idx].name + " taomini butunlay o'chirib tashlamoqchimisiz?")) {
+            if (confirm(state.menu[idx].name + " taomini butunlay o'chirmoqchimisiz?")) {
                 state.menu.splice(idx, 1);
                 saveStorage();
                 renderAdminMenu();
@@ -1086,7 +1092,6 @@
 
             state.tables.push({ key: key, zone: zone, number: nextNum });
             state.orders[key] = [];
-            state.tablePaidAmounts[key] = 0;
             state.tableWaiters[key] = (state.zoneWaiters[zone]||["Ofitsiant"])[0];
 
             saveStorage();
@@ -1100,7 +1105,6 @@
             if (confirm(t.zone + " #" + t.number + " stolni butunlay o'chirasizmi?")) {
                 delete state.orders[t.key];
                 delete state.tableWaiters[t.key];
-                delete state.tablePaidAmounts[t.key];
                 delete state.reservations[t.key];
                 state.tables.splice(idx, 1);
 
@@ -1148,16 +1152,16 @@
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Buyurtma yo'q!");
 
-            var calc = getTableTotalAmounts(state.selectedKey);
-            document.getElementById('pay-modal-total').innerText = calc.grandTotal.toLocaleString() + " so'm";
-            document.getElementById('pay-modal-already-paid').innerText = calc.alreadyPaid.toLocaleString() + " so'm";
-            document.getElementById('pay-modal-amount').innerText = calc.remaining.toLocaleString() + " so'm";
+            var calc = getCurrentCalculations();
+            document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
 
             state.payRating = 0;
             document.querySelectorAll('#pay-stars .star').forEach(function(s){ s.classList.remove('selected'); });
             document.getElementById('pay-rating-txt').innerText = "⚠️ Yulduzcha tanlang!";
             document.getElementById('split-box').style.display = 'none';
-            document.getElementById('split-input-val').value = '';
+
+            document.getElementById('split-cash-input').value = '';
+            document.getElementById('split-card-input').value = '';
 
             document.getElementById('modal-pay').style.display = 'grid';
         }
@@ -1173,61 +1177,53 @@
 
         function toggleSplitBox() {
             var b = document.getElementById('split-box');
-            b.style.display = b.style.display === 'block' ? 'none' : 'block';
-            calcSplitLive();
+            b.style.display = (b.style.display === 'block') ? 'none' : 'block';
+            calcSplitLive('cash');
         }
 
-        function calcSplitLive() {
-            var calc = getTableTotalAmounts(state.selectedKey);
-            var val = parseFloat(document.getElementById('split-input-val').value) || 0;
-            var rem = Math.max(0, calc.remaining - val);
-            document.getElementById('split-rem-val').innerText = rem.toLocaleString() + " so'm";
+        // Jonli avtomatik qoldiq hisoblash
+        function calcSplitLive(source) {
+            var calc = getCurrentCalculations();
+            var total = calc.total;
+
+            var cashIn = document.getElementById('split-cash-input');
+            var cardIn = document.getElementById('split-card-input');
+
+            if (source === 'cash') {
+                var cVal = parseFloat(cashIn.value) || 0;
+                var rem = Math.max(0, total - cVal);
+                cardIn.value = rem > 0 ? rem : 0;
+            } else {
+                var crdVal = parseFloat(cardIn.value) || 0;
+                var rem = Math.max(0, total - crdVal);
+                cashIn.value = rem > 0 ? rem : 0;
+            }
         }
 
-        function execFullRemainingPay(method) {
-            if (state.payRating === 0) return alert("Ofitsiantga baho bering!");
-            var calc = getTableTotalAmounts(state.selectedKey);
-            finishFinalClosure(method, calc.remaining);
+        // Bitta bosishda to'liq yopish
+        function execFullPay(method) {
+            if (state.payRating === 0) return alert("Iltimos, ofitsiantga baho bering (1 dan 5 gacha)!");
+            var calc = getCurrentCalculations();
+            finishPayment(method, calc.total);
         }
 
-        function execPartialPayment(method) {
-            if (state.payRating === 0) return alert("Ofitsiantga baho bering!");
+        // Bitta bosishda Aralash to'lovni yopish
+        function execInstantSplitPay() {
+            if (state.payRating === 0) return alert("Iltimos, ofitsiantga baho bering (1 dan 5 gacha)!");
 
-            var calc = getTableTotalAmounts(state.selectedKey);
-            var paidPart = parseFloat(document.getElementById('split-input-val').value) || 0;
+            var calc = getCurrentCalculations();
+            var cVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
+            var crdVal = parseFloat(document.getElementById('split-card-input').value) || 0;
 
-            if (paidPart <= 0) return alert("To'lanayotgan summani kiriting!");
-            if (paidPart >= calc.remaining) {
-                return finishFinalClosure(method, calc.remaining);
+            if ((cVal + crdVal) !== calc.total) {
+                return alert("Naqd va Karta yig'indisi umumiy hisobga (" + calc.total.toLocaleString() + " so'm) teng bo'lishi kerak!");
             }
 
-            state.tablePaidAmounts[state.selectedKey] = (state.tablePaidAmounts[state.selectedKey] || 0) + paidPart;
-            var leftDebt = calc.remaining - paidPart;
-
-            var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
-            var d = new Date();
-
-            state.history.unshift({
-                time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
-                date: d.toLocaleDateString(),
-                table: (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol') + ' (Qisman)',
-                waiter: state.tableWaiters[state.selectedKey] || 'Ofitsiant',
-                rating: state.payRating,
-                method: method + ' (Qisman)',
-                items: "Qisman to'lov olindi",
-                total: paidPart
-            });
-
-            saveStorage();
-            closeModal('modal-pay');
-            renderHallTables();
-            renderCurOrder();
-            renderDashboard();
-
-            alert("✅ Qisman to'lov qabul qilindi!\n\nTo'landi: " + paidPart.toLocaleString() + " so'm\nQOLGAN QARZ: " + leftDebt.toLocaleString() + " so'm\n\nStol yopilmadi, qoldiq saqlanib qoldi!");
+            var methodStr = "Aralash (Naqd: " + cVal.toLocaleString() + " + Karta: " + crdVal.toLocaleString() + ")";
+            finishPayment(methodStr, calc.total);
         }
 
-        function finishFinalClosure(method, lastPaymentAmt) {
+        function finishPayment(method, finalTotal) {
             var curOrders = state.orders[state.selectedKey] || [];
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
             var d = new Date();
@@ -1240,9 +1236,10 @@
                 rating: state.payRating,
                 method: method,
                 items: curOrders.map(function(o){ return o.name + ' (x' + o.qty + ')'; }).join(', '),
-                total: lastPaymentAmt
+                total: finalTotal
             });
 
+            // Ombor sarfi (Spisaniye)
             curOrders.forEach(function(o){
                 var r = recipeMap[o.raw || o.name];
                 if (r) {
@@ -1253,8 +1250,8 @@
                 }
             });
 
+            // Stolni tozalash va yopish
             state.orders[state.selectedKey] = [];
-            state.tablePaidAmounts[state.selectedKey] = 0;
             delete state.reservations[state.selectedKey];
 
             saveStorage();
@@ -1262,10 +1259,11 @@
             renderHallTables();
             renderCurOrder();
             renderDashboard();
-            alert("✅ Hisob to'liq yopildi! Stol bo'shatildi.");
+
+            alert("✅ To'lov qabul qilindi va hisob to'liq yopildi!");
         }
 
-        /* MODALLAR */
+        /* MODALLAR VA CHEKNI BO'LIB TO'LASH */
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openTransferModal() {
@@ -1283,9 +1281,7 @@
             var target = document.getElementById('transfer-target-sel').value;
             if (!target) return alert("Bo'sh stol yo'q!");
             state.orders[target] = state.orders[state.selectedKey];
-            state.tablePaidAmounts[target] = state.tablePaidAmounts[state.selectedKey] || 0;
             state.orders[state.selectedKey] = [];
-            state.tablePaidAmounts[state.selectedKey] = 0;
             state.selectedKey = target;
             saveStorage();
             closeModal('modal-transfer');
@@ -1371,7 +1367,7 @@
             closeModal('modal-split-bill');
             renderHallTables();
             renderCurOrder();
-            alert("Mehmon o'z hissasini (" + totalPart.toLocaleString() + " so'm) to'ladi!");
+            alert("Mehmon o'z hissasini (" + totalPart.toLocaleString() + " so'm) to'ladi! Qolgan taomlar stolda qoldi.");
         }
 
         /* SKLAD VA XODIMLAR */
