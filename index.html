@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestaurantOS - To'liq Tizim (Kassa, KDS, Sklad, Chegirma)</title>
+    <title>RestaurantOS - Avto Chegirma, Ofitsiant Reytingi va Bonus</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
         header { background: #2c3e50; color: white; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -87,6 +87,11 @@
         .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
         .history-table th { background: #f1f2f6; }
 
+        /* Yulduzchalar reytingi */
+        .rating-stars { display: flex; gap: 8px; font-size: 30px; cursor: pointer; margin: 10px 0 15px 0; justify-content: center; }
+        .star { color: #dcdde1; transition: 0.2s; }
+        .star.selected { color: #f1c40f; }
+
         /* KDS Oshxona */
         .kds-dept-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .kds-dept-btn { background: #e2e8f0; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; }
@@ -130,7 +135,7 @@
         .modal-card { background: white; padding: 22px; border-radius: 10px; max-width: 500px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #7f8c8d; }
-        .payment-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .payment-options { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
         .payment-btn { padding: 14px; border: 2px solid #ddd; background: #fff; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .payment-btn:hover { border-color: #27ae60; background: #f0fff4; }
 
@@ -158,7 +163,7 @@
     <header>
         <div>
             <h1 style="margin:0; font-size:22px;">RestaurantOS</h1>
-            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Kassa, KDS, Sklad va Mijozlar Chegirmasi</p>
+            <p style="margin:2px 0 0 0; font-size:13px; opacity:0.8;">Avtomatik Chegirma, Reyting va Ofitsiant Bonusi</p>
         </div>
         <div class="nav-tabs">
             <button class="nav-btn active" id="tab-hall-btn" onclick="switchMainTab('hall')">
@@ -229,8 +234,9 @@
                     <!-- Mijoz va Chegirma -->
                     <div style="margin-top:10px; display:flex; gap:6px;">
                         <input type="text" id="cust-phone" placeholder="Mijoz tel: 901234567" style="flex:1; padding:5px 8px; border:1px solid #bdc3c7; border-radius:4px;">
-                        <select id="cust-discount" onchange="updateDiscount()" style="padding:5px 8px; border-radius:4px; border:1px solid #bdc3c7;">
-                            <option value="0">Chegirma: 0%</option>
+                        <select id="cust-discount" onchange="updateDiscountManual()" style="padding:5px 8px; border-radius:4px; border:1px solid #bdc3c7;">
+                            <option value="auto">Chegirma: Avto</option>
+                            <option value="0">0%</option>
                             <option value="5">VIP: 5%</option>
                             <option value="10">VIP: 10%</option>
                             <option value="15">VIP: 15%</option>
@@ -277,13 +283,13 @@
                 </div>
 
                 <div style="margin-top:20px;">
-                    <h3 style="margin-bottom:8px; font-size:15px; color:#2c3e50;">Ofitsiantlar bo'yicha ko'rsatkichlar:</h3>
+                    <h3 style="margin-bottom:8px; font-size:15px; color:#2c3e50;">Ofitsiantlar reytingi va ishlagan ulushi (Eng ko'p yulduz olganga +10% bonus):</h3>
                     <div id="waiter-summary-boxes" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
                 </div>
 
                 <table class="history-table">
                     <thead>
-                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Ofitsiant</th><th>Mijoz</th><th>Taomlar</th><th>To'lov turi</th><th>Summa</th></tr>
+                        <tr><th>Vaqt</th><th>Zona</th><th>Stol</th><th>Ofitsiant</th><th>Mijoz</th><th>Baho</th><th>Taomlar</th><th>To'lov</th><th>Summa</th></tr>
                     </thead>
                     <tbody id="history-rows"></tbody>
                 </table>
@@ -333,14 +339,30 @@
         </div>
     </div>
 
-    <!-- To'lov modali -->
+    <!-- To'lov va Baholash modali -->
     <div class="modal-overlay" id="pay-modal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>To'lov Turini Tanlang</h3>
+                <h3>Hisobni Yopish & Baholash</h3>
                 <button class="close-modal-btn" id="btn-close-pay-modal">&times;</button>
             </div>
-            <p style="margin-top:15px; font-size:16px;">To'lanishi kerak bo'lgan summa: <b id="pay-modal-amount" style="color:#27ae60;">0 so'm</b></p>
+            
+            <p style="margin-top:15px; font-size:15px;">To'lanishi kerak: <b id="pay-modal-amount" style="color:#27ae60; font-size:18px;">0 so'm</b></p>
+            <div id="pay-modal-disc-info" style="font-size:13px; color:#e67e22; margin-bottom:10px;"></div>
+
+            <!-- Ofitsiantni yulduzchalar bilan baholash -->
+            <div style="text-align:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:12px;">
+                <span style="font-size:13px; color:#555;">Ofitsiant xizmatini baholang:</span>
+                <div class="rating-stars" id="stars-box">
+                    <span class="star selected" onclick="setRating(1)">★</span>
+                    <span class="star selected" onclick="setRating(2)">★</span>
+                    <span class="star selected" onclick="setRating(3)">★</span>
+                    <span class="star selected" onclick="setRating(4)">★</span>
+                    <span class="star selected" onclick="setRating(5)">★</span>
+                </div>
+                <small id="rating-label" style="color:#7f8c8d;">5 yulduz (A'lo xizmat)</small>
+            </div>
+
             <div class="payment-options">
                 <button class="payment-btn" onclick="confirmPayment('Naqd')">💵 Naqd pul</button>
                 <button class="payment-btn" onclick="confirmPayment('Karta (Terminal)')">💳 Karta (Uzcard / Humo)</button>
@@ -399,6 +421,7 @@
         var currentZoneFilter = "Barchasi";
         var currentKdsDept = "Barchasi";
         var activeDropdownIndex = null;
+        var selectedRating = 5;
 
         var recipeCard = {
             "Osh": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
@@ -510,13 +533,13 @@
                 var s = localStorage.getItem('ros_stock_v1');
                 if (s) { var pS = JSON.parse(s); if (Array.isArray(pS)) state.stock = pS; }
 
-                var td = localStorage.getItem('ros_discounts');
+                var td = localStorage.getItem('ros_discounts_v2');
                 if (td) { var pTD = JSON.parse(td); if (pTD && typeof pTD === 'object') state.tableDiscounts = pTD; }
 
                 var tc = localStorage.getItem('ros_customers');
                 if (tc) { var pTC = JSON.parse(tc); if (pTC && typeof pTC === 'object') state.tableCustomers = pTC; }
 
-                var h = localStorage.getItem('ros_history_v7');
+                var h = localStorage.getItem('ros_history_v8');
                 if (h) { var pH = JSON.parse(h); if (Array.isArray(pH)) state.history = pH; }
             } catch (e) {
                 console.error("Xotira yuklashda xato:", e);
@@ -525,7 +548,7 @@
             state.tables.forEach(function(tbl) {
                 if (!Array.isArray(state.orders[tbl.key])) state.orders[tbl.key] = [];
                 if (state.serviceFees[tbl.key] === undefined) state.serviceFees[tbl.key] = 10;
-                if (state.tableDiscounts[tbl.key] === undefined) state.tableDiscounts[tbl.key] = 0;
+                if (state.tableDiscounts[tbl.key] === undefined) state.tableDiscounts[tbl.key] = 'auto';
                 if (state.tableCustomers[tbl.key] === undefined) state.tableCustomers[tbl.key] = '';
                 var zList = state.zoneWaiters[tbl.zone] || ["Ofitsiant"];
                 if (!state.tableWaiters[tbl.key]) state.tableWaiters[tbl.key] = zList[0];
@@ -542,11 +565,11 @@
                 localStorage.setItem('ros_service_fees', JSON.stringify(state.serviceFees));
                 localStorage.setItem('ros_zone_waiters', JSON.stringify(state.zoneWaiters));
                 localStorage.setItem('ros_table_waiters', JSON.stringify(state.tableWaiters));
-                localStorage.setItem('ros_discounts', JSON.stringify(state.tableDiscounts));
+                localStorage.setItem('ros_discounts_v2', JSON.stringify(state.tableDiscounts));
                 localStorage.setItem('ros_customers', JSON.stringify(state.tableCustomers));
                 localStorage.setItem('ros_kds_v2', JSON.stringify(state.kdsTickets));
                 localStorage.setItem('ros_stock_v1', JSON.stringify(state.stock));
-                localStorage.setItem('ros_history_v7', JSON.stringify(state.history));
+                localStorage.setItem('ros_history_v8', JSON.stringify(state.history));
             } catch (e) {
                 console.error("Xotiraga yozishda xato:", e);
             }
@@ -773,7 +796,7 @@
             activeDropdownIndex = null;
             var fee = state.serviceFees[key] !== undefined ? state.serviceFees[key] : 10;
             document.getElementById('service-fee-rate').value = fee;
-            var disc = state.tableDiscounts[key] !== undefined ? state.tableDiscounts[key] : 0;
+            var disc = state.tableDiscounts[key] !== undefined ? state.tableDiscounts[key] : 'auto';
             document.getElementById('cust-discount').value = disc;
             document.getElementById('cust-phone').value = state.tableCustomers[key] || '';
             renderWaitersSelect();
@@ -788,9 +811,9 @@
             renderOrder();
         }
 
-        function updateDiscount() {
+        function updateDiscountManual() {
             var sel = document.getElementById('cust-discount');
-            state.tableDiscounts[state.selectedKey] = parseInt(sel.value) || 0;
+            state.tableDiscounts[state.selectedKey] = sel.value;
             saveStorage();
             renderOrder();
         }
@@ -812,7 +835,7 @@
             state.tables.push({ key: newKey, zone: selectedZone, number: nextNum });
             state.orders[newKey] = [];
             state.serviceFees[newKey] = 10;
-            state.tableDiscounts[newKey] = 0;
+            state.tableDiscounts[newKey] = 'auto';
             state.tableCustomers[newKey] = '';
             var zList = state.zoneWaiters[selectedZone] || ["Ofitsiant"];
             state.tableWaiters[newKey] = zList[0];
@@ -942,12 +965,27 @@
             }
         }
 
+        // Avtomatik chegirma: 100k dan oshsa 5%, 200k dan oshsa 10%
         function getCurrentCalculations() {
             var subtotal = 0;
             var currentOrders = state.orders[state.selectedKey] || [];
             currentOrders.forEach(function(o) { subtotal += (o.price * o.qty); });
 
-            var discPct = state.tableDiscounts[state.selectedKey] !== undefined ? state.tableDiscounts[state.selectedKey] : 0;
+            var discVal = state.tableDiscounts[state.selectedKey] !== undefined ? state.tableDiscounts[state.selectedKey] : 'auto';
+            var discPct = 0;
+
+            if (discVal === 'auto') {
+                if (subtotal > 200000) {
+                    discPct = 10;
+                } else if (subtotal > 100000) {
+                    discPct = 5;
+                } else {
+                    discPct = 0;
+                }
+            } else {
+                discPct = parseInt(discVal) || 0;
+            }
+
             var discAmount = Math.round(subtotal * (discPct / 100));
             var discountedSubtotal = subtotal - discAmount;
 
@@ -1179,11 +1217,32 @@
             }
         }
 
+        // Baholash yulduzchalari
+        function setRating(val) {
+            selectedRating = val;
+            var stars = document.querySelectorAll('#stars-box .star');
+            stars.forEach(function(s, idx) {
+                if (idx < val) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+            var labels = ["1 yulduz (Juda yomon)", "2 yulduz (Qoniqarsiz)", "3 yulduz (O'rtacha)", "4 yulduz (Yaxshi)", "5 yulduz (A'lo xizmat)"];
+            document.getElementById('rating-label').innerText = labels[val - 1];
+        }
+
         var payModal = document.getElementById('pay-modal');
         document.getElementById('btn-open-pay-modal').onclick = function() {
             var calc = getCurrentCalculations();
             if (calc.orders.length === 0) return alert("Bu stolda buyurtma yo'q!");
+
             document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
+            
+            var discMsg = '';
+            if (calc.discPct > 0) {
+                discMsg = '🎉 ' + calc.discPct + '% chegirma qo\'llandi (-' + calc.discAmount.toLocaleString() + ' so\'m)';
+            }
+            document.getElementById('pay-modal-disc-info').innerText = discMsg;
+
+            setRating(5);
             payModal.style.display = 'flex';
         };
         document.getElementById('btn-close-pay-modal').onclick = function() { payModal.style.display = 'none'; };
@@ -1210,6 +1269,7 @@
                 tableNum: num,
                 waiter: waiter,
                 customer: custPhone,
+                rating: selectedRating,
                 items: itemNames.join('; '),
                 method: method,
                 discount: calc.discAmount,
@@ -1224,10 +1284,10 @@
             });
 
             state.orders[state.selectedKey] = [];
-            state.tableDiscounts[state.selectedKey] = 0;
+            state.tableDiscounts[state.selectedKey] = 'auto';
             state.tableCustomers[state.selectedKey] = '';
             document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-discount').value = 0;
+            document.getElementById('cust-discount').value = 'auto';
 
             activeDropdownIndex = null;
             payModal.style.display = 'none';
@@ -1254,10 +1314,11 @@
                 else payme += rec.total;
 
                 var w = rec.waiter || 'Noma\'lum';
-                if (!waiterStats[w]) waiterStats[w] = { total: 0, fee: 0, count: 0 };
+                if (!waiterStats[w]) waiterStats[w] = { total: 0, fee: 0, count: 0, stars: 0 };
                 waiterStats[w].total += rec.total;
                 waiterStats[w].fee += (rec.serviceFee || 0);
                 waiterStats[w].count++;
+                waiterStats[w].stars += (rec.rating || 5);
 
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td>' + rec.time + '</td>' +
@@ -1265,6 +1326,7 @@
                                '<td>Stol ' + rec.tableNum + '</td>' +
                                '<td><b>' + w + '</b></td>' +
                                '<td>' + (rec.customer || '-') + '</td>' +
+                               '<td style="color:#f39c12;font-weight:bold;">' + (rec.rating ? rec.rating + ' ★' : '5 ★') + '</td>' +
                                '<td>' + rec.items + '</td>' +
                                '<td>' + (rec.method || 'Naqd') + '</td>' +
                                '<td style="color:#27ae60;font-weight:bold;">' + rec.total.toLocaleString() + ' so\'m</td>';
@@ -1276,15 +1338,36 @@
             document.getElementById('stat-card').innerText = card.toLocaleString() + ' so\'m';
             document.getElementById('stat-payme').innerText = payme.toLocaleString() + ' so\'m';
 
+            // Eng ko'p yulduzcha olgan ofitsiantni aniqlash
+            var bestWaiter = null;
+            var maxStars = -1;
+            for (var wName in waiterStats) {
+                if (waiterStats[wName].stars > maxStars && waiterStats[wName].stars > 0) {
+                    maxStars = waiterStats[wName].stars;
+                    bestWaiter = wName;
+                }
+            }
+
             var wBox = document.getElementById('waiter-summary-boxes');
             wBox.innerHTML = '';
+
             for (var waiter in waiterStats) {
+                var isLeader = (waiter === bestWaiter);
+                var baseFee = waiterStats[waiter].fee;
+                var bonusAmount = isLeader ? Math.round(baseFee * 0.10) : 0;
+                var finalFee = baseFee + bonusAmount;
+                var avgStars = (waiterStats[waiter].stars / waiterStats[waiter].count).toFixed(1);
+
                 var div = document.createElement('div');
-                div.style.cssText = "background:#fff; border:1px solid #ddd; padding:10px 14px; border-radius:6px; min-width:180px; font-size:13px;";
-                div.innerHTML = '<b>👤 ' + waiter + '</b><br>' +
-                                '<span style="color:#555;">Stollar soni: ' + waiterStats[waiter].count + ' ta</span><br>' +
-                                '<span style="color:#27ae60; font-weight:bold;">Tushum: ' + waiterStats[waiter].total.toLocaleString() + ' so\'m</span><br>' +
-                                '<small style="color:#e67e22;">Xizmat ulushi: ' + waiterStats[waiter].fee.toLocaleString() + ' so\'m</small>';
+                div.style.cssText = "background:#fff; border:" + (isLeader ? "2px solid #f1c40f;" : "1px solid #ddd;") + " padding:10px 14px; border-radius:6px; min-width:200px; font-size:13px;";
+                div.innerHTML = 
+                    '<b>👤 ' + waiter + (isLeader ? ' <span style="background:#fef08a;color:#854d0e;padding:2px 6px;border-radius:4px;font-size:11px;">🏆 KUN YETAKCHISI</span>' : '') + '</b><br>' +
+                    '<span style="color:#f39c12; font-weight:bold;">Reyting: ' + avgStars + ' ★ (' + waiterStats[waiter].stars + ' ta yulduz)</span><br>' +
+                    '<span style="color:#555;">Stollar soni: ' + waiterStats[waiter].count + ' ta</span><br>' +
+                    '<span style="color:#27ae60; font-weight:bold;">Tushum: ' + waiterStats[waiter].total.toLocaleString() + ' so\'m</span><br>' +
+                    '<small style="color:#e67e22;">Xizmat ulushi: ' + baseFee.toLocaleString() + ' so\'m' + 
+                    (isLeader ? '<br><b style="color:#27ae60;">+10% Bonus: +' + bonusAmount.toLocaleString() + ' so\'m (Jami: ' + finalFee.toLocaleString() + ' so\'m)</b>' : '') + 
+                    '</small>';
                 wBox.appendChild(div);
             }
         }
@@ -1293,7 +1376,7 @@
             if (state.history.length === 0) return alert("Hozircha yopilgan hisoblar yo'q!");
 
             var csvContent = "\uFEFF";
-            csvContent += "Sana va Vaqt,Zona,Stol,Ofitsiant,Mijoz,Buyurtma taomlari,To'lov turi,Chegirma (so'm),Xizmat haqi (so'm),Jami summa (so'm)\n";
+            csvContent += "Sana va Vaqt,Zona,Stol,Ofitsiant,Mijoz,Baho,Buyurtma taomlari,To'lov turi,Chegirma (so'm),Xizmat haqi (so'm),Jami summa (so'm)\n";
 
             state.history.forEach(function(r) {
                 var row = [
@@ -1302,6 +1385,7 @@
                     '"Stol ' + r.tableNum + '"',
                     '"' + (r.waiter || 'Ofitsiant') + '"',
                     '"' + (r.customer || '-') + '"',
+                    (r.rating || 5),
                     '"' + r.items.replace(/"/g, '""') + '"',
                     '"' + (r.method || 'Naqd') + '"',
                     r.discount || 0,
