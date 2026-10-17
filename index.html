@@ -4,36 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>RestaurantOS - Onlayn Buyurtma va Kassa Tizimi</title>
-    <meta name="google-site-verification" content="bsVhBY1kBIgWdgiZjs8Gqk-3VMc1r5VdMt59-DR-lVk" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
+    <meta name="google-site-verification" content="bsVhBY1kBiGwdgiZjs8Gqk-3VMc1r5VdMt59-DR-lVk" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
     <style>
         :root {
-            --bg: #f1f4f6;
+            --bg: #f8fafc;
             --card: #ffffff;
-            --ink: #13232e;
-            --muted: #667985;
-            --line: #cbd5e1;
-            --fill: #e3eaee;
-            --accent: #1d6f8a;
-            --accent-hover: #15556a;
-            --green: #27ae60;
-            --red: #e74c3c;
-            --yellow: #f39c12;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --fill: #f1f5f9;
+            --accent: #0284c7;
+            --accent-hover: #0369a1;
+            --primary: #f97316;
+            --primary-hover: #ea580c;
+            --green: #16a34a;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --radius: 12px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
-        html, body { min-height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "Manrope", system-ui, sans-serif; font-size: 14px; }
+        html, body { min-height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "Plus Jakarta Sans", system-ui, sans-serif; font-size: 14px; }
 
-        /* A. MIJOZLAR UCHUN ONLAYN MENYU (OCHIQ SAHIFA) */
-        #client-screen { display: block; max-width: 900px; margin: 0 auto; padding: 16px; }
-        .client-header { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-        .client-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
-        @media (max-width: 768px) { .client-grid { grid-template-columns: 1fr; } }
+        /* ==================== 1. MIJOZLAR REJIMI (MODERN FOOD DELIVERY UI) ==================== */
+        #client-screen { display: block; max-width: 1200px; margin: 0 auto; padding: 16px 20px 40px; }
         
-        .client-menu-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; }
-        .client-cart-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; height: fit-content; position: sticky; top: 16px; }
+        /* Top Navigation */
+        .client-navbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+        .brand-badge { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .brand-logo-circle { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #fb923c); color: white; display: grid; place-items: center; font-size: 22px; font-weight: 800; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); }
+        .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
+        .brand-sub { font-size: 12px; color: var(--muted); }
 
-        /* B. LOGIN EKRANI */
+        .btn-staff-entry { background: var(--fill); color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-staff-entry:hover { background: var(--ink); color: white; }
+
+        /* Banner Card */
+        .client-hero {
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80') center/cover;
+            border-radius: 16px; padding: 36px 30px; color: white; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .hero-tag { background: rgba(249, 115, 22, 0.9); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; width: fit-content; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-title { font-size: 2rem; font-weight: 800; margin: 0; line-height: 1.2; }
+        .hero-p { color: #cbd5e1; font-size: 14px; max-width: 600px; margin: 0; }
+        .hero-perks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; font-size: 13px; font-weight: 600; }
+        .hero-perk-item { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; backdrop-filter: blur(4px); }
+
+        /* Filter & Search Bar */
+        .catalog-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+        .cat-chip { background: var(--card); border: 1.5px solid var(--line); padding: 8px 18px; border-radius: 24px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; color: var(--muted); }
+        .cat-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-chip.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); }
+
+        .search-box { position: relative; min-width: 260px; }
+        .search-input { width: 100%; background: var(--card); border: 1.5px solid var(--line); border-radius: 24px; padding: 9px 16px 9px 38px; font-family: inherit; font-size: 13px; outline: none; }
+        .search-input:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+
+        /* Asosiy 2 ustunli joylashuv */
+        .client-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+        @media (max-width: 900px) { .client-layout { grid-template-columns: 1fr; } }
+
+        /* Taom kartochkalari tarmog'i */
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+        .food-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+        .food-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); border-color: #cbd5e1; }
+        .food-img-wrap { width: 100%; height: 160px; background: var(--fill); position: relative; overflow: hidden; }
+        .food-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .food-card:hover .food-img { transform: scale(1.04); }
+        .food-badge-dept { position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); color: white; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; backdrop-filter: blur(4px); }
+        .food-badge-stop { position: absolute; inset: 0; background: rgba(239, 68, 68, 0.85); color: white; display: grid; place-items: center; font-weight: 800; font-size: 14px; text-transform: uppercase; }
+
+        .food-info { padding: 14px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 8px; }
+        .food-title { font-size: 1.05rem; font-weight: 800; margin: 0; line-height: 1.3; }
+        .food-price { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+        
+        .pors-btn-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
+        .pors-pill { background: var(--fill); border: 1px solid var(--line); border-radius: 6px; padding: 6px 4px; font-weight: 700; font-size: 11px; cursor: pointer; text-align: center; }
+        .pors-pill:hover { background: #e2e8f0; }
+        .btn-add-cart { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-add-cart:hover { background: var(--primary-hover); }
+
+        /* O'ng tomon: Savatcha va Buyurtma berish formasi */
+        .cart-sticky-box { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 20px; position: sticky; top: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+        .cart-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1.5px dashed var(--line); margin-bottom: 14px; }
+        .cart-title { font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .cart-count-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+
+        .cart-items-container { max-height: 220px; overflow-y: auto; display: grid; gap: 10px; padding-right: 4px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--fill); padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+        .cart-item-del { background: none; border: none; color: var(--red); font-size: 16px; font-weight: 800; cursor: pointer; padding: 0 4px; }
+
+        .cart-calc-box { margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed var(--line); display: grid; gap: 6px; font-size: 13px; }
+        .cart-calc-row { display: flex; justify-content: space-between; color: var(--muted); }
+        .cart-calc-row.total { color: var(--ink); font-size: 1.15rem; font-weight: 800; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--line); }
+
+        .checkout-form { margin-top: 16px; display: grid; gap: 10px; }
+        .form-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 2px; }
+        .form-input { width: 100%; background: var(--fill); border: 1.5px solid transparent; border-radius: 8px; padding: 10px 12px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; }
+        .form-input:focus { background: white; border-color: var(--primary); }
+        .btn-order-submit { width: 100%; background: var(--green); color: white; border: none; padding: 13px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); margin-top: 6px; }
+        .btn-order-submit:hover { background: #15803d; }
+
+        /* ==================== 2. LOGIN EKRANI ==================== */
         #auth-screen { display: none; place-items: center; min-height: 100vh; padding: 20px; }
         .login-wrap { width: 100%; max-width: 320px; display: grid; gap: 12px; }
         .login-card { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -41,7 +117,7 @@
         .btn-login { background: var(--accent); color: white; border: none; padding: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
         .btn-login:hover { background: var(--accent-hover); }
 
-        /* C. ASOSIY ILOVA LAYOUTI */
+        /* ==================== 3. ASOSIY ILOVA LAYOUTI ==================== */
         #app-screen { display: none; min-height: 100vh; grid-template-columns: 210px 1fr; }
         .sidebar { background: var(--card); border-right: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; padding: 16px 12px; }
         .logo-box { padding: 10px 8px; font-weight: 800; font-size: 18px; color: var(--accent); border-bottom: 2px solid var(--ink); margin-bottom: 10px; }
@@ -93,7 +169,7 @@
             border-color: #f1c40f !important;
         }
 
-        /* MENYU */
+        /* MENYU VA AMALLAR */
         .menu-list { display: grid; gap: 8px; max-height: 520px; overflow-y: auto; }
         .menu-row { background: var(--fill); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         .menu-row.stopped { background: #fee2e2; border-color: #fca5a5; opacity: 0.7; }
@@ -128,57 +204,110 @@
         .rating-stars { display: flex; gap: 8px; font-size: 32px; justify-content: center; margin: 10px 0; cursor: pointer; user-select: none; }
         .star { color: #cbd5e1; }
         .star.selected { color: var(--yellow); }
-
-        @media print {
-            body * { visibility: hidden; }
-            #receipt-print, #receipt-print * { visibility: visible; }
-            #receipt-print { display: block !important; position: absolute; inset: 0; padding: 20px; font-family: monospace; }
-        }
-        #receipt-print { display: none; width: 280px; border: 1px dashed #000; }
     </style>
 </head>
 <body>
 
     <div id="toast-box"></div>
 
-    <!-- ==================== 1. MIJOZLAR UCHUN ONLAYN MENYU (GOOGLEDAN KIRGANDA) ==================== -->
+    <!-- ==================== 1. YANGILANGAN CHUNON VA JOZIBALI MIJOZLAR MENYUSI ==================== -->
     <div id="client-screen">
-        <header class="client-header">
-            <div>
-                <h1 style="margin:0; font-size:1.4rem; font-weight:800; color:var(--accent);">Milliy Taomlar & Yetkazib berish</h1>
-                <p style="margin:2px 0 0 0; color:var(--muted); font-size:12px;">Uyga issiq va lazzatli taomlarni yetkazib beramiz</p>
+        <!-- Top Navbar -->
+        <nav class="client-navbar">
+            <a href="#" class="brand-badge">
+                <div class="brand-logo-circle">🍽️</div>
+                <div>
+                    <div class="brand-title">RestaurantOS</div>
+                    <div class="brand-sub">Milliy Taomlar & Tezkor Yetkazib berish</div>
+                </div>
+            </a>
+            <button class="btn-staff-entry" onclick="openStaffLogin()">
+                <span>🔒</span> Xodimlar kabineti
+            </button>
+        </nav>
+
+        <!-- Hero Banner -->
+        <header class="client-hero">
+            <span class="hero-tag">🔥 Issiq va Halol Taomlar</span>
+            <h1 class="hero-title">Mazali milliy taomlarni uyingizga buyurtma qiling!</h1>
+            <p class="hero-p">To‘yimli osh, shirador shashliklar va issiq sho‘rvalar. Buyurtmangizni 30-40 daqiqa ichida yetkazib beramiz.</p>
+            <div class="hero-perks">
+                <span class="hero-perk-item">⏱ 30-45 daqiqa yetkazish</span>
+                <span class="hero-perk-item">⚡ Issiq holda yetkazish</span>
+                <span class="hero-perk-item">💵 Naqd, Karta yoki Payme</span>
+                <span class="hero-perk-item">📞 +998 (90) 123-45-67</span>
             </div>
-            <button class="btn-login" onclick="openStaffLogin()" style="font-size:12px; padding:8px 14px;">🔒 Xodimlar kirishi</button>
         </header>
 
-        <div class="client-grid">
-            <!-- Taomlar tanlovi -->
-            <div class="client-menu-card">
-                <h2 style="margin:0 0 12px 0; font-size:1.1rem;">Taomnoma (Menyu)</h2>
-                <div class="menu-list" id="client-menu-list"></div>
+        <!-- Kategoriya va Qidiruv Boshqaruvi -->
+        <div class="catalog-controls">
+            <div class="category-scroll" id="client-cat-bar">
+                <button class="cat-chip active" onclick="filterClientCat('Barchasi')">Barchasi</button>
+                <button class="cat-chip" onclick="filterClientCat('Issiq taomlar')">🍲 Issiq taomlar</button>
+                <button class="cat-chip" onclick="filterClientCat('Mangal')">🍢 Mangal & Shashlik</button>
+                <button class="cat-chip" onclick="filterClientCat('Bar')">🫖 Ichimliklar</button>
             </div>
-
-            <!-- Savatcha va Manzil kiritish -->
-            <div class="client-cart-card">
-                <h2 style="margin:0 0 12px 0; font-size:1.1rem;">🛒 Savatchangiz</h2>
-                <div id="client-cart-items" style="max-height:180px; overflow-y:auto; border-bottom:1px dashed var(--line); padding-bottom:8px; margin-bottom:10px;">
-                    <p style="color:var(--muted); font-size:12px;">Savatcha hozircha bo'sh</p>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; margin-bottom:12px;">
-                    <span>Jami:</span>
-                    <span id="client-cart-total" style="color:var(--accent);">0 so'm</span>
-                </div>
-
-                <div style="display:grid; gap:8px;">
-                    <input type="text" id="order-cust-name" class="login-input" placeholder="Ismingiz (masalan: Sardor)">
-                    <input type="text" id="order-cust-phone" class="login-input" placeholder="Telefon raqamingiz (+998...)">
-                    <textarea id="order-cust-addr" class="login-input" rows="2" placeholder="Yetkazish manzili (ko'cha, uy, mo'ljal)"></textarea>
-                    <button class="btn-login" onclick="submitOnlineDeliveryOrder()" style="background:var(--green); font-size:14px; padding:12px;">
-                        🚗 Buyurtma berish (Dostavka)
-                    </button>
-                </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="client-search" class="search-input" placeholder="Taom qidirish..." oninput="renderClientMenu()">
             </div>
+        </div>
+
+        <!-- Asosiy menyu va Savatcha layouti -->
+        <div class="client-layout">
+            <!-- Taomlar Gridi -->
+            <main>
+                <div class="food-grid" id="client-food-grid"></div>
+            </main>
+
+            <!-- O'ng tomondagi Savatcha va Buyurtma formasi -->
+            <aside>
+                <div class="cart-sticky-box">
+                    <div class="cart-head">
+                        <h2 class="cart-title">
+                            <span>🛒 Savatchangiz</span>
+                            <span class="cart-count-badge" id="client-cart-count">0</span>
+                        </h2>
+                    </div>
+
+                    <div class="cart-items-container" id="client-cart-items">
+                        <p style="color:var(--muted); font-size:13px; text-align:center; margin:20px 0;">Savatchangiz bo'sh.<br>Menyudan taom tanlang!</p>
+                    </div>
+
+                    <div class="cart-calc-box">
+                        <div class="cart-calc-row"><span>Taomlar narxi:</span> <span id="client-subtotal">0 so'm</span></div>
+                        <div class="cart-calc-row"><span>Yetkazib berish (Dostavka):</span> <span style="color:var(--green); font-weight:700;">10 000 so'm</span></div>
+                        <div class="cart-calc-row total"><span>Jami to'lov:</span> <span id="client-cart-total" style="color:var(--primary);">0 so'm</span></div>
+                    </div>
+
+                    <!-- Buyurtma ma'lumotlari -->
+                    <div class="checkout-form">
+                        <div>
+                            <label class="form-label">Ismingiz *</label>
+                            <input type="text" id="order-cust-name" class="form-input" placeholder="Masalan: Sardor">
+                        </div>
+                        <div>
+                            <label class="form-label">Telefon raqamingiz *</label>
+                            <input type="tel" id="order-cust-phone" class="form-input" placeholder="+998 (90) 000-00-00">
+                        </div>
+                        <div>
+                            <label class="form-label">Yetkazish manzili (ko'cha, uy, xonadon) *</label>
+                            <textarea id="order-cust-addr" class="form-input" rows="2" placeholder="Masalan: Mustaqillik ko'chasi 45-uy"></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">To'lov usuli</label>
+                            <select id="order-cust-paymethod" class="form-input">
+                                <option value="Naqd">💵 Naqd pul (kuryerga)</option>
+                                <option value="Karta">💳 Karta (kuryer terminali)</option>
+                                <option value="Payme">📲 Payme / Click</option>
+                            </select>
+                        </div>
+                        <button class="btn-order-submit" onclick="submitOnlineDeliveryOrder()">
+                            🚀 Buyurtmani tasdiqlash
+                        </button>
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 
@@ -186,7 +315,7 @@
     <div id="auth-screen">
         <div class="login-wrap">
             <div class="login-card">
-                <h2>RestaurantOS</h2>
+                <h2 style="margin:0; text-align:center;">RestaurantOS</h2>
                 <div style="font-size:12px; color:var(--muted); text-align:center; margin-top:-8px;">Xodimlar tizimiga kirish</div>
                 <input type="text" id="login-user" class="login-input" placeholder="Login (admin)" value="admin">
                 <input type="password" id="login-pass" class="login-input" placeholder="Parol (0000)" value="0000" onkeydown="if(event.key==='Enter') doLogin()">
@@ -275,7 +404,6 @@
                                 <button class="btn-split-bill" style="padding:6px 8px; font-size:11px; flex:1;" onclick="openSplitBillModal()">✂️ Bo'lib to'lash</button>
                             </div>
 
-                            <!-- Yetkazib berish ma'lumotlari (agar dostavka bo'lsa) -->
                             <div id="cur-delivery-info-box" style="display:none; background:#f5f3ff; border:1px solid #c4b5fd; padding:8px; border-radius:6px; font-size:12px;"></div>
 
                             <div class="order-items-box" id="cur-order-items"></div>
@@ -507,27 +635,13 @@
         </div>
     </div>
 
-    <!-- CHOP ETISH CHEKI -->
-    <div id="receipt-print">
-        <center>
-            <h3>RESTAURANT OS</h3>
-            <p id="rc-date"></p>
-            <h4 id="rc-table" style="margin:4px 0;"></h4>
-            <p>Xizmat ko'rsatdi: <span id="rc-waiter"></span></p>
-            <hr>
-        </center>
-        <div id="rc-items"></div>
-        <hr>
-        <div>Jami: <span id="rc-tot">0</span> so'm</div>
-        <p id="rc-pay-type"></p>
-    </div>
-
     <script>
         var state = {
             adminPin: "0000",
             selectedKey: 'Asosiy zal-1',
             currentZone: 'Barchasi',
             currentKdsDept: 'Barchasi',
+            clientCatFilter: 'Barchasi',
             payRating: 0,
             splitBillSelection: {},
             clientCart: [],
@@ -547,15 +661,15 @@
                 "Dostavka": ["Rustam (Kuryer)", "Davron (Kuryer)"]
             },
             tableWaiters: {},
-            deliveryDetails: {}, // Dostavka manzillari va telefonlari
+            deliveryDetails: {},
             reservations: {},
             orders: {},
             kdsTickets: [],
             menu: [
-                { name: 'Osh', price: 35000, dept: 'Issiq taomlar', isStopped: false },
-                { name: 'Shashlik', price: 18000, dept: 'Mangal', isStopped: false },
-                { name: 'Choy', price: 5000, dept: 'Bar', isStopped: false },
-                { name: "Sho'rva", price: 30000, dept: 'Issiq taomlar', isStopped: false }
+                { name: 'Osh (Choyxona)', price: 35000, dept: 'Issiq taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=400&q=80', desc: "To'yona uslubda damlangan sara go'shtli issiq palov" },
+                { name: 'Mol go\'shti Shashlik', price: 18000, dept: 'Mangal', isStopped: false, img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80', desc: "Ko'mir taftida pishirilgan yumshoq va sersuv go'sht" },
+                { name: 'Katta Sho\'rva', price: 30000, dept: 'Issiq taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80', desc: "Katta ilikli suyak va yangi sabzavotlar bilan tayyorlangan" },
+                { name: 'Ko\'k Choy (Choynakda)', price: 5000, dept: 'Bar', isStopped: false, img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80', desc: "Limon va novvot bilan damlangan xushbo'y choy" }
             ],
             stock: [
                 { name: "Go'sht", qty: 25.0, unit: "kg" },
@@ -568,10 +682,10 @@
         };
 
         var recipeMap = {
-            "Osh": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
-            "Shashlik": [ { item: "Go'sht", qty: 0.25 } ],
-            "Sho'rva": [ { item: "Go'sht", qty: 0.2 }, { item: "Sabzi", qty: 0.1 } ],
-            "Choy": [ { item: "Choy (paket)", qty: 1 } ]
+            "Osh (Choyxona)": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
+            "Mol go'shti Shashlik": [ { item: "Go'sht", qty: 0.25 } ],
+            "Katta Sho'rva": [ { item: "Go'sht", qty: 0.2 }, { item: "Sabzi", qty: 0.1 } ],
+            "Ko'k Choy (Choynakda)": [ { item: "Choy (paket)", qty: 1 } ]
         };
 
         function playAlertSound() {
@@ -681,7 +795,7 @@
 
         function loadStorage() {
             try {
-                var d = localStorage.getItem('ros_delivery_v1');
+                var d = localStorage.getItem('ros_delivery_v2');
                 if (d) {
                     var parsed = JSON.parse(d);
                     if (parsed.tables) state.tables = parsed.tables;
@@ -707,7 +821,7 @@
 
         function saveStorage() {
             try {
-                localStorage.setItem('ros_delivery_v1', JSON.stringify({
+                localStorage.setItem('ros_delivery_v2', JSON.stringify({
                     tables: state.tables,
                     orders: state.orders,
                     history: state.history,
@@ -741,31 +855,64 @@
             }
         }
 
-        /* ==================== A. MIJOZLAR MENYUSI VA SAVATCHASI ==================== */
+        /* ==================== A. YANGI MIJOZLAR MENYUSI ==================== */
+        function filterClientCat(cat) {
+            state.clientCatFilter = cat;
+            document.querySelectorAll('#client-cat-bar .cat-chip').forEach(function(b){
+                b.classList.toggle('active', b.innerText.includes(cat) || (cat === 'Barchasi' && b.innerText === 'Barchasi'));
+            });
+            renderClientMenu();
+        }
+
         function renderClientMenu() {
-            var container = document.getElementById('client-menu-list');
-            container.innerHTML = '';
+            var grid = document.getElementById('client-food-grid');
+            grid.innerHTML = '';
+            var searchTxt = (document.getElementById('client-search')?.value || '').toLowerCase();
 
             state.menu.forEach(function(item, idx){
+                if (state.clientCatFilter !== 'Barchasi' && item.dept !== state.clientCatFilter) return;
+                if (searchTxt && !item.name.toLowerCase().includes(searchTxt)) return;
+
                 var isOsh = item.name.toLowerCase().includes('osh');
                 var isStopped = !!item.isStopped;
+                var defImg = item.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
 
-                var row = document.createElement('div');
-                row.className = 'menu-row' + (isStopped ? ' stopped' : '');
+                var card = document.createElement('div');
+                card.className = 'food-card';
 
-                var actHtml = '';
-                if (isOsh) {
-                    actHtml = '<div class="portion-actions">' +
-                        '<button class="p-btn" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 1.0)">1 pors</button>' +
-                        '<button class="p-btn half" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 0.7)">0.7</button>' +
-                        '<button class="p-btn half" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 0.5)">0.5</button>' +
+                var actionArea = '';
+                if (isStopped) {
+                    actionArea = '<button class="btn-add-cart" disabled style="background:var(--muted); cursor:not-allowed;">⛔ Vaqtincha mavjud emas</button>';
+                } else if (isOsh) {
+                    actionArea = '<div>' +
+                        '<div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">Porsiya tanlang:</div>' +
+                        '<div class="pors-btn-row">' +
+                            '<button class="pors-pill" onclick="addToClientCart('+idx+', 1.0)">1 pors</button>' +
+                            '<button class="pors-pill" onclick="addToClientCart('+idx+', 0.7)">0.7</button>' +
+                            '<button class="pors-pill" onclick="addToClientCart('+idx+', 0.5)">0.5</button>' +
+                        '</div>' +
                     '</div>';
                 } else {
-                    actHtml = '<div class="portion-actions"><button class="p-btn" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 1.0)">+ Savatchaga</button></div>';
+                    actionArea = '<button class="btn-add-cart" onclick="addToClientCart('+idx+', 1.0)">🛒 Savatchaga qo\'shish</button>';
                 }
 
-                row.innerHTML = '<div><b>' + item.name + '</b> ' + (isStopped ? '<span style="color:var(--red); font-size:11px;">[Hozircha tugagan]</span>' : '') + '<br><small style="color:var(--muted);">' + item.price.toLocaleString() + ' so\'m</small></div>' + actHtml;
-                container.appendChild(row);
+                card.innerHTML = '<div class="food-img-wrap">' +
+                    '<img src="' + defImg + '" alt="' + item.name + '" class="food-img">' +
+                    '<span class="food-badge-dept">' + item.dept + '</span>' +
+                    (isStopped ? '<div class="food-badge-stop">Tugagan (Stop)</div>' : '') +
+                '</div>' +
+                '<div class="food-info">' +
+                    '<div>' +
+                        '<h3 class="food-title">' + item.name + '</h3>' +
+                        '<p style="margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.4;">' + (item.desc || "A'lo sifatli ingredientlardan yangi tayyorlangan.") + '</p>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">' +
+                        '<span class="food-price">' + item.price.toLocaleString() + ' so\'m</span>' +
+                    '</div>' +
+                    actionArea +
+                '</div>';
+
+                grid.appendChild(card);
             });
             renderClientCart();
         }
@@ -790,24 +937,34 @@
         function renderClientCart() {
             var box = document.getElementById('client-cart-items');
             box.innerHTML = '';
-            var total = 0;
+            var subtotal = 0;
+            var totalCount = 0;
 
             if (state.clientCart.length === 0) {
-                box.innerHTML = '<p style="color:var(--muted); font-size:12px;">Savatcha bo\'sh</p>';
+                box.innerHTML = '<p style="color:var(--muted); font-size:13px; text-align:center; margin:20px 0;">Savatchangiz bo\'sh.<br>Menyudan taom tanlang!</p>';
+                document.getElementById('client-subtotal').innerText = '0 so\'m';
                 document.getElementById('client-cart-total').innerText = '0 so\'m';
+                document.getElementById('client-cart-count').innerText = '0';
                 return;
             }
 
             state.clientCart.forEach(function(c, i){
                 var itemTot = c.price * c.qty;
-                total += itemTot;
-                box.innerHTML += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:13px;">' +
-                    '<div><b>' + c.name + '</b> &times; ' + c.qty + '<br><small>' + itemTot.toLocaleString() + ' so\'m</small></div>' +
-                    '<button class="order-btn-del" onclick="removeFromClientCart('+i+')">&times;</button>' +
+                subtotal += itemTot;
+                totalCount += c.qty;
+
+                box.innerHTML += '<div class="cart-item-row">' +
+                    '<div><b>' + c.name + '</b> &times; ' + c.qty + '<br><small style="color:var(--primary); font-weight:700;">' + itemTot.toLocaleString() + ' so\'m</small></div>' +
+                    '<button class="cart-item-del" onclick="removeFromClientCart('+i+')">&times;</button>' +
                 '</div>';
             });
 
-            document.getElementById('client-cart-total').innerText = total.toLocaleString() + ' so\'m';
+            var deliveryFee = 10000;
+            var grandTotal = subtotal + deliveryFee;
+
+            document.getElementById('client-cart-count').innerText = totalCount;
+            document.getElementById('client-subtotal').innerText = subtotal.toLocaleString() + ' so\'m';
+            document.getElementById('client-cart-total').innerText = grandTotal.toLocaleString() + ' so\'m';
         }
 
         function removeFromClientCart(i) {
@@ -815,16 +972,15 @@
             renderClientCart();
         }
 
-        // Onlayn buyurtmani jo'natish (Kassaga tushirish)
         function submitOnlineDeliveryOrder() {
-            if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh!");
+            if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh! Iltimos, taom tanlang.");
             var name = document.getElementById('order-cust-name').value.trim();
             var phone = document.getElementById('order-cust-phone').value.trim();
             var addr = document.getElementById('order-cust-addr').value.trim();
+            var pMethod = document.getElementById('order-cust-paymethod').value;
 
             if (!name || !phone || !addr) return alert("Iltimos, ismingiz, telefon va manzilingizni to'liq kiriting!");
 
-            // Yangi Dostavka stolini ochish
             var deliveryCount = state.tables.filter(function(t){ return t.zone === 'Dostavka'; }).length;
             var nextNum = deliveryCount + 1;
             var key = 'Dostavka-' + nextNum;
@@ -832,9 +988,14 @@
             state.tables.push({ key: key, zone: 'Dostavka', number: nextNum });
             state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
             state.tableWaiters[key] = (state.zoneWaiters['Dostavka'] || ['Kuryer'])[0];
-            state.deliveryDetails[key] = { name: name, phone: phone, address: addr, time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) };
+            state.deliveryDetails[key] = { 
+                name: name, 
+                phone: phone, 
+                address: addr, 
+                payMethod: pMethod,
+                time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) 
+            };
 
-            // Avtomatik oshxonaga (KDS) uzatish
             var d = new Date();
             state.kdsTickets.unshift({
                 id: Date.now(),
@@ -850,7 +1011,6 @@
 
             saveStorage();
 
-            // Savatchani tozalash
             state.clientCart = [];
             document.getElementById('order-cust-name').value = '';
             document.getElementById('order-cust-phone').value = '';
@@ -858,7 +1018,7 @@
             renderClientCart();
 
             showNotification("🚗 Yangi onlayn buyurtma qabul qilindi! (" + name + " - " + addr + ")");
-            alert("Rahmat! Sizning buyurtmangiz qabul qilindi va oshxonaga uzatildi. Tez orada siz bilan bog'lanamiz!");
+            alert("Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi va oshxonaga uzatildi. Tez orada siz bilan bog'lanamiz!");
         }
 
         /* ==================== B. XODIMLAR VA KASSA QISMI ==================== */
@@ -1008,12 +1168,11 @@
             document.getElementById('cur-table-title').innerHTML = (isDeliv ? '🚗 Dostavka #' + curTbl.number : (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol')) + (isReady ? ' <span style="color:var(--green);">[🔔 TAYYOR!]</span>' : '');
             document.getElementById('btn-serve-order').style.display = isReady ? 'block' : 'none';
 
-            // Dostavka ma'lumotlari qutisi
             var delivBox = document.getElementById('cur-delivery-info-box');
             if (isDeliv && state.deliveryDetails[state.selectedKey]) {
                 var dInfo = state.deliveryDetails[state.selectedKey];
                 delivBox.style.display = 'block';
-                delivBox.innerHTML = '<b>Mijoz:</b> ' + dInfo.name + ' | <b>Tel:</b> ' + dInfo.phone + '<br><b>Manzil:</b> ' + dInfo.address + '<br><small style="color:var(--muted);">Vaqt: ' + dInfo.time + '</small>';
+                delivBox.innerHTML = '<b>Mijoz:</b> ' + dInfo.name + ' | <b>Tel:</b> ' + dInfo.phone + '<br><b>Manzil:</b> ' + dInfo.address + '<br><b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br><small style="color:var(--muted);">Vaqt: ' + dInfo.time + '</small>';
             } else {
                 delivBox.style.display = 'none';
             }
@@ -1058,7 +1217,6 @@
 
         function updateTableFee() { renderCurOrder(); }
 
-        /* OSHXONAGA YUBORISH */
         function sendOrderToKitchenDirect() {
             var cur = state.orders[state.selectedKey] || [];
             if (cur.length === 0) return alert("Buyurtma bo'sh!");
@@ -1098,7 +1256,6 @@
             }
         }
 
-        /* KDS OSHXONA */
         function setKdsFilter(dept) {
             state.currentKdsDept = dept;
             document.querySelectorAll('#kds-dept-bar button').forEach(function(b){
@@ -1162,7 +1319,6 @@
             }
         }
 
-        /* SOZLAMALAR */
         function resetAdminSettingsView() {
             document.getElementById('admin-pin-prompt').style.display = 'block';
             document.getElementById('admin-settings-content').style.display = 'none';
@@ -1202,7 +1358,7 @@
             var p = parseFloat(document.getElementById('adm-new-food-price').value);
             if (!n || !p) return alert("Nom va narxni to'liq kiriting!");
 
-            state.menu.push({ name: n, dept: d, price: p, isStopped: false });
+            state.menu.push({ name: n, dept: d, price: p, isStopped: false, desc: "Yangi qo'shilgan tansiq taom" });
             saveStorage();
             renderAdminMenu();
             renderHallMenu();
@@ -1290,7 +1446,6 @@
             renderClientMenu();
         }
 
-        /* TO'LOV MANTIG'I */
         function openPaymentModal() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Buyurtma yo'q!");
@@ -1379,7 +1534,6 @@
                 total: finalTotal
             });
 
-            // Sklad spisaniye
             curOrders.forEach(function(o){
                 var r = recipeMap[o.raw || o.name];
                 if (r) {
@@ -1390,7 +1544,6 @@
                 }
             });
 
-            // Agar Dostavka bo'lsa, yopilganda ro'yxatdan butunlay olib tashlash
             if (isDeliv) {
                 state.tables = state.tables.filter(function(t){ return t.key !== state.selectedKey; });
                 delete state.orders[state.selectedKey];
@@ -1411,7 +1564,6 @@
             alert("✅ To'lov qabul qilindi va buyurtma yopildi!");
         }
 
-        /* MODALLAR */
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openTransferModal() {
@@ -1518,7 +1670,6 @@
             alert("Ushbu qism (" + totalPart.toLocaleString() + " so'm) to'landi!");
         }
 
-        /* SKLAD VA XODIMLAR */
         function renderStock() {
             var b = document.getElementById('stock-grid-box');
             b.innerHTML = '';
@@ -1580,7 +1731,7 @@
             a.click();
         }
 
-        // Boshlang'ich yuklash
+        // Dastlabki ishga tushirish
         loadStorage();
         renderClientMenu();
     </script>
