@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>RestaurantOS - Professional Kassa va KDS</title>
+    <title>RestaurantOS - Onlayn Buyurtma va Kassa Tizimi</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
     <style>
         :root {
@@ -23,16 +23,24 @@
         *, *::before, *::after { box-sizing: border-box; }
         html, body { min-height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "Manrope", system-ui, sans-serif; font-size: 14px; }
 
-        /* LOGIN */
-        #auth-screen { display: grid; place-items: center; min-height: 100vh; padding: 20px; }
+        /* A. MIJOZLAR UCHUN ONLAYN MENYU (OCHIQ SAHIFA) */
+        #client-screen { display: block; max-width: 900px; margin: 0 auto; padding: 16px; }
+        .client-header { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .client-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+        @media (max-width: 768px) { .client-grid { grid-template-columns: 1fr; } }
+        
+        .client-menu-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; }
+        .client-cart-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; height: fit-content; position: sticky; top: 16px; }
+
+        /* B. LOGIN EKRANI */
+        #auth-screen { display: none; place-items: center; min-height: 100vh; padding: 20px; }
         .login-wrap { width: 100%; max-width: 320px; display: grid; gap: 12px; }
         .login-card { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .login-card h2 { margin: 0; text-align: center; font-size: 1.3rem; font-weight: 800; }
         .login-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 14px; outline: none; }
         .btn-login { background: var(--accent); color: white; border: none; padding: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
         .btn-login:hover { background: var(--accent-hover); }
 
-        /* ASOSIY LAYOUT */
+        /* C. ASOSIY ILOVA LAYOUTI */
         #app-screen { display: none; min-height: 100vh; grid-template-columns: 210px 1fr; }
         .sidebar { background: var(--card); border-right: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; padding: 16px 12px; }
         .logo-box { padding: 10px 8px; font-weight: 800; font-size: 18px; color: var(--accent); border-bottom: 2px solid var(--ink); margin-bottom: 10px; }
@@ -51,13 +59,13 @@
         .view-panel { display: none; }
         .view-panel.active { display: block; }
 
-        /* DASHBOARD */
+        /* DASHBOARD METRIKALARI */
         .dash-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
         .metric-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; display: grid; gap: 4px; }
         .metric-card span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
         .metric-card b { font-size: 20px; font-weight: 800; color: var(--ink); }
 
-        /* STOLLAR */
+        /* STOLLAR & KASSA */
         .hall-grid { display: grid; grid-template-columns: 320px 1fr 340px; gap: 16px; align-items: start; }
         .panel-box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         
@@ -70,6 +78,7 @@
         .table-tile.free { background: var(--green); }
         .table-tile.busy { background: var(--red); }
         .table-tile.reserved { background: var(--yellow); }
+        .table-tile.delivery { background: #8e44ad; }
         .table-tile.selected { border-color: var(--ink) !important; box-shadow: 0 0 0 2px var(--ink); }
 
         @keyframes pulse-ready {
@@ -106,6 +115,7 @@
         .kds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
         .kds-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         .kds-card.ready { border-color: var(--green); background: #f0fdf4; }
+        .kds-card.delivery-tag { border-top: 5px solid #8e44ad; }
 
         /* TOAST */
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -130,26 +140,67 @@
 
     <div id="toast-box"></div>
 
-    <!-- 1. LOGIN -->
-    <div id="auth-screen">
-        <div class="login-wrap">
-            <div class="login-card">
-                <h2>RestaurantOS</h2>
-                <div style="font-size:12px; color:var(--muted); text-align:center; margin-top:-8px;">Tizimga kirish</div>
-                <input type="text" id="login-user" class="login-input" placeholder="Login (admin)" value="admin">
-                <input type="password" id="login-pass" class="login-input" placeholder="Parol (0000)" value="0000" onkeydown="if(event.key==='Enter') doLogin()">
-                <button class="btn-login" onclick="doLogin()">Kirish</button>
+    <!-- ==================== 1. MIJOZLAR UCHUN ONLAYN MENYU (GOOGLEDAN KIRGANDA) ==================== -->
+    <div id="client-screen">
+        <header class="client-header">
+            <div>
+                <h1 style="margin:0; font-size:1.4rem; font-weight:800; color:var(--accent);">Milliy Taomlar & Yetkazib berish</h1>
+                <p style="margin:2px 0 0 0; color:var(--muted); font-size:12px;">Uyga issiq va lazzatli taomlarni yetkazib beramiz</p>
+            </div>
+            <button class="btn-login" onclick="openStaffLogin()" style="font-size:12px; padding:8px 14px;">🔒 Xodimlar kirishi</button>
+        </header>
+
+        <div class="client-grid">
+            <!-- Taomlar tanlovi -->
+            <div class="client-menu-card">
+                <h2 style="margin:0 0 12px 0; font-size:1.1rem;">Taomnoma (Menyu)</h2>
+                <div class="menu-list" id="client-menu-list"></div>
+            </div>
+
+            <!-- Savatcha va Manzil kiritish -->
+            <div class="client-cart-card">
+                <h2 style="margin:0 0 12px 0; font-size:1.1rem;">🛒 Savatchangiz</h2>
+                <div id="client-cart-items" style="max-height:180px; overflow-y:auto; border-bottom:1px dashed var(--line); padding-bottom:8px; margin-bottom:10px;">
+                    <p style="color:var(--muted); font-size:12px;">Savatcha hozircha bo'sh</p>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; margin-bottom:12px;">
+                    <span>Jami:</span>
+                    <span id="client-cart-total" style="color:var(--accent);">0 so'm</span>
+                </div>
+
+                <div style="display:grid; gap:8px;">
+                    <input type="text" id="order-cust-name" class="login-input" placeholder="Ismingiz (masalan: Sardor)">
+                    <input type="text" id="order-cust-phone" class="login-input" placeholder="Telefon raqamingiz (+998...)">
+                    <textarea id="order-cust-addr" class="login-input" rows="2" placeholder="Yetkazish manzili (ko'cha, uy, mo'ljal)"></textarea>
+                    <button class="btn-login" onclick="submitOnlineDeliveryOrder()" style="background:var(--green); font-size:14px; padding:12px;">
+                        🚗 Buyurtma berish (Dostavka)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. ASOSIY ILOVA -->
+    <!-- ==================== 2. XODIMLAR LOGIN EKRANI ==================== -->
+    <div id="auth-screen">
+        <div class="login-wrap">
+            <div class="login-card">
+                <h2>RestaurantOS</h2>
+                <div style="font-size:12px; color:var(--muted); text-align:center; margin-top:-8px;">Xodimlar tizimiga kirish</div>
+                <input type="text" id="login-user" class="login-input" placeholder="Login (admin)" value="admin">
+                <input type="password" id="login-pass" class="login-input" placeholder="Parol (0000)" value="0000" onkeydown="if(event.key==='Enter') doLogin()">
+                <button class="btn-login" onclick="doLogin()">Kirish</button>
+                <button class="btn-login" style="background:transparent; color:var(--muted); border:1px solid var(--line);" onclick="backToClientMenu()">⬅️ Mijoz menyusiga qaytish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 3. ASOSIY XODIMLAR PANELI ==================== -->
     <div id="app-screen">
         <aside class="sidebar">
             <div class="logo-box">RestaurantOS</div>
             <div class="nav-link active" onclick="switchNav('dash', this)"><span>📊 Boshqaruv</span></div>
             
-            <!-- STOLLAR & KASSA (TAYYOR BO'LGAN BILDIRIShNOMA BILAN) -->
             <div class="nav-link" id="nav-hall-btn" onclick="switchNav('hall', this)">
                 <span>🛎 Stollar & Kassa</span>
                 <span id="ready-badge-hall" class="nav-badge-ready" style="display:none;">0 ta tayyor</span>
@@ -170,6 +221,7 @@
             <header class="topbar">
                 <h1 class="topbar-title" id="page-title">Boshqaruv paneli</h1>
                 <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-login" style="font-size:12px; padding:6px 12px; background:var(--green);" onclick="openPublicMenuDirect()">🌐 Mijoz Menyu Sayti</button>
                     <span style="font-weight:700;">👤 Admin</span>
                     <button class="btn-logout" onclick="doLogout()">Chiqish</button>
                 </div>
@@ -181,7 +233,7 @@
                     <div class="dash-metrics">
                         <div class="metric-card"><span>Bugungi Tushum</span><b id="dash-rev">0 so'm</b></div>
                         <div class="metric-card"><span>Buyurtmalar soni</span><b id="dash-orders-cnt">0 ta</b></div>
-                        <div class="metric-card"><span>Band stollar</span><b id="dash-busy-tbls">0 ta</b></div>
+                        <div class="metric-card"><span>Band stollar & Dostavka</span><b id="dash-busy-tbls">0 ta</b></div>
                         <div class="metric-card"><span>O'rtacha chek</span><b id="dash-avg-bill">0 so'm</b></div>
                     </div>
                     <div class="panel-box">
@@ -189,7 +241,7 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                    <th style="padding:6px;">Vaqt</th><th>Stol</th><th>Ofitsiant</th><th>To'lov</th><th>Summa</th>
+                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Ofitsiant/Kuryer</th><th>To'lov</th><th>Summa</th>
                                 </tr>
                             </thead>
                             <tbody id="dash-recent-rows"></tbody>
@@ -197,11 +249,11 @@
                     </div>
                 </div>
 
-                <!-- 2. STOLLAR VA KASSA -->
+                <!-- 2. STOLLAR VA KASSA (DOSTAVKA BILAN) -->
                 <div id="view-hall" class="view-panel">
                     <div class="hall-grid">
                         <div class="panel-box">
-                            <h3>Stollar</h3>
+                            <h3>Stollar & Dostavka</h3>
                             <div class="zone-bar" id="hall-zone-bar"></div>
                             <div class="tables-canvas" id="hall-tables-canvas"></div>
                         </div>
@@ -222,10 +274,13 @@
                                 <button class="btn-split-bill" style="padding:6px 8px; font-size:11px; flex:1;" onclick="openSplitBillModal()">✂️ Bo'lib to'lash</button>
                             </div>
 
+                            <!-- Yetkazib berish ma'lumotlari (agar dostavka bo'lsa) -->
+                            <div id="cur-delivery-info-box" style="display:none; background:#f5f3ff; border:1px solid #c4b5fd; padding:8px; border-radius:6px; font-size:12px;"></div>
+
                             <div class="order-items-box" id="cur-order-items"></div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px;">
-                                <div>Ofitsiant: <select id="cur-waiter-sel" onchange="updateTableWaiter()" style="width:100%; padding:4px;"></select></div>
+                                <div>Xodim/Kuryer: <select id="cur-waiter-sel" onchange="updateTableWaiter()" style="width:100%; padding:4px;"></select></div>
                                 <div>Xizmat: <select id="cur-fee-sel" onchange="updateTableFee()" style="width:100%; padding:4px;">
                                     <option value="0">0%</option>
                                     <option value="10" selected>10%</option>
@@ -239,9 +294,7 @@
                                 <b style="font-size:18px; color:var(--ink);" id="cur-total-price">0 so'm</b>
                             </div>
 
-                            <!-- Taom tayyor bo'lganda chiqadigan tugma -->
-                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taomni oshxonadan oldim (Mijozga berildi)</button>
-
+                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taom tayyor (Kuryer/Mijozga topshirildi)</button>
                             <button class="btn-action-wide btn-kds-send" onclick="sendOrderToKitchenDirect()">👨‍🍳 Oshxonaga yuborish</button>
                             <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">Hisobni yopish</button>
                         </div>
@@ -258,7 +311,7 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                    <th style="padding:6px;">Vaqt</th><th>Stol</th><th>Ofitsiant</th><th>Baho</th><th>Taomlar</th><th>To'lov</th><th>Summa</th>
+                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Xodim</th><th>Baho</th><th>Taomlar</th><th>To'lov</th><th>Summa</th>
                                 </tr>
                             </thead>
                             <tbody id="all-history-rows"></tbody>
@@ -305,12 +358,12 @@
                 <!-- 7. XODIMLAR REYTINGI -->
                 <div id="view-staff" class="view-panel">
                     <div class="panel-box">
-                        <h3>Ofitsiantlar reytingi va +10% Bonus yetakchisi</h3>
+                        <h3>Ofitsiantlar va Kuryerlar faoliyati</h3>
                         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;" id="staff-cards-box"></div>
                     </div>
                 </div>
 
-                <!-- 8. SOZLAMALAR (ADMIN PIN) -->
+                <!-- 8. SOZLAMALAR -->
                 <div id="view-settings" class="view-panel">
                     <div id="admin-pin-prompt" class="panel-box" style="max-width:380px; margin:40px auto; text-align:center;">
                         <h3>🔒 Administrator Tekshiruvi</h3>
@@ -343,32 +396,19 @@
                         </div>
 
                         <div class="panel-box">
-                            <h3>👥 Xodimlarni boshqarish (Ofitsiant)</h3>
+                            <h3>👥 Xodimlarni boshqarish (Ofitsiant / Kuryer)</h3>
                             <div style="display:flex; gap:8px; margin:8px 0;">
                                 <select id="adm-staff-zone" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
                                     <option value="Asosiy zal">Asosiy zal</option>
                                     <option value="Hovli (Leto)">Hovli (Leto)</option>
                                     <option value="Banket zali">Banket zali</option>
                                     <option value="VIP xona">VIP xona</option>
+                                    <option value="Dostavka">Dostavka (Kuryer)</option>
                                 </select>
-                                <input type="text" id="adm-staff-name" placeholder="Ofitsiant ismi" style="flex:2; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
+                                <input type="text" id="adm-staff-name" placeholder="Xodim ismi" style="flex:2; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
                                 <button class="btn-login" onclick="adminAddStaff()">+ Qo'shish</button>
                             </div>
                             <div id="adm-staff-list" style="margin-top:10px; display:grid; gap:8px;"></div>
-                        </div>
-
-                        <div class="panel-box">
-                            <h3>🗑 Stollarni o'chirish / qo'shish</h3>
-                            <div style="display:flex; gap:8px; margin:8px 0;">
-                                <select id="adm-new-table-zone" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
-                                    <option value="Asosiy zal">Asosiy zal</option>
-                                    <option value="Hovli (Leto)">Hovli (Leto)</option>
-                                    <option value="Banket zali">Banket zali</option>
-                                    <option value="VIP xona">VIP xona</option>
-                                </select>
-                                <button class="btn-login" onclick="adminAddTable()">+ Yangi stol ochish</button>
-                            </div>
-                            <div id="adm-tables-list" style="margin-top:10px; display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:10px;"></div>
                         </div>
 
                         <div class="panel-box" style="max-width:380px;">
@@ -391,11 +431,9 @@
             </div>
             
             <p style="font-size:16px; margin:12px 0 6px 0;">To'lov summasi: <b id="pay-modal-amount" style="color:var(--accent); font-size:20px;">0 so'm</b></p>
-            <div id="pay-modal-disc" style="font-size:12px; color:var(--yellow); margin-bottom:8px;"></div>
 
-            <!-- Yulduzchalar -->
             <div style="text-align:center; background:var(--fill); padding:8px; border-radius:8px;">
-                <span style="font-size:12px; font-weight:700;">Ofitsiant xizmatini baholang:</span>
+                <span style="font-size:12px; font-weight:700;">Xizmatni baholang:</span>
                 <div class="rating-stars" id="pay-stars">
                     <span class="star" onclick="setPayRating(1)">★</span>
                     <span class="star" onclick="setPayRating(2)">★</span>
@@ -406,7 +444,6 @@
                 <small id="pay-rating-txt" style="color:var(--red); font-weight:700;">⚠️ Yulduzcha tanlang!</small>
             </div>
 
-            <!-- TO'LOV USULLARI -->
             <div style="display:grid; gap:8px; margin-top:14px;">
                 <button class="btn-login" onclick="execFullPay('Naqd')">💵 To'liq Naqd pul bilan yopish</button>
                 <button class="btn-login" style="background:#2980b9;" onclick="execFullPay('Karta')">💳 To'liq Karta bilan yopish</button>
@@ -414,25 +451,19 @@
                 <button class="btn-split-bill" onclick="toggleSplitBox()">🔀 Aralash to'lov (Naqd + Karta)</button>
             </div>
 
-            <!-- BITTA URINIShDA ARALASH TO'LOV KIKRITISH -->
             <div id="split-box" style="display:none; margin-top:12px; padding:12px; border:2px dashed var(--line); border-radius:8px; background:#fff;">
-                <h4 style="margin:0 0 8px 0; color:var(--ink);">Aralash to'lovni taqsimlash:</h4>
+                <h4 style="margin:0 0 8px 0; color:var(--ink);">Aralash to'lov:</h4>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                     <div>
-                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💵 Naqd to'langan:</label>
+                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💵 Naqd:</label>
                         <input type="number" id="split-cash-input" class="login-input" placeholder="0" oninput="calcSplitLive('cash')">
                     </div>
                     <div>
-                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💳 Karta to'langan:</label>
+                        <label style="font-size:11px; font-weight:700; color:var(--muted);">💳 Karta:</label>
                         <input type="number" id="split-card-input" class="login-input" placeholder="0" oninput="calcSplitLive('card')">
                     </div>
                 </div>
-                
-                <div id="split-hint-text" style="margin:8px 0; font-size:12px; font-weight:700; color:var(--accent);">
-                    Naqd summani yozing, qoldig'i kartaga avtomatik o'tadi.
-                </div>
-
-                <button class="btn-login" style="width:100%;" onclick="execInstantSplitPay()">Tasdiqlash va Chek chiqarish</button>
+                <button class="btn-login" style="width:100%; margin-top:10px;" onclick="execInstantSplitPay()">Tasdiqlash va Chek chiqarish</button>
             </div>
         </div>
     </div>
@@ -443,7 +474,7 @@
             <h3>✂️ Chekni bo'lib to'lash (Mehmon ulushi)</h3>
             <div id="split-items-list" style="margin:10px 0; max-height:200px; overflow-y:auto;"></div>
             <div style="border-top:1px dashed var(--line); padding-top:8px;">
-                <b>Ushbu mehmon hisobi: <span id="split-bill-total" style="color:var(--accent);">0</span> so'm</b>
+                <b>Ushbu qism hisobi: <span id="split-bill-total" style="color:var(--accent);">0</span> so'm</b>
             </div>
             <div style="display:grid; gap:6px; margin-top:12px;">
                 <button class="btn-login" onclick="confirmSplitPart('Naqd')">💵 Naqd bilan to'lash</button>
@@ -481,7 +512,7 @@
             <h3>RESTAURANT OS</h3>
             <p id="rc-date"></p>
             <h4 id="rc-table" style="margin:4px 0;"></h4>
-            <p>Ofitsiant: <span id="rc-waiter"></span></p>
+            <p>Xizmat ko'rsatdi: <span id="rc-waiter"></span></p>
             <hr>
         </center>
         <div id="rc-items"></div>
@@ -493,12 +524,12 @@
     <script>
         var state = {
             adminPin: "0000",
-            currentTab: 'dash',
             selectedKey: 'Asosiy zal-1',
             currentZone: 'Barchasi',
             currentKdsDept: 'Barchasi',
             payRating: 0,
             splitBillSelection: {},
+            clientCart: [],
             tables: [
                 { key: 'Asosiy zal-1', zone: 'Asosiy zal', number: 1 },
                 { key: 'Asosiy zal-2', zone: 'Asosiy zal', number: 2 },
@@ -511,9 +542,11 @@
                 "Asosiy zal": ["Aliyor", "Sardor"],
                 "Hovli (Leto)": ["Jasur", "Bekzod"],
                 "Banket zali": ["Malika"],
-                "VIP xona": ["Shaxzod"]
+                "VIP xona": ["Shaxzod"],
+                "Dostavka": ["Rustam (Kuryer)", "Davron (Kuryer)"]
             },
             tableWaiters: {},
+            deliveryDetails: {}, // Dostavka manzillari va telefonlari
             reservations: {},
             orders: {},
             kdsTickets: [],
@@ -572,22 +605,42 @@
             }, 6000);
         }
 
+        /* NAVIGATION & SCREENS */
+        function openStaffLogin() {
+            document.getElementById('client-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'grid';
+        }
+
+        function backToClientMenu() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('client-screen').style.display = 'block';
+            renderClientMenu();
+        }
+
+        function openPublicMenuDirect() {
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('client-screen').style.display = 'block';
+            renderClientMenu();
+        }
+
         function doLogin() {
             var u = (document.getElementById('login-user').value || '').trim();
             var p = (document.getElementById('login-pass').value || '').trim();
             
             if ((u.toLowerCase() === 'admin') && (p === String(state.adminPin) || p === '0000')) {
                 document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('client-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'grid';
-                initApp();
+                initStaffApp();
             } else {
-                alert("Login yoki parol xato!\nLogin: admin\nParol: " + state.adminPin);
+                alert("Login yoki parol xato! (admin / " + state.adminPin + ")");
             }
         }
 
         function doLogout() {
             document.getElementById('app-screen').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'grid';
+            document.getElementById('client-screen').style.display = 'block';
+            renderClientMenu();
         }
 
         function switchNav(tabId, el) {
@@ -600,7 +653,7 @@
 
             var titles = {
                 'dash': "Boshqaruv paneli",
-                'hall': "Stollar va Kassa",
+                'hall': "Stollar & Dostavka",
                 'orders': "Buyurtmalar tarixi",
                 'kds': "Oshxona ekrani (KDS)",
                 'menu': "Menyu va Stop-list",
@@ -620,14 +673,14 @@
             if (tabId === 'settings') resetAdminSettingsView();
         }
 
-        function initApp() {
+        function initStaffApp() {
             loadStorage();
             switchNav('dash', document.querySelector('.nav-link'));
         }
 
         function loadStorage() {
             try {
-                var d = localStorage.getItem('ros_fast_split_v3');
+                var d = localStorage.getItem('ros_delivery_v1');
                 if (d) {
                     var parsed = JSON.parse(d);
                     if (parsed.tables) state.tables = parsed.tables;
@@ -637,7 +690,7 @@
                     if (parsed.menu) state.menu = parsed.menu;
                     if (parsed.zoneWaiters) state.zoneWaiters = parsed.zoneWaiters;
                     if (parsed.adminPin) state.adminPin = String(parsed.adminPin);
-                    if (parsed.reservations) state.reservations = parsed.reservations;
+                    if (parsed.deliveryDetails) state.deliveryDetails = parsed.deliveryDetails;
                 }
             } catch(e){}
 
@@ -653,7 +706,7 @@
 
         function saveStorage() {
             try {
-                localStorage.setItem('ros_fast_split_v3', JSON.stringify({
+                localStorage.setItem('ros_delivery_v1', JSON.stringify({
                     tables: state.tables,
                     orders: state.orders,
                     history: state.history,
@@ -661,19 +714,17 @@
                     menu: state.menu,
                     zoneWaiters: state.zoneWaiters,
                     adminPin: String(state.adminPin),
-                    reservations: state.reservations
+                    deliveryDetails: state.deliveryDetails
                 }));
             } catch(e){}
             updateBadges();
         }
 
-        // TAYYOR BO'LGAN TAOMLAR VA KDS NISHONLARI
         function updateBadges() {
             var activeKds = state.kdsTickets.filter(function(t){ return t.status !== 'done'; }).length;
             var kb = document.getElementById('kds-badge');
             if (activeKds > 0) { kb.innerText = activeKds; kb.style.display = 'inline-block'; } else { kb.style.display = 'none'; }
 
-            // ZAL BO'LIMIGA XABAR: Nechta stolda taom tayyor?
             var readyTablesCount = 0;
             state.tables.forEach(function(tbl){
                 var isReady = state.kdsTickets.some(function(ticket){ return ticket.tableKey === tbl.key && ticket.status === 'ready'; });
@@ -689,7 +740,127 @@
             }
         }
 
-        /* 1. DASHBOARD */
+        /* ==================== A. MIJOZLAR MENYUSI VA SAVATCHASI ==================== */
+        function renderClientMenu() {
+            var container = document.getElementById('client-menu-list');
+            container.innerHTML = '';
+
+            state.menu.forEach(function(item, idx){
+                var isOsh = item.name.toLowerCase().includes('osh');
+                var isStopped = !!item.isStopped;
+
+                var row = document.createElement('div');
+                row.className = 'menu-row' + (isStopped ? ' stopped' : '');
+
+                var actHtml = '';
+                if (isOsh) {
+                    actHtml = '<div class="portion-actions">' +
+                        '<button class="p-btn" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 1.0)">1 pors</button>' +
+                        '<button class="p-btn half" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 0.7)">0.7</button>' +
+                        '<button class="p-btn half" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 0.5)">0.5</button>' +
+                    '</div>';
+                } else {
+                    actHtml = '<div class="portion-actions"><button class="p-btn" '+(isStopped?'disabled':'')+' onclick="addToClientCart('+idx+', 1.0)">+ Savatchaga</button></div>';
+                }
+
+                row.innerHTML = '<div><b>' + item.name + '</b> ' + (isStopped ? '<span style="color:var(--red); font-size:11px;">[Hozircha tugagan]</span>' : '') + '<br><small style="color:var(--muted);">' + item.price.toLocaleString() + ' so\'m</small></div>' + actHtml;
+                container.appendChild(row);
+            });
+            renderClientCart();
+        }
+
+        function addToClientCart(idx, portion) {
+            var item = state.menu[idx];
+            if (!item || item.isStopped) return;
+
+            var pLabel = portion === 1.0 ? '1 pors' : (portion === 0.7 ? '0.7 pors' : '0.5 pors');
+            var name = item.name + (item.name.toLowerCase().includes('osh') ? ' (' + pLabel + ')' : '');
+            var price = Math.round(item.price * portion);
+
+            var ex = state.clientCart.find(function(c){ return c.name === name; });
+            if (ex) {
+                ex.qty++;
+            } else {
+                state.clientCart.push({ name: name, raw: item.name, price: price, portion: portion, qty: 1, dept: item.dept });
+            }
+            renderClientCart();
+        }
+
+        function renderClientCart() {
+            var box = document.getElementById('client-cart-items');
+            box.innerHTML = '';
+            var total = 0;
+
+            if (state.clientCart.length === 0) {
+                box.innerHTML = '<p style="color:var(--muted); font-size:12px;">Savatcha bo\'sh</p>';
+                document.getElementById('client-cart-total').innerText = '0 so\'m';
+                return;
+            }
+
+            state.clientCart.forEach(function(c, i){
+                var itemTot = c.price * c.qty;
+                total += itemTot;
+                box.innerHTML += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:13px;">' +
+                    '<div><b>' + c.name + '</b> &times; ' + c.qty + '<br><small>' + itemTot.toLocaleString() + ' so\'m</small></div>' +
+                    '<button class="order-btn-del" onclick="removeFromClientCart('+i+')">&times;</button>' +
+                '</div>';
+            });
+
+            document.getElementById('client-cart-total').innerText = total.toLocaleString() + ' so\'m';
+        }
+
+        function removeFromClientCart(i) {
+            state.clientCart.splice(i, 1);
+            renderClientCart();
+        }
+
+        // Onlayn buyurtmani jo'natish (Kassaga tushirish)
+        function submitOnlineDeliveryOrder() {
+            if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh!");
+            var name = document.getElementById('order-cust-name').value.trim();
+            var phone = document.getElementById('order-cust-phone').value.trim();
+            var addr = document.getElementById('order-cust-addr').value.trim();
+
+            if (!name || !phone || !addr) return alert("Iltimos, ismingiz, telefon va manzilingizni to'liq kiriting!");
+
+            // Yangi Dostavka stolini ochish
+            var deliveryCount = state.tables.filter(function(t){ return t.zone === 'Dostavka'; }).length;
+            var nextNum = deliveryCount + 1;
+            var key = 'Dostavka-' + nextNum;
+
+            state.tables.push({ key: key, zone: 'Dostavka', number: nextNum });
+            state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
+            state.tableWaiters[key] = (state.zoneWaiters['Dostavka'] || ['Kuryer'])[0];
+            state.deliveryDetails[key] = { name: name, phone: phone, address: addr, time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) };
+
+            // Avtomatik oshxonaga (KDS) uzatish
+            var d = new Date();
+            state.kdsTickets.unshift({
+                id: Date.now(),
+                tableKey: key,
+                zone: 'Dostavka',
+                tableNum: nextNum,
+                waiter: state.tableWaiters[key],
+                time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+                items: JSON.parse(JSON.stringify(state.clientCart)),
+                status: 'waiting',
+                isDelivery: true
+            });
+
+            saveStorage();
+
+            // Savatchani tozalash
+            state.clientCart = [];
+            document.getElementById('order-cust-name').value = '';
+            document.getElementById('order-cust-phone').value = '';
+            document.getElementById('order-cust-addr').value = '';
+            renderClientCart();
+
+            showNotification("🚗 Yangi onlayn buyurtma qabul qilindi! (" + name + " - " + addr + ")");
+            alert("Rahmat! Sizning buyurtmangiz qabul qilindi va oshxonaga uzatildi. Tez orada siz bilan bog'lanamiz!");
+        }
+
+        /* ==================== B. XODIMLAR VA KASSA QISMI ==================== */
         function renderDashboard() {
             var rev = 0;
             state.history.forEach(function(h){ rev += h.total; });
@@ -716,15 +887,14 @@
             });
         }
 
-        /* 2. STOLLAR & KASSA */
         function renderHallZones() {
             var bar = document.getElementById('hall-zone-bar');
             bar.innerHTML = '';
-            var zList = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona"];
+            var zList = ["Barchasi", "Asosiy zal", "Hovli (Leto)", "Banket zali", "VIP xona", "Dostavka"];
             zList.forEach(function(z){
                 var btn = document.createElement('button');
                 btn.className = 'zone-pill' + (state.currentZone === z ? ' active' : '');
-                btn.innerText = z;
+                btn.innerText = (z === 'Dostavka' ? '🚗 Dostavka' : z);
                 btn.onclick = function(){ state.currentZone = z; renderHallZones(); renderHallTables(); };
                 bar.appendChild(btn);
             });
@@ -740,13 +910,14 @@
                 var isBusy = orders.length > 0;
                 var isRes = !!state.reservations[t.key];
                 var isReady = state.kdsTickets.some(function(ticket){ return ticket.tableKey === t.key && ticket.status === 'ready'; });
+                var isDeliv = (t.zone === 'Dostavka');
 
-                var statusCls = isReady ? 'ready-alert' : (isBusy ? 'busy' : (isRes ? 'reserved' : 'free'));
-                var statusTxt = isReady ? '🔔 TAYYOR!' : (isBusy ? '(Band)' : (isRes ? '🟡 (Bron)' : '(Bo\'sh)'));
+                var statusCls = isReady ? 'ready-alert' : (isDeliv && isBusy ? 'delivery' : (isBusy ? 'busy' : (isRes ? 'reserved' : 'free')));
+                var statusTxt = isReady ? '🔔 TAYYOR!' : (isDeliv ? '🚗 Dostavka' : (isBusy ? '(Band)' : (isRes ? '🟡 (Bron)' : '(Bo\'sh)')));
 
                 var tile = document.createElement('div');
                 tile.className = 'table-tile ' + statusCls + (state.selectedKey === t.key ? ' selected' : '');
-                tile.innerHTML = t.zone + '<br><b>Stol ' + t.number + '</b><br>' + statusTxt + '<br><small>[' + (state.tableWaiters[t.key]||'Ofitsiant') + ']</small>';
+                tile.innerHTML = (isDeliv ? '🚗 Buyurtma #' + t.number : t.zone + '<br><b>Stol ' + t.number + '</b>') + '<br>' + statusTxt + '<br><small>[' + (state.tableWaiters[t.key]||'Xodim') + ']</small>';
                 tile.onclick = function(){
                     state.selectedKey = t.key;
                     renderHallTables();
@@ -831,9 +1002,20 @@
         function renderCurOrder() {
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
             var isReady = state.kdsTickets.some(function(ticket){ return ticket.tableKey === state.selectedKey && ticket.status === 'ready'; });
+            var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
 
-            document.getElementById('cur-table-title').innerHTML = (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol') + (isReady ? ' <span style="color:var(--green);">[🔔 TAYYOR!]</span>' : '');
+            document.getElementById('cur-table-title').innerHTML = (isDeliv ? '🚗 Dostavka #' + curTbl.number : (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol')) + (isReady ? ' <span style="color:var(--green);">[🔔 TAYYOR!]</span>' : '');
             document.getElementById('btn-serve-order').style.display = isReady ? 'block' : 'none';
+
+            // Dostavka ma'lumotlari qutisi
+            var delivBox = document.getElementById('cur-delivery-info-box');
+            if (isDeliv && state.deliveryDetails[state.selectedKey]) {
+                var dInfo = state.deliveryDetails[state.selectedKey];
+                delivBox.style.display = 'block';
+                delivBox.innerHTML = '<b>Mijoz:</b> ' + dInfo.name + ' | <b>Tel:</b> ' + dInfo.phone + '<br><b>Manzil:</b> ' + dInfo.address + '<br><small style="color:var(--muted);">Vaqt: ' + dInfo.time + '</small>';
+            } else {
+                delivBox.style.display = 'none';
+            }
 
             var container = document.getElementById('cur-order-items');
             container.innerHTML = '';
@@ -853,7 +1035,7 @@
 
             var wSel = document.getElementById('cur-waiter-sel');
             wSel.innerHTML = '';
-            var zWaiters = curTbl ? (state.zoneWaiters[curTbl.zone]||["Ofitsiant"]) : ["Ofitsiant"];
+            var zWaiters = curTbl ? (state.zoneWaiters[curTbl.zone]||["Xodim"]) : ["Xodim"];
             zWaiters.forEach(function(w){
                 wSel.innerHTML += '<option value="'+w+'" '+(state.tableWaiters[state.selectedKey]===w?'selected':'')+'>'+w+'</option>';
             });
@@ -881,8 +1063,9 @@
             if (cur.length === 0) return alert("Buyurtma bo'sh!");
 
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
-            var waiter = state.tableWaiters[state.selectedKey] || 'Ofitsiant';
+            var waiter = state.tableWaiters[state.selectedKey] || 'Xodim';
             var d = new Date();
+            var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
 
             state.kdsTickets.unshift({
                 id: Date.now(),
@@ -892,7 +1075,8 @@
                 waiter: waiter,
                 time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
                 items: JSON.parse(JSON.stringify(cur)),
-                status: 'waiting'
+                status: 'waiting',
+                isDelivery: isDeliv
             });
 
             saveStorage();
@@ -909,11 +1093,11 @@
                 renderHallTables();
                 renderCurOrder();
                 if (document.getElementById('view-kds').style.display === 'block') renderKDS();
-                alert("Taom mehmonlarga topshirildi deb belgilandi!");
+                alert("Taom topshirildi deb belgilandi!");
             }
         }
 
-        /* KDS OSHXONA VA XABARNOMA */
+        /* KDS OSHXONA */
         function setKdsFilter(dept) {
             state.currentKdsDept = dept;
             document.querySelectorAll('#kds-dept-bar button').forEach(function(b){
@@ -939,7 +1123,7 @@
                 if (filtered.length === 0) return;
 
                 var card = document.createElement('div');
-                card.className = 'kds-card' + (ticket.status === 'ready' ? ' ready' : '');
+                card.className = 'kds-card' + (ticket.status === 'ready' ? ' ready' : '') + (ticket.isDelivery ? ' delivery-tag' : '');
 
                 var itHtml = '';
                 filtered.forEach(function(i){ itHtml += '<div>• ' + i.name + ' &times; ' + i.qty + '</div>'; });
@@ -948,14 +1132,14 @@
                 if (ticket.status === 'waiting') {
                     btnActionHtml = '<button class="btn-login" onclick="advanceKds('+ticket.id+', \'cooking\')">🔵 Pishirishni boshlash</button>';
                 } else if (ticket.status === 'cooking') {
-                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Zalga xabar berish)</button>';
+                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Zalga xabar)</button>';
                 } else {
                     btnActionHtml = '<span style="color:var(--green); font-weight:700;">🔔 Zalga xabar yuborilgan!</span>';
                 }
 
                 card.innerHTML = '<div>' +
-                    '<h4>' + ticket.zone + ' #' + ticket.tableNum + ' (' + ticket.waiter + ')</h4>' +
-                    '<small style="color:var(--muted);">' + ticket.time + '</small>' +
+                    '<h4>' + (ticket.isDelivery ? '🚗 DOSTAVKA #' + ticket.tableNum + ' <span style="font-size:11px; background:#fef08a; padding:2px 4px; border-radius:4px; color:#854d0e;">(Konteynerga)</span>' : ticket.zone + ' #' + ticket.tableNum) + '</h4>' +
+                    '<small style="color:var(--muted);">' + ticket.time + ' (' + ticket.waiter + ')</small>' +
                     '<div style="margin:8px 0; font-size:13px;">' + itHtml + '</div>' +
                     '</div>' + btnActionHtml;
                 container.appendChild(card);
@@ -972,7 +1156,7 @@
                 renderCurOrder();
 
                 if (newStatus === 'ready') {
-                    showNotification(t.zone + " #" + t.tableNum + " (" + t.waiter + ") taomlari TAYYOR bo'ldi!");
+                    showNotification((t.isDelivery ? "🚗 DOSTAVKA #" + t.tableNum : t.zone + " #" + t.tableNum) + " taomlari TAYYOR bo'ldi!");
                 }
             }
         }
@@ -991,7 +1175,6 @@
                 document.getElementById('admin-settings-content').style.display = 'grid';
                 renderAdminMenu();
                 renderAdminStaff();
-                renderAdminTables();
             } else {
                 alert("Xato PIN-kod! (Standart: " + state.adminPin + ")");
             }
@@ -1022,6 +1205,7 @@
             saveStorage();
             renderAdminMenu();
             renderHallMenu();
+            renderClientMenu();
             document.getElementById('adm-new-food-name').value = '';
             document.getElementById('adm-new-food-price').value = '';
         }
@@ -1032,6 +1216,7 @@
                 saveStorage();
                 renderAdminMenu();
                 renderHallMenu();
+                renderClientMenu();
             }
         }
 
@@ -1064,54 +1249,10 @@
         }
 
         function adminDelStaff(zone, wIdx) {
-            if (confirm("Ushbu ofitsiantni o'chirmoqchimisiz?")) {
+            if (confirm("Ushbu xodimni o'chirmoqchimisiz?")) {
                 state.zoneWaiters[zone].splice(wIdx, 1);
                 saveStorage();
                 renderAdminStaff();
-                renderCurOrder();
-            }
-        }
-
-        function renderAdminTables() {
-            var container = document.getElementById('adm-tables-list');
-            container.innerHTML = '';
-            state.tables.forEach(function(t, idx){
-                container.innerHTML += '<div style="background:var(--fill); border:1px solid var(--line); border-radius:6px; padding:8px; display:flex; justify-content:space-between; align-items:center;">' +
-                    '<div><b>' + t.zone + '</b><br>Stol ' + t.number + '</div>' +
-                    '<button class="order-btn-del" onclick="adminDelTable('+idx+')">🗑</button>' +
-                '</div>';
-            });
-        }
-
-        function adminAddTable() {
-            var zone = document.getElementById('adm-new-table-zone').value;
-            var maxNum = 0;
-            state.tables.forEach(function(t){ if (t.zone === zone && t.number > maxNum) maxNum = t.number; });
-            var nextNum = maxNum + 1;
-            var key = zone + '-' + nextNum;
-
-            state.tables.push({ key: key, zone: zone, number: nextNum });
-            state.orders[key] = [];
-            state.tableWaiters[key] = (state.zoneWaiters[zone]||["Ofitsiant"])[0];
-
-            saveStorage();
-            renderAdminTables();
-            renderHallTables();
-        }
-
-        function adminDelTable(idx) {
-            if (state.tables.length <= 1) return alert("Kamida 1 ta stol qolishi shart!");
-            var t = state.tables[idx];
-            if (confirm(t.zone + " #" + t.number + " stolni butunlay o'chirasizmi?")) {
-                delete state.orders[t.key];
-                delete state.tableWaiters[t.key];
-                delete state.reservations[t.key];
-                state.tables.splice(idx, 1);
-
-                if (state.selectedKey === t.key) state.selectedKey = state.tables[0].key;
-                saveStorage();
-                renderAdminTables();
-                renderHallTables();
                 renderCurOrder();
             }
         }
@@ -1145,6 +1286,7 @@
             saveStorage();
             renderQuickMenu();
             renderHallMenu();
+            renderClientMenu();
         }
 
         /* TO'LOV MANTIG'I */
@@ -1181,11 +1323,9 @@
             calcSplitLive('cash');
         }
 
-        // Jonli avtomatik qoldiq hisoblash
         function calcSplitLive(source) {
             var calc = getCurrentCalculations();
             var total = calc.total;
-
             var cashIn = document.getElementById('split-cash-input');
             var cardIn = document.getElementById('split-card-input');
 
@@ -1200,23 +1340,21 @@
             }
         }
 
-        // Bitta bosishda to'liq yopish
         function execFullPay(method) {
-            if (state.payRating === 0) return alert("Iltimos, ofitsiantga baho bering (1 dan 5 gacha)!");
+            if (state.payRating === 0) return alert("Iltimos, xizmatga baho bering (1 dan 5 gacha)!");
             var calc = getCurrentCalculations();
             finishPayment(method, calc.total);
         }
 
-        // Bitta bosishda Aralash to'lovni yopish
         function execInstantSplitPay() {
-            if (state.payRating === 0) return alert("Iltimos, ofitsiantga baho bering (1 dan 5 gacha)!");
+            if (state.payRating === 0) return alert("Iltimos, xizmatga baho bering (1 dan 5 gacha)!");
 
             var calc = getCurrentCalculations();
             var cVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
             var crdVal = parseFloat(document.getElementById('split-card-input').value) || 0;
 
             if ((cVal + crdVal) !== calc.total) {
-                return alert("Naqd va Karta yig'indisi umumiy hisobga (" + calc.total.toLocaleString() + " so'm) teng bo'lishi kerak!");
+                return alert("Naqd va Karta yig'indisi umumiy hisobga teng bo'lishi kerak!");
             }
 
             var methodStr = "Aralash (Naqd: " + cVal.toLocaleString() + " + Karta: " + crdVal.toLocaleString() + ")";
@@ -1227,19 +1365,20 @@
             var curOrders = state.orders[state.selectedKey] || [];
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
             var d = new Date();
+            var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
 
             state.history.unshift({
                 time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
                 date: d.toLocaleDateString(),
-                table: curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol',
-                waiter: state.tableWaiters[state.selectedKey] || 'Ofitsiant',
+                table: (isDeliv ? '🚗 Dostavka #' + curTbl.number : curTbl.zone + ' #' + curTbl.number),
+                waiter: state.tableWaiters[state.selectedKey] || 'Xodim',
                 rating: state.payRating,
                 method: method,
                 items: curOrders.map(function(o){ return o.name + ' (x' + o.qty + ')'; }).join(', '),
                 total: finalTotal
             });
 
-            // Ombor sarfi (Spisaniye)
+            // Sklad spisaniye
             curOrders.forEach(function(o){
                 var r = recipeMap[o.raw || o.name];
                 if (r) {
@@ -1250,9 +1389,17 @@
                 }
             });
 
-            // Stolni tozalash va yopish
-            state.orders[state.selectedKey] = [];
-            delete state.reservations[state.selectedKey];
+            // Agar Dostavka bo'lsa, yopilganda ro'yxatdan butunlay olib tashlash
+            if (isDeliv) {
+                state.tables = state.tables.filter(function(t){ return t.key !== state.selectedKey; });
+                delete state.orders[state.selectedKey];
+                delete state.deliveryDetails[state.selectedKey];
+                delete state.tableWaiters[state.selectedKey];
+                state.selectedKey = state.tables[0] ? state.tables[0].key : 'Asosiy zal-1';
+            } else {
+                state.orders[state.selectedKey] = [];
+                delete state.reservations[state.selectedKey];
+            }
 
             saveStorage();
             closeModal('modal-pay');
@@ -1260,17 +1407,17 @@
             renderCurOrder();
             renderDashboard();
 
-            alert("✅ To'lov qabul qilindi va hisob to'liq yopildi!");
+            alert("✅ To'lov qabul qilindi va buyurtma yopildi!");
         }
 
-        /* MODALLAR VA CHEKNI BO'LIB TO'LASH */
+        /* MODALLAR */
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openTransferModal() {
             var sel = document.getElementById('transfer-target-sel');
             sel.innerHTML = '';
             state.tables.forEach(function(t){
-                if (t.key !== state.selectedKey && (state.orders[t.key]||[]).length === 0) {
+                if (t.key !== state.selectedKey && (state.orders[t.key]||[]).length === 0 && t.zone !== 'Dostavka') {
                     sel.innerHTML += '<option value="'+t.key+'">' + t.zone + ' #' + t.number + '</option>';
                 }
             });
@@ -1367,7 +1514,7 @@
             closeModal('modal-split-bill');
             renderHallTables();
             renderCurOrder();
-            alert("Mehmon o'z hissasini (" + totalPart.toLocaleString() + " so'm) to'ladi! Qolgan taomlar stolda qoldi.");
+            alert("Ushbu qism (" + totalPart.toLocaleString() + " so'm) to'landi!");
         }
 
         /* SKLAD VA XODIMLAR */
@@ -1421,7 +1568,7 @@
         }
 
         function exportHistoryCSV() {
-            var csv = "Vaqt,Stol,Ofitsiant,Baho,Taomlar,To'lov,Summa\n";
+            var csv = "Vaqt,Stol/Manzil,Xodim,Baho,Taomlar,To'lov,Summa\n";
             state.history.forEach(function(r){
                 csv += '"'+r.time+'","'+r.table+'","'+r.waiter+'",'+r.rating+',"'+r.items+'","'+r.method+'",'+r.total+'\n';
             });
@@ -1431,6 +1578,10 @@
             a.download = 'Buyurtmalar.csv';
             a.click();
         }
+
+        // Boshlang'ich yuklash
+        loadStorage();
+        renderClientMenu();
     </script>
 </body>
 </html>
