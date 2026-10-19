@@ -27,10 +27,9 @@
         *, *::before, *::after { box-sizing: border-box; }
         html, body { min-height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "Plus Jakarta Sans", system-ui, sans-serif; font-size: 14px; }
 
-        /* ==================== 1. MIJOZLAR REJIMI (MODERN FOOD DELIVERY UI) ==================== */
+        /* ==================== 1. MIJOZLAR MENYUSI ==================== */
         #client-screen { display: block; max-width: 1200px; margin: 0 auto; padding: 16px 20px 40px; }
         
-        /* Top Navigation */
         .client-navbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
         .brand-badge { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
         .brand-logo-circle { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #fb923c); color: white; display: grid; place-items: center; font-size: 22px; font-weight: 800; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); }
@@ -40,7 +39,6 @@
         .btn-staff-entry { background: var(--fill); color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-staff-entry:hover { background: var(--ink); color: white; }
 
-        /* Banner Card */
         .client-hero {
             background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80') center/cover;
             border-radius: 16px; padding: 36px 30px; color: white; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);
@@ -52,7 +50,6 @@
         .hero-perks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; font-size: 13px; font-weight: 600; }
         .hero-perk-item { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; backdrop-filter: blur(4px); }
 
-        /* Filter & Search Bar */
         .catalog-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
         .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
         .cat-chip { background: var(--card); border: 1.5px solid var(--line); padding: 8px 18px; border-radius: 24px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; color: var(--muted); }
@@ -64,11 +61,9 @@
         .search-input:focus { border-color: var(--accent); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
 
-        /* Asosiy 2 ustunli joylashuv */
         .client-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
         @media (max-width: 900px) { .client-layout { grid-template-columns: 1fr; } }
 
-        /* Taom kartochkalari tarmog'i */
         .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
         .food-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
         .food-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); border-color: #cbd5e1; }
@@ -88,7 +83,6 @@
         .btn-add-cart { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-add-cart:hover { background: var(--primary-hover); }
 
-        /* O'ng tomon: Savatcha va Buyurtma berish formasi */
         .cart-sticky-box { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 20px; position: sticky; top: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
         .cart-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1.5px dashed var(--line); margin-bottom: 14px; }
         .cart-title { font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px; }
@@ -136,13 +130,11 @@
         .view-panel { display: none; }
         .view-panel.active { display: block; }
 
-        /* DASHBOARD METRIKALARI */
         .dash-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
         .metric-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; display: grid; gap: 4px; }
         .metric-card span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
         .metric-card b { font-size: 20px; font-weight: 800; color: var(--ink); }
 
-        /* STOLLAR & KASSA */
         .hall-grid { display: grid; grid-template-columns: 320px 1fr 340px; gap: 16px; align-items: start; }
         .panel-box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         
@@ -169,7 +161,6 @@
             border-color: #f1c40f !important;
         }
 
-        /* MENYU VA AMALLAR */
         .menu-list { display: grid; gap: 8px; max-height: 520px; overflow-y: auto; }
         .menu-row { background: var(--fill); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         .menu-row.stopped { background: #fee2e2; border-color: #fca5a5; opacity: 0.7; }
@@ -188,17 +179,15 @@
         .btn-split-bill { background: var(--fill); border: 1.5px solid var(--accent); color: var(--accent); }
         .btn-serve-done { display: none; width: 100%; background: var(--green); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; animation: pulse-ready 1.2s infinite; }
 
-        /* KDS */
         .kds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
         .kds-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
         .kds-card.ready { border-color: var(--green); background: #f0fdf4; }
         .kds-card.delivery-tag { border-top: 5px solid #8e44ad; }
 
-        /* TOAST */
+        /* TOAST & POPUP BILDIRISHNOMA */
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-item { background: var(--ink); color: white; padding: 14px 20px; border-radius: 8px; border-left: 5px solid var(--green); font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); pointer-events: auto; }
+        .toast-item { background: #0f172a; color: white; padding: 16px 20px; border-radius: 10px; border-left: 6px solid var(--green); font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: auto; animation: pulse-ready 1.5s infinite; max-width: 380px; }
 
-        /* MODALLAR */
         .modal-mask { display: none; position: fixed; inset: 0; background: rgba(19, 35, 46, 0.6); z-index: 1000; place-items: center; padding: 20px; }
         .modal-box { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; width: 100%; max-width: 480px; padding: 20px; max-height: 85vh; overflow-y: auto; }
         .rating-stars { display: flex; gap: 8px; font-size: 32px; justify-content: center; margin: 10px 0; cursor: pointer; user-select: none; }
@@ -210,9 +199,8 @@
 
     <div id="toast-box"></div>
 
-    <!-- ==================== 1. YANGILANGAN CHUNON VA JOZIBALI MIJOZLAR MENYUSI ==================== -->
+    <!-- ==================== 1. MIJOZLAR MENYUSI ==================== -->
     <div id="client-screen">
-        <!-- Top Navbar -->
         <nav class="client-navbar">
             <a href="#" class="brand-badge">
                 <div class="brand-logo-circle">🍽️</div>
@@ -226,11 +214,10 @@
             </button>
         </nav>
 
-        <!-- Hero Banner -->
         <header class="client-hero">
             <span class="hero-tag">🔥 Issiq va Halol Taomlar</span>
             <h1 class="hero-title">Mazali milliy taomlarni uyingizga buyurtma qiling!</h1>
-            <p class="hero-p">To‘yimli osh, shirador shashliklar va issiq sho‘rvalar. Buyurtmangizni 30-40 daqiqa ichida yetkazib beramiz.</p>
+            <p class="hero-p">To‘yimli osh, shirador shashliklar, tansiq qozon kabob va sho‘rvalar. Buyurtmangizni 30-40 daqiqa ichida yetkazib beramiz.</p>
             <div class="hero-perks">
                 <span class="hero-perk-item">⏱ 30-45 daqiqa yetkazish</span>
                 <span class="hero-perk-item">⚡ Issiq holda yetkazish</span>
@@ -239,12 +226,13 @@
             </div>
         </header>
 
-        <!-- Kategoriya va Qidiruv Boshqaruvi -->
         <div class="catalog-controls">
             <div class="category-scroll" id="client-cat-bar">
                 <button class="cat-chip active" onclick="filterClientCat('Barchasi')">Barchasi</button>
                 <button class="cat-chip" onclick="filterClientCat('Issiq taomlar')">🍲 Issiq taomlar</button>
                 <button class="cat-chip" onclick="filterClientCat('Mangal')">🍢 Mangal & Shashlik</button>
+                <button class="cat-chip" onclick="filterClientCat('Xamir taomlar')">🥟 Xamir taomlar</button>
+                <button class="cat-chip" onclick="filterClientCat('Salatlar')">🥗 Salatlar</button>
                 <button class="cat-chip" onclick="filterClientCat('Bar')">🫖 Ichimliklar</button>
             </div>
             <div class="search-box">
@@ -253,14 +241,11 @@
             </div>
         </div>
 
-        <!-- Asosiy menyu va Savatcha layouti -->
         <div class="client-layout">
-            <!-- Taomlar Gridi -->
             <main>
                 <div class="food-grid" id="client-food-grid"></div>
             </main>
 
-            <!-- O'ng tomondagi Savatcha va Buyurtma formasi -->
             <aside>
                 <div class="cart-sticky-box">
                     <div class="cart-head">
@@ -276,11 +261,10 @@
 
                     <div class="cart-calc-box">
                         <div class="cart-calc-row"><span>Taomlar narxi:</span> <span id="client-subtotal">0 so'm</span></div>
-                        <div class="cart-calc-row"><span>Yetkazib berish (Dostavka):</span> <span style="color:var(--green); font-weight:700;">10 000 so'm</span></div>
+                        <div class="cart-calc-row"><span>Yetkazib berish:</span> <span style="color:var(--green); font-weight:700;">10 000 so'm</span></div>
                         <div class="cart-calc-row total"><span>Jami to'lov:</span> <span id="client-cart-total" style="color:var(--primary);">0 so'm</span></div>
                     </div>
 
-                    <!-- Buyurtma ma'lumotlari -->
                     <div class="checkout-form">
                         <div>
                             <label class="form-label">Ismingiz *</label>
@@ -291,7 +275,7 @@
                             <input type="tel" id="order-cust-phone" class="form-input" placeholder="+998 (90) 000-00-00">
                         </div>
                         <div>
-                            <label class="form-label">Yetkazish manzili (ko'cha, uy, xonadon) *</label>
+                            <label class="form-label">Yetkazish manzili *</label>
                             <textarea id="order-cust-addr" class="form-input" rows="2" placeholder="Masalan: Mustaqillik ko'chasi 45-uy"></textarea>
                         </div>
                         <div>
@@ -311,7 +295,7 @@
         </div>
     </div>
 
-    <!-- ==================== 2. XODIMLAR LOGIN EKRANI ==================== -->
+    <!-- ==================== 2. LOGIN EKRANI ==================== -->
     <div id="auth-screen">
         <div class="login-wrap">
             <div class="login-card">
@@ -329,7 +313,10 @@
     <div id="app-screen">
         <aside class="sidebar">
             <div class="logo-box">RestaurantOS</div>
-            <div class="nav-link active" onclick="switchNav('dash', this)"><span>📊 Boshqaruv</span></div>
+            <div class="nav-link active" onclick="switchNav('dash', this)">
+                <span>📊 Boshqaruv</span>
+                <span id="nav-incoming-badge" class="nav-badge-kds" style="display:none; background:var(--primary);">0</span>
+            </div>
             
             <div class="nav-link" id="nav-hall-btn" onclick="switchNav('hall', this)">
                 <span>🛎 Stollar & Kassa</span>
@@ -358,14 +345,29 @@
             </header>
 
             <div class="workspace">
-                <!-- 1. DASHBOARD -->
+                <!-- 1. DASHBOARD VA YANGI BUYURTMALAR RO'YXATI -->
                 <div id="view-dash" class="view-panel active">
+                    <!-- Yangi kelgan dostavkalar kartochkasi -->
+                    <div id="incoming-deliveries-container" style="display:none; margin-bottom:20px;">
+                        <div class="panel-box" style="border: 2px solid var(--primary); background:#fffaf0;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h3 style="margin:0; color:var(--primary); display:flex; align-items:center; gap:8px;">
+                                    <span>🚗 Yangi Kelgan Onlayn Buyurtmalar (Dostavka)</span>
+                                    <span class="nav-badge-kds" id="incoming-count-badge" style="background:var(--primary);">0</span>
+                                </h3>
+                                <button class="btn-login" style="padding:4px 10px; font-size:11px;" onclick="switchNav('hall', document.getElementById('nav-hall-btn'))">Kassada ko'rish ➔</button>
+                            </div>
+                            <div id="incoming-deliveries-list" style="display:grid; gap:10px; margin-top:12px;"></div>
+                        </div>
+                    </div>
+
                     <div class="dash-metrics">
                         <div class="metric-card"><span>Bugungi Tushum</span><b id="dash-rev">0 so'm</b></div>
                         <div class="metric-card"><span>Buyurtmalar soni</span><b id="dash-orders-cnt">0 ta</b></div>
                         <div class="metric-card"><span>Band stollar & Dostavka</span><b id="dash-busy-tbls">0 ta</b></div>
                         <div class="metric-card"><span>O'rtacha chek</span><b id="dash-avg-bill">0 so'm</b></div>
                     </div>
+
                     <div class="panel-box">
                         <h3>So'nggi yopilgan buyurtmalar</h3>
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
@@ -379,7 +381,7 @@
                     </div>
                 </div>
 
-                <!-- 2. STOLLAR VA KASSA (DOSTAVKA BILAN) -->
+                <!-- 2. STOLLAR VA KASSA -->
                 <div id="view-hall" class="view-panel">
                     <div class="hall-grid">
                         <div class="panel-box">
@@ -404,7 +406,7 @@
                                 <button class="btn-split-bill" style="padding:6px 8px; font-size:11px; flex:1;" onclick="openSplitBillModal()">✂️ Bo'lib to'lash</button>
                             </div>
 
-                            <div id="cur-delivery-info-box" style="display:none; background:#f5f3ff; border:1px solid #c4b5fd; padding:8px; border-radius:6px; font-size:12px;"></div>
+                            <div id="cur-delivery-info-box" style="display:none; background:#f5f3ff; border:1px solid #c4b5fd; padding:10px; border-radius:8px; font-size:13px;"></div>
 
                             <div class="order-items-box" id="cur-order-items"></div>
 
@@ -423,7 +425,7 @@
                                 <b style="font-size:18px; color:var(--ink);" id="cur-total-price">0 so'm</b>
                             </div>
 
-                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taom tayyor (Kuryer/Mijozga topshirildi)</button>
+                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taom tayyor (Topshirildi)</button>
                             <button class="btn-action-wide btn-kds-send" onclick="sendOrderToKitchenDirect()">👨‍🍳 Oshxonaga yuborish</button>
                             <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">Hisobni yopish</button>
                         </div>
@@ -455,6 +457,8 @@
                             <button class="zone-pill active" onclick="setKdsFilter('Barchasi')">Barchasi</button>
                             <button class="zone-pill" onclick="setKdsFilter('Issiq taomlar')">Issiq taomlar</button>
                             <button class="zone-pill" onclick="setKdsFilter('Mangal')">Mangal</button>
+                            <button class="zone-pill" onclick="setKdsFilter('Xamir taomlar')">Xamir taomlar</button>
+                            <button class="zone-pill" onclick="setKdsFilter('Salatlar')">Salatlar</button>
                             <button class="zone-pill" onclick="setKdsFilter('Bar')">Bar</button>
                         </div>
                         <div class="kds-grid" id="kds-cards-container" style="margin-top:14px;"></div>
@@ -468,7 +472,7 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                    <th style="padding:6px;">Taom nomi</th><th>Sex</th><th>Narxi</th><th style="text-align:right;">Holati</th>
+                                    <th style="padding:6px;">Rasm</th><th>Taom nomi</th><th>Sex / Toifa</th><th>Narxi</th><th style="text-align:right;">Holati</th>
                                 </tr>
                             </thead>
                             <tbody id="quick-menu-rows"></tbody>
@@ -502,22 +506,30 @@
                     </div>
 
                     <div id="admin-settings-content" style="display:none; gap:20px;">
+                        <!-- TAOM QO'SHISH -->
                         <div class="panel-box">
-                            <h3>🍲 Menyuni boshqarish (Qo'shish / O'chirish)</h3>
-                            <div style="display:flex; gap:8px; margin:8px 0; flex-wrap:wrap;">
-                                <input type="text" id="adm-new-food-name" placeholder="Taom nomi" style="flex:2; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
-                                <select id="adm-new-food-dept" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
+                            <h3>🍲 Menyuga yangi taom qo'shish</h3>
+                            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:8px; margin:8px 0;">
+                                <input type="text" id="adm-new-food-name" placeholder="Taom nomi (masalan: Qozon kabob)" class="login-input">
+                                <select id="adm-new-food-dept" class="login-input">
                                     <option value="Issiq taomlar">Issiq taomlar</option>
-                                    <option value="Mangal">Mangal</option>
-                                    <option value="Bar">Bar</option>
+                                    <option value="Mangal">Mangal & Shashlik</option>
+                                    <option value="Xamir taomlar">Xamir taomlar</option>
+                                    <option value="Salatlar">Salatlar</option>
+                                    <option value="Bar">Bar (Ichimliklar)</option>
                                 </select>
-                                <input type="number" id="adm-new-food-price" placeholder="Narxi (1 pors)" style="flex:1; padding:8px; border:1.5px solid var(--line); border-radius:6px;">
-                                <button class="btn-login" onclick="adminAddFood()">+ Qo'shish</button>
+                                <input type="number" id="adm-new-food-price" placeholder="Narxi (so'm)" class="login-input">
                             </div>
-                            <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                                <input type="text" id="adm-new-food-img" placeholder="Rasm havolasi (URL - https://...)" class="login-input">
+                                <input type="text" id="adm-new-food-desc" placeholder="Taom tavsifi (masalan: Mayin mol go'shtidan)" class="login-input">
+                            </div>
+                            <button class="btn-login" style="width:100%; margin-top:8px;" onclick="adminAddFood()">+ Menyuga Qo'shish</button>
+
+                            <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:14px;">
                                 <thead>
                                     <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                        <th style="padding:6px;">Taom</th><th>Sex</th><th>Narx</th><th style="text-align:right;">Amallar</th>
+                                        <th style="padding:6px;">Taom</th><th>Sex / Toifa</th><th>Narx</th><th style="text-align:right;">Amallar</th>
                                     </tr>
                                 </thead>
                                 <tbody id="adm-menu-rows"></tbody>
@@ -551,7 +563,7 @@
         </main>
     </div>
 
-    <!-- MODAL: TO'LOV VA QULAY ARALASH TO'LOV -->
+    <!-- MODAL: TO'LOV -->
     <div class="modal-mask" id="modal-pay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -668,14 +680,22 @@
             menu: [
                 { name: 'Osh (Choyxona)', price: 35000, dept: 'Issiq taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=400&q=80', desc: "To'yona uslubda damlangan sara go'shtli issiq palov" },
                 { name: 'Mol go\'shti Shashlik', price: 18000, dept: 'Mangal', isStopped: false, img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80', desc: "Ko'mir taftida pishirilgan yumshoq va sersuv go'sht" },
+                { name: 'Qozon kabob', price: 42000, dept: 'Issiq taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80', desc: "Qovurilgan kartoshka va yumshoq go'shtli tansiq taom" },
+                { name: 'Uyg\'ur Lag\'mon', price: 32000, dept: 'Xamir taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=400&q=80', desc: "Qo'lda cho'zilgan xamir, shirador say va go'sht bilan" },
                 { name: 'Katta Sho\'rva', price: 30000, dept: 'Issiq taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80', desc: "Katta ilikli suyak va yangi sabzavotlar bilan tayyorlangan" },
-                { name: 'Ko\'k Choy (Choynakda)', price: 5000, dept: 'Bar', isStopped: false, img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80', desc: "Limon va novvot bilan damlangan xushbo'y choy" }
+                { name: 'Tandir Somsa', price: 12000, dept: 'Xamir taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80', desc: "Qarsildoq xamir, mayin mol go'shti va piyozli" },
+                { name: 'Manti (5 dona)', price: 28000, dept: 'Xamir taomlar', isStopped: false, img: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80', desc: "Bug'da pishirilgan mayin xamirli to'yimli manti" },
+                { name: 'Achichuk salati', price: 12000, dept: 'Salatlar', isStopped: false, img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: "Yangi pomidor, bodring, piyoz va ko'katlar aralashmasi" },
+                { name: 'Ko\'k Choy (Choynakda)', price: 5000, dept: 'Bar', isStopped: false, img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80', desc: "Limon va novvot bilan damlangan xushbo'y choy" },
+                { name: 'Moxito (Klassik)', price: 18000, dept: 'Bar', isStopped: false, img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80', desc: "Yalpiz, laym va muz bilan tetiklantiruvchi ichimlik" }
             ],
             stock: [
-                { name: "Go'sht", qty: 25.0, unit: "kg" },
+                { name: "Go'sht", qty: 35.0, unit: "kg" },
                 { name: "Guruch", qty: 30.0, unit: "kg" },
-                { name: "Yog'", qty: 15.0, unit: "L" },
-                { name: "Sabzi", qty: 20.0, unit: "kg" },
+                { name: "Yog'", qty: 20.0, unit: "L" },
+                { name: "Sabzi", qty: 25.0, unit: "kg" },
+                { name: "Un", qty: 40.0, unit: "kg" },
+                { name: "Kartoshka", qty: 30.0, unit: "kg" },
                 { name: "Choy (paket)", qty: 100, unit: "dona" }
             ],
             history: []
@@ -684,40 +704,89 @@
         var recipeMap = {
             "Osh (Choyxona)": [ { item: "Guruch", qty: 0.2 }, { item: "Go'sht", qty: 0.2 }, { item: "Yog'", qty: 0.05 }, { item: "Sabzi", qty: 0.15 } ],
             "Mol go'shti Shashlik": [ { item: "Go'sht", qty: 0.25 } ],
+            "Qozon kabob": [ { item: "Go'sht", qty: 0.25 }, { item: "Kartoshka", qty: 0.2 } ],
+            "Uyg'ur Lag'mon": [ { item: "Un", qty: 0.15 }, { item: "Go'sht", qty: 0.15 } ],
             "Katta Sho'rva": [ { item: "Go'sht", qty: 0.2 }, { item: "Sabzi", qty: 0.1 } ],
+            "Tandir Somsa": [ { item: "Un", qty: 0.1 }, { item: "Go'sht", qty: 0.08 } ],
+            "Manti (5 dona)": [ { item: "Un", qty: 0.15 }, { item: "Go'sht", qty: 0.15 } ],
             "Ko'k Choy (Choynakda)": [ { item: "Choy (paket)", qty: 1 } ]
         };
 
+        // BALAND VA ANIQ QO'NG'IROQ OVOZI (2 MARTA ZARB BILAN)
         function playAlertSound() {
             try {
                 var ctx = new (window.AudioContext || window.webkitAudioContext)();
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.6);
+                
+                // 1-signal
+                var osc1 = ctx.createOscillator();
+                var gain1 = ctx.createGain();
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc1.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+                gain1.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start();
+                osc1.stop(ctx.currentTime + 0.4);
+
+                // 2-signal (takroriy baland)
+                setTimeout(function(){
+                    try {
+                        var osc2 = ctx.createOscillator();
+                        var gain2 = ctx.createGain();
+                        osc2.type = 'triangle';
+                        osc2.frequency.setValueAtTime(783.99, ctx.currentTime); // G5
+                        osc2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15); // D6
+                        gain2.gain.setValueAtTime(0.5, ctx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+                        osc2.connect(gain2);
+                        gain2.connect(ctx.destination);
+                        osc2.start();
+                        osc2.stop(ctx.currentTime + 0.6);
+                    } catch(e){}
+                }, 400);
+
             } catch (e) {}
         }
 
-        function showNotification(text) {
+        // LOYIHA ICHIDAGI TO'LIQ VA ANIQ BILDIRISHNOMA DARCHASI
+        function showRichInAppNotification(orderData) {
             playAlertSound();
             var box = document.getElementById('toast-box');
             var toast = document.createElement('div');
             toast.className = 'toast-item';
-            toast.innerHTML = '<b>🔔 XABARNOMA:</b><br>' + text;
+
+            var itemsHtml = '';
+            orderData.items.forEach(function(it){
+                itemsHtml += '• <b>' + it.name + '</b> &times; ' + it.qty + ' ta<br>';
+            });
+
+            toast.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:6px; margin-bottom:8px;">' +
+                '<b style="color:#4ade80; font-size:14px;">🚗 YANGI ONLAYN BUYURTMA</b>' +
+                '<button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="font-size:13px; line-height:1.5;">' +
+                '👤 <b>Mijoz:</b> ' + orderData.name + '<br>' +
+                '📞 <b>Tel:</b> <a href="tel:'+orderData.phone+'" style="color:#38bdf8; text-decoration:none; font-weight:700;">' + orderData.phone + '</a><br>' +
+                '📍 <b>Manzil:</b> ' + orderData.address + '<br>' +
+                '💳 <b>To\'lov:</b> ' + orderData.payMethod + '<br>' +
+                '<div style="background:rgba(255,255,255,0.08); padding:6px 8px; border-radius:6px; margin:6px 0;">' + itemsHtml + '</div>' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">' +
+                    '<b style="font-size:15px; color:#facc15;">Jami: ' + orderData.total.toLocaleString() + ' so\'m</b>' +
+                    '<button class="btn-login" style="padding:6px 12px; font-size:12px;" onclick="openDeliveryFromDash(\''+orderData.tableKey+'\'); this.parentElement.parentElement.parentElement.remove();">Ochish ➔</button>' +
+                '</div>' +
+            '</div>';
+
             box.appendChild(toast);
 
             setTimeout(function() {
-                toast.style.transition = '0.4s';
-                toast.style.opacity = '0';
-                setTimeout(function() { toast.remove(); }, 400);
-            }, 6000);
+                if (toast.parentElement) {
+                    toast.style.transition = '0.5s';
+                    toast.style.opacity = '0';
+                    setTimeout(function() { toast.remove(); }, 500);
+                }
+            }, 15000); // 15 soniya ekranda turadi
         }
 
         /* NAVIGATION & SCREENS */
@@ -795,7 +864,7 @@
 
         function loadStorage() {
             try {
-                var d = localStorage.getItem('ros_delivery_v2');
+                var d = localStorage.getItem('ros_delivery_v4');
                 if (d) {
                     var parsed = JSON.parse(d);
                     if (parsed.tables) state.tables = parsed.tables;
@@ -821,7 +890,7 @@
 
         function saveStorage() {
             try {
-                localStorage.setItem('ros_delivery_v2', JSON.stringify({
+                localStorage.setItem('ros_delivery_v4', JSON.stringify({
                     tables: state.tables,
                     orders: state.orders,
                     history: state.history,
@@ -853,9 +922,18 @@
             } else {
                 rh.style.display = 'none';
             }
+
+            var delivOrdersCount = state.tables.filter(function(t){ return t.zone === 'Dostavka' && (state.orders[t.key]||[]).length > 0; }).length;
+            var inb = document.getElementById('nav-incoming-badge');
+            if (delivOrdersCount > 0) {
+                inb.innerText = delivOrdersCount;
+                inb.style.display = 'inline-block';
+            } else {
+                inb.style.display = 'none';
+            }
         }
 
-        /* ==================== A. YANGI MIJOZLAR MENYUSI ==================== */
+        /* ==================== A. MIJOZLAR MENYUSI ==================== */
         function filterClientCat(cat) {
             state.clientCatFilter = cat;
             document.querySelectorAll('#client-cat-bar .cat-chip').forEach(function(b){
@@ -897,14 +975,14 @@
                 }
 
                 card.innerHTML = '<div class="food-img-wrap">' +
-                    '<img src="' + defImg + '" alt="' + item.name + '" class="food-img">' +
+                    '<img src="' + defImg + '" alt="' + item.name + '" class="food-img" onerror="this.src=\'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80\'">' +
                     '<span class="food-badge-dept">' + item.dept + '</span>' +
                     (isStopped ? '<div class="food-badge-stop">Tugagan (Stop)</div>' : '') +
                 '</div>' +
                 '<div class="food-info">' +
                     '<div>' +
                         '<h3 class="food-title">' + item.name + '</h3>' +
-                        '<p style="margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.4;">' + (item.desc || "A'lo sifatli ingredientlardan yangi tayyorlangan.") + '</p>' +
+                        '<p style="margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.4;">' + (item.desc || "Yangi tansiq masalliqlardan tayyorlangan.") + '</p>' +
                     '</div>' +
                     '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">' +
                         '<span class="food-price">' + item.price.toLocaleString() + ' so\'m</span>' +
@@ -972,6 +1050,7 @@
             renderClientCart();
         }
 
+        // ONLAYN BUYURTMA BERISH (TIZIMNING O'ZIGA ANIQ VA TO'LIQ KELISHI)
         function submitOnlineDeliveryOrder() {
             if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh! Iltimos, taom tanlang.");
             var name = document.getElementById('order-cust-name').value.trim();
@@ -985,6 +1064,13 @@
             var nextNum = deliveryCount + 1;
             var key = 'Dostavka-' + nextNum;
 
+            var dNow = new Date();
+            var curTimeStr = dNow.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+
+            var subtotalSum = 0;
+            state.clientCart.forEach(function(ci){ subtotalSum += (ci.price * ci.qty); });
+            var grandTotalSum = subtotalSum + 10000;
+
             state.tables.push({ key: key, zone: 'Dostavka', number: nextNum });
             state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
             state.tableWaiters[key] = (state.zoneWaiters['Dostavka'] || ['Kuryer'])[0];
@@ -993,17 +1079,16 @@
                 phone: phone, 
                 address: addr, 
                 payMethod: pMethod,
-                time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) 
+                time: curTimeStr 
             };
 
-            var d = new Date();
             state.kdsTickets.unshift({
                 id: Date.now(),
                 tableKey: key,
                 zone: 'Dostavka',
                 tableNum: nextNum,
                 waiter: state.tableWaiters[key],
-                time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+                time: curTimeStr,
                 items: JSON.parse(JSON.stringify(state.clientCart)),
                 status: 'waiting',
                 isDelivery: true
@@ -1011,14 +1096,25 @@
 
             saveStorage();
 
+            // TIZIM ICHIDA TO'LIQ BILDIRISHNOMA CHIQARISH VA QO'NG'IROQ CHALISH
+            showRichInAppNotification({
+                tableKey: key,
+                name: name,
+                phone: phone,
+                address: addr,
+                payMethod: pMethod,
+                items: JSON.parse(JSON.stringify(state.clientCart)),
+                total: grandTotalSum
+            });
+
+            // Savatchani tozalash
             state.clientCart = [];
             document.getElementById('order-cust-name').value = '';
             document.getElementById('order-cust-phone').value = '';
             document.getElementById('order-cust-addr').value = '';
             renderClientCart();
 
-            showNotification("🚗 Yangi onlayn buyurtma qabul qilindi! (" + name + " - " + addr + ")");
-            alert("Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi va oshxonaga uzatildi. Tez orada siz bilan bog'lanamiz!");
+            alert("Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi va tizimga uzatildi!");
         }
 
         /* ==================== B. XODIMLAR VA KASSA QISMI ==================== */
@@ -1035,6 +1131,57 @@
             var avg = state.history.length > 0 ? Math.round(rev / state.history.length) : 0;
             document.getElementById('dash-avg-bill').innerText = avg.toLocaleString() + " so'm";
 
+            // XODIMLAR BO'LIMIGA KIRISHI BILAN ANIQ RO'YXAT CHIQISHI
+            var incomingDeliveries = state.tables.filter(function(t){
+                return t.zone === 'Dostavka' && (state.orders[t.key]||[]).length > 0;
+            });
+
+            var incCont = document.getElementById('incoming-deliveries-container');
+            var incList = document.getElementById('incoming-deliveries-list');
+            var incBadge = document.getElementById('incoming-count-badge');
+
+            if (incomingDeliveries.length > 0) {
+                incCont.style.display = 'block';
+                incBadge.innerText = incomingDeliveries.length + " ta";
+                incList.innerHTML = '';
+
+                incomingDeliveries.forEach(function(dt){
+                    var dInfo = state.deliveryDetails[dt.key] || { name: "Mijoz", phone: "-", address: "-", payMethod: "Naqd", time: "-" };
+                    var curOrds = state.orders[dt.key] || [];
+                    var totalSum = 10000;
+                    var itemsTxt = curOrds.map(function(ci){ return ci.name + ' (' + ci.qty + ' ta)'; }).join(', ');
+                    curOrds.forEach(function(ci){ totalSum += (ci.price * ci.qty); });
+
+                    var row = document.createElement('div');
+                    row.style.background = 'white';
+                    row.style.border = '1px solid #fed7aa';
+                    row.style.borderRadius = '10px';
+                    row.style.padding = '12px 16px';
+                    row.style.display = 'flex';
+                    row.style.justifyContent = 'space-between';
+                    row.style.alignItems = 'center';
+                    row.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)';
+
+                    row.innerHTML = '<div>' +
+                        '<div style="display:flex; align-items:center; gap:8px;">' +
+                            '<b style="font-size:15px; color:var(--ink);">🚗 Buyurtma #' + dt.number + ' — ' + dInfo.name + '</b>' +
+                            '<span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;">' + dInfo.payMethod + '</span>' +
+                            '<small style="color:var(--muted);">' + (dInfo.time || '') + '</small>' +
+                        '</div>' +
+                        '<div style="font-size:13px; margin:4px 0;">📞 <b>Tel:</b> ' + dInfo.phone + ' | 📍 <b>Manzil:</b> ' + dInfo.address + '</div>' +
+                        '<div style="font-size:12px; color:var(--muted);">🍲 <b>Taomlar:</b> ' + itemsTxt + '</div>' +
+                    '</div>' +
+                    '<div style="text-align:right;">' +
+                        '<b style="color:var(--primary); font-size:16px;">' + totalSum.toLocaleString() + ' so\'m</b><br>' +
+                        '<button class="btn-login" style="padding:6px 14px; font-size:12px; margin-top:6px; background:var(--primary);" onclick="openDeliveryFromDash(\''+dt.key+'\')">Kassada boshqarish ➔</button>' +
+                    '</div>';
+
+                    incList.appendChild(row);
+                });
+            } else {
+                incCont.style.display = 'none';
+            }
+
             var tbody = document.getElementById('dash-recent-rows');
             tbody.innerHTML = '';
             state.history.slice(0, 5).forEach(function(r){
@@ -1046,6 +1193,12 @@
                     '<td style="font-weight:700; color:var(--green);">' + r.total.toLocaleString() + ' so\'m</td>' +
                 '</tr>';
             });
+        }
+
+        function openDeliveryFromDash(key) {
+            state.selectedKey = key;
+            state.currentZone = 'Dostavka';
+            switchNav('hall', document.getElementById('nav-hall-btn'));
         }
 
         function renderHallZones() {
@@ -1152,12 +1305,20 @@
 
         function getCurrentCalculations() {
             var curOrders = state.orders[state.selectedKey] || [];
+            var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
+            var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
+
             var subtotal = 0;
             curOrders.forEach(function(o){ subtotal += (o.price * o.qty); });
-            var feePct = parseInt(document.getElementById('cur-fee-sel')?.value) || 10;
-            var feeAmt = Math.round(subtotal * (feePct / 100));
-            var grandTotal = subtotal + feeAmt;
-            return { subtotal: subtotal, feePct: feePct, feeAmt: feeAmt, total: grandTotal };
+
+            if (isDeliv) {
+                // Dostavka uchun 10 000 so'm yetkazish xizmati
+                return { subtotal: subtotal, feePct: 0, feeAmt: 10000, total: subtotal + 10000, isDeliv: true };
+            } else {
+                var feePct = parseInt(document.getElementById('cur-fee-sel')?.value) || 10;
+                var feeAmt = Math.round(subtotal * (feePct / 100));
+                return { subtotal: subtotal, feePct: feePct, feeAmt: feeAmt, total: subtotal + feeAmt, isDeliv: false };
+            }
         }
 
         function renderCurOrder() {
@@ -1172,7 +1333,12 @@
             if (isDeliv && state.deliveryDetails[state.selectedKey]) {
                 var dInfo = state.deliveryDetails[state.selectedKey];
                 delivBox.style.display = 'block';
-                delivBox.innerHTML = '<b>Mijoz:</b> ' + dInfo.name + ' | <b>Tel:</b> ' + dInfo.phone + '<br><b>Manzil:</b> ' + dInfo.address + '<br><b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br><small style="color:var(--muted);">Vaqt: ' + dInfo.time + '</small>';
+                delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtmachi ma\'lumotlari:</div>' +
+                    '👤 <b>Mijoz:</b> ' + dInfo.name + '<br>' +
+                    '📞 <b>Tel:</b> <a href="tel:'+dInfo.phone+'" style="color:var(--accent); font-weight:700;">' + dInfo.phone + '</a><br>' +
+                    '📍 <b>Manzil:</b> ' + dInfo.address + '<br>' +
+                    '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br>' +
+                    '<small style="color:var(--muted);">Qabul qilingan vaqt: ' + (dInfo.time || '-') + '</small>';
             } else {
                 delivBox.style.display = 'none';
             }
@@ -1190,7 +1356,11 @@
             });
 
             var calc = getCurrentCalculations();
-            document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Xizmat (' + calc.feePct + '%): ' + calc.feeAmt.toLocaleString() + ' so\'m';
+            if (calc.isDeliv) {
+                document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Yetkazish: 10 000 so\'m';
+            } else {
+                document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Xizmat (' + calc.feePct + '%): ' + calc.feeAmt.toLocaleString() + ' so\'m';
+            }
             document.getElementById('cur-total-price').innerText = calc.total.toLocaleString() + ' so\'m';
 
             var wSel = document.getElementById('cur-waiter-sel');
@@ -1252,7 +1422,7 @@
                 renderHallTables();
                 renderCurOrder();
                 if (document.getElementById('view-kds').style.display === 'block') renderKDS();
-                alert("Taom topshirildi deb belgilandi!");
+                alert("Topshirildi deb belgilandi!");
             }
         }
 
@@ -1290,9 +1460,9 @@
                 if (ticket.status === 'waiting') {
                     btnActionHtml = '<button class="btn-login" onclick="advanceKds('+ticket.id+', \'cooking\')">🔵 Pishirishni boshlash</button>';
                 } else if (ticket.status === 'cooking') {
-                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Zalga xabar)</button>';
+                    btnActionHtml = '<button class="btn-login" style="background:var(--green);" onclick="advanceKds('+ticket.id+', \'ready\')">🟢 Tayyor bo\'ldi (Xabar berish)</button>';
                 } else {
-                    btnActionHtml = '<span style="color:var(--green); font-weight:700;">🔔 Zalga xabar yuborilgan!</span>';
+                    btnActionHtml = '<span style="color:var(--green); font-weight:700;">🔔 Xabar berilgan!</span>';
                 }
 
                 card.innerHTML = '<div>' +
@@ -1314,7 +1484,8 @@
                 renderCurOrder();
 
                 if (newStatus === 'ready') {
-                    showNotification((t.isDelivery ? "🚗 DOSTAVKA #" + t.tableNum : t.zone + " #" + t.tableNum) + " taomlari TAYYOR bo'ldi!");
+                    playAlertSound();
+                    alert((t.isDelivery ? "🚗 DOSTAVKA #" + t.tableNum : t.zone + " #" + t.tableNum) + " taomlari TAYYOR bo'ldi!");
                 }
             }
         }
@@ -1356,15 +1527,30 @@
             var n = document.getElementById('adm-new-food-name').value.trim();
             var d = document.getElementById('adm-new-food-dept').value;
             var p = parseFloat(document.getElementById('adm-new-food-price').value);
+            var img = document.getElementById('adm-new-food-img').value.trim();
+            var desc = document.getElementById('adm-new-food-desc').value.trim();
+
             if (!n || !p) return alert("Nom va narxni to'liq kiriting!");
 
-            state.menu.push({ name: n, dept: d, price: p, isStopped: false, desc: "Yangi qo'shilgan tansiq taom" });
+            state.menu.push({ 
+                name: n, 
+                dept: d, 
+                price: p, 
+                isStopped: false, 
+                img: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80',
+                desc: desc || "Yangi tansiq taom" 
+            });
+
             saveStorage();
             renderAdminMenu();
             renderHallMenu();
             renderClientMenu();
+
             document.getElementById('adm-new-food-name').value = '';
             document.getElementById('adm-new-food-price').value = '';
+            document.getElementById('adm-new-food-img').value = '';
+            document.getElementById('adm-new-food-desc').value = '';
+            alert("Taom menyuga qo'shildi!");
         }
 
         function adminDelFood(idx) {
@@ -1427,8 +1613,10 @@
             var tbody = document.getElementById('quick-menu-rows');
             tbody.innerHTML = '';
             state.menu.forEach(function(item, idx){
+                var defImg = item.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
                 tbody.innerHTML += '<tr style="border-bottom:1px solid #eee;">' +
-                    '<td style="padding:6px;"><b>' + item.name + '</b></td>' +
+                    '<td style="padding:6px;"><img src="'+defImg+'" style="width:36px; height:36px; border-radius:6px; object-fit:cover;"></td>' +
+                    '<td><b>' + item.name + '</b></td>' +
                     '<td>' + item.dept + '</td>' +
                     '<td>' + item.price.toLocaleString() + ' so\'m</td>' +
                     '<td style="text-align:right;">' +
@@ -1731,7 +1919,6 @@
             a.click();
         }
 
-        // Dastlabki ishga tushirish
         loadStorage();
         renderClientMenu();
     </script>
