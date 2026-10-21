@@ -212,13 +212,28 @@
         .kds-card.ready { border-color: var(--green); background: #f0fdf4; }
         .kds-card.delivery-tag { border-top: 5px solid #8e44ad; }
 
+        /* XODIM REYTINGI KARTALARI */
+        .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .staff-tile-card { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; }
+        .staff-tile-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); border-color: var(--accent); }
+
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-item { background: #0f172a; color: white; padding: 16px 20px; border-radius: 10px; border-left: 6px solid var(--green); font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: auto; animation: pulse-ready 1.5s infinite; max-width: 380px; }
+
+        /* TERMOPRINTER PECHAT STILI */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-receipt, #printable-receipt * { visibility: visible; }
+            #printable-receipt { position: absolute; left: 0; top: 0; width: 80mm; padding: 10px; font-family: monospace; color: #000; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
     <div id="toast-box"></div>
+
+    <!-- YASHIRIN PECHAT CHEKI BLOKI -->
+    <div id="printable-receipt" style="display:none;"></div>
 
     <!-- ==================== 1. MIJOZLAR MENYUSI ==================== -->
     <div id="client-screen">
@@ -340,6 +355,10 @@
                         <div>
                             <label class="form-label">Yetkazish manzili *</label>
                             <textarea id="order-cust-addr" class="form-input" rows="2" placeholder="Masalan: Mustaqillik ko'chasi 45-uy"></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Buyurtmaga izoh (Ixtiyoriy)</label>
+                            <input type="text" id="order-cust-note" class="form-input" placeholder="Masalan: Achchiq qilmang, domofon kodi: 12">
                         </div>
                         <div>
                             <label class="form-label">To'lov usuli</label>
@@ -510,9 +529,16 @@
                             </div>
 
                             <!-- KASSA BOSQICHLARI -->
-                            <button class="btn-action-wide btn-kds-send" id="btn-confirm-kitchen" onclick="confirmAndSendKitchen()">✅ Tasdiqlash va Oshxonaga yuborish</button>
-                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">🚗 Kuryer yo'lga chiqdi deb belgilash</button>
-                            <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">💵 To'lovni qabul qilish va Yetkazildi qilish</button>
+                            <div style="display:grid; gap:6px;">
+                                <button class="btn-action-wide btn-kds-send" id="btn-confirm-kitchen" onclick="confirmAndSendKitchen()">✅ Tasdiqlash va Oshxonaga yuborish</button>
+                                <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">🚗 Kuryer yo'lga chiqdi deb belgilash</button>
+                                <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">💵 To'lovni qabul qilish va Yetkazildi qilish</button>
+                                
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn-split-bill" style="flex:1;" onclick="printCurrentBill()">🖨️ Chek chiqarish</button>
+                                    <button class="btn-split-bill" style="flex:1; color:var(--red); border-color:var(--red);" id="btn-cancel-delivery" onclick="cancelDeliveryOrder()">❌ Bekor qilish</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -572,7 +598,7 @@
                 <div id="view-staff" class="view-panel">
                     <div class="panel-box">
                         <h3>Ofitsiantlar va Kuryerlar faoliyati (Mijozlar bergan baho)</h3>
-                        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;" id="staff-cards-box"></div>
+                        <div class="staff-grid" id="staff-cards-box" style="margin-top:10px;"></div>
                     </div>
                 </div>
 
@@ -639,6 +665,19 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- MODAL: XODIMNING BATAFSIL STATISTIKASI -->
+    <div class="modal-mask" id="modal-staff-detail">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;" id="staff-detail-title">Xodim statistikasi</h3>
+                <button onclick="closeModal('modal-staff-detail')" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+            </div>
+            <div id="staff-detail-summary" style="margin:12px 0; background:var(--fill); padding:10px; border-radius:8px;"></div>
+            <h4 style="margin:10px 0 6px 0;">Bajargan buyurtmalari:</h4>
+            <div id="staff-detail-orders" style="max-height:260px; overflow-y:auto; display:grid; gap:8px;"></div>
+        </div>
     </div>
 
     <!-- MODAL: KASSA TO'LOV OYNASI -->
@@ -736,6 +775,7 @@
             clientGivenRating: 5,
             splitBillSelection: {},
             clientCart: [],
+            courierRoundRobinIdx: 0,
             tables: [
                 { key: 'Asosiy zal-1', zone: 'Asosiy zal', number: 1 },
                 { key: 'Asosiy zal-2', zone: 'Asosiy zal', number: 2 },
@@ -836,6 +876,7 @@
             });
 
             var discTxt = (orderData.discountAmt > 0) ? '<span style="color:#4ade80;">Chegirma ('+orderData.discountPct+'%): -'+orderData.discountAmt.toLocaleString()+' so\'m</span><br>' : '';
+            var noteTxt = orderData.note ? '<div style="background:#fef3c7; color:#92400e; padding:4px 6px; border-radius:4px; margin:4px 0; font-size:11px;">📝 <b>Izoh:</b> '+orderData.note+'</div>' : '';
 
             toast.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:6px; margin-bottom:8px;">' +
                 '<b style="color:#4ade80; font-size:14px;">🚗 YANGI BUYURTMA TUSHDI</b>' +
@@ -845,6 +886,8 @@
                 '👤 <b>Mijoz:</b> ' + orderData.name + '<br>' +
                 '📞 <b>Tel:</b> ' + orderData.phone + '<br>' +
                 '📍 <b>Manzil:</b> ' + orderData.address + '<br>' +
+                '🚴 <b>Biriktirilgan kuryer:</b> ' + (orderData.courier || '-') + '<br>' +
+                noteTxt +
                 '💳 <b>To\'lov:</b> ' + orderData.payMethod + '<br>' +
                 discTxt +
                 '<div style="background:rgba(255,255,255,0.08); padding:6px 8px; border-radius:6px; margin:6px 0;">' + itemsHtml + '</div>' +
@@ -904,6 +947,8 @@
                             name: dInfo.name || "Mijoz",
                             phone: dInfo.phone || "-",
                             address: dInfo.address || "-",
+                            courier: dInfo.courier || state.tableWaiters[latestDeliv.key] || "Kuryer",
+                            note: dInfo.note || "",
                             payMethod: dInfo.payMethod || "Naqd",
                             items: curOrds,
                             discountPct: dCalc.discountPct,
@@ -923,6 +968,7 @@
                 renderDashboard();
                 renderKDS();
                 renderStock();
+                renderStaff();
                 updateBadges();
             });
         }
@@ -941,7 +987,7 @@
             });
         }
 
-        // CHEGIRMA VA MOLIYAVIY HISOB-KITOB FUNKSIYASI (100k -> 2%, 200k -> 4%)
+        // CHEGIRMA VA MOLIYAVIY HISOB-KITOB (100k -> 2%, 200k -> 4%)
         function calcCartFinancials(itemsArray) {
             var rawSubtotal = 0;
             var totalCount = 0;
@@ -1024,6 +1070,9 @@
                     setClientRating(5);
                     document.getElementById('modal-client-rating').style.display = 'grid';
                 }
+            } else if (dInfo.status === 'cancelled') {
+                pStep.className = 'tracker-step';
+                msg.innerHTML = "❌ <b style='color:var(--red);'>Buyurtmangiz bekor qilindi.</b> Sabab: " + (dInfo.cancelReason || "Restoran bandligi sababli");
             }
         }
 
@@ -1242,7 +1291,6 @@
             renderClientCart();
         }
 
-        // SAVATCHANI CHEGIRMA VA DETALLI HISOB-KITOBLAR BILAN CHIQARISH
         function renderClientCart() {
             var box = document.getElementById('client-cart-items');
             if (!box) return;
@@ -1271,7 +1319,6 @@
             document.getElementById('client-cart-count').innerText = cCalc.totalCount;
             document.getElementById('client-raw-subtotal').innerText = cCalc.rawSubtotal.toLocaleString() + ' so\'m';
 
-            // Chegirma bo'lsa ko'rsatamiz
             var discLine = document.getElementById('client-discount-line');
             var netLine = document.getElementById('client-net-line');
 
@@ -1295,11 +1342,13 @@
             renderClientCart();
         }
 
+        // ONLAYN BUYURTMADA KURYERNI AVTOMATIK BIRIKTIRISH
         function submitOnlineDeliveryOrder() {
             if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh! Iltimos, taom tanlang.");
             var name = document.getElementById('order-cust-name').value.trim();
             var phone = document.getElementById('order-cust-phone').value.trim();
             var addr = document.getElementById('order-cust-addr').value.trim();
+            var note = document.getElementById('order-cust-note').value.trim();
             var pMethod = document.getElementById('order-cust-paymethod').value;
 
             if (!name || !phone || !addr) return alert("Iltimos, ismingiz, telefon va manzilingizni to'liq kiriting!");
@@ -1312,14 +1361,23 @@
             var curTimeStr = dNow.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
             var cCalc = calcCartFinancials(state.clientCart);
 
+            // Kuryerlarni navbat bilan avtomatik biriktirish
+            var couriers = state.zoneWaiters["Dostavka"] || ["Rustam (Kuryer)", "Davron (Kuryer)"];
+            var assignedCourier = couriers[state.courierRoundRobinIdx % couriers.length] || "Kuryer";
+            state.courierRoundRobinIdx++;
+
             state.tables.push({ key: key, zone: 'Dostavka', number: nextNum });
             state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
+            state.tableWaiters[key] = assignedCourier;
+
             if (!state.deliveryDetails) state.deliveryDetails = {};
             state.deliveryDetails[key] = { 
                 number: nextNum,
                 name: name, 
                 phone: phone, 
                 address: addr, 
+                note: note,
+                courier: assignedCourier,
                 payMethod: pMethod,
                 time: curTimeStr,
                 status: 'pending',
@@ -1340,10 +1398,12 @@
             document.getElementById('order-cust-name').value = '';
             document.getElementById('order-cust-phone').value = '';
             document.getElementById('order-cust-addr').value = '';
+            document.getElementById('order-cust-note').value = '';
             renderClientCart();
             renderClientTracker();
 
             var alertMsg = "Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi.\n\n" +
+                           "Kuryer: " + assignedCourier + "\n" +
                            "Taomlar: " + cCalc.rawSubtotal.toLocaleString() + " so'm\n" +
                            (cCalc.discountAmt > 0 ? ("Chegirma (" + cCalc.discountPct + "%): -" + cCalc.discountAmt.toLocaleString() + " so'm\n") : "") +
                            "Yetkazib berish: 10 000 so'm\n" +
@@ -1393,6 +1453,7 @@
                     }
 
                     var discNote = (dCalc.discountAmt > 0) ? '<span style="color:var(--green); font-weight:700;">Chegirma ('+dCalc.discountPct+'%): -'+dCalc.discountAmt.toLocaleString()+' so\'m</span>' : '';
+                    var noteTxt = dInfo.note ? '<div style="background:#fffbeb; padding:2px 6px; border-radius:4px; color:#b45309; font-size:11px; margin:2px 0;">📝 <b>Izoh:</b> '+dInfo.note+'</div>' : '';
 
                     var row = document.createElement('div');
                     row.style.background = 'white';
@@ -1410,7 +1471,8 @@
                             statusBadge +
                             '<small style="color:var(--muted);">' + (dInfo.time || '') + '</small>' +
                         '</div>' +
-                        '<div style="font-size:13px; margin:4px 0;">📞 <b>Tel:</b> ' + dInfo.phone + ' | 📍 <b>Manzil:</b> ' + dInfo.address + '</div>' +
+                        '<div style="font-size:13px; margin:4px 0;">📞 <b>Tel:</b> ' + dInfo.phone + ' | 📍 <b>Manzil:</b> ' + dInfo.address + ' | 🚴 <b>Kuryer:</b> ' + (dInfo.courier || state.tableWaiters[dt.key] || '-') + '</div>' +
+                        noteTxt +
                         '<div style="font-size:12px; color:var(--muted);">🍲 <b>Taomlar:</b> ' + itemsTxt + '</div>' +
                         (discNote ? '<div style="font-size:12px; margin-top:2px;">' + discNote + '</div>' : '') +
                     '</div>' +
@@ -1583,10 +1645,12 @@
             var delivBox = document.getElementById('cur-delivery-info-box');
             var btnConfirmKitchen = document.getElementById('btn-confirm-kitchen');
             var btnServeOrder = document.getElementById('btn-serve-order');
+            var btnCancelDelivery = document.getElementById('btn-cancel-delivery');
 
             if (isDeliv && state.deliveryDetails && state.deliveryDetails[state.selectedKey]) {
                 var dInfo = state.deliveryDetails[state.selectedKey];
                 delivBox.style.display = 'block';
+                btnCancelDelivery.style.display = 'block';
 
                 var stBadge = '';
                 if (dInfo.status === 'pending') stBadge = '<span style="color:var(--red); font-weight:800;">(Kassir tasdiqlashi lozim)</span>';
@@ -1594,12 +1658,18 @@
                 else if (dInfo.status === 'delivering') stBadge = '<span style="color:var(--accent); font-weight:800;">(Kuryer yo\'lda)</span>';
 
                 var discInfoTxt = (dInfo.discountAmt > 0) ? '<br>🎁 <b>Chegirma:</b> ' + dInfo.discountPct + '% (-' + dInfo.discountAmt.toLocaleString() + ' so\'m)' : '';
+                var noteInfoTxt = dInfo.note ? '<br>📝 <b>Mijoz izohi:</b> <span style="color:#b45309; font-weight:700;">' + dInfo.note + '</span>' : '';
+
+                // Xarita linki
+                var mapUrl = 'https://yandex.uz/maps/?text=' + encodeURIComponent(dInfo.address);
 
                 delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtma ma\'lumotlari: ' + stBadge + '</div>' +
                     '👤 <b>Mijoz:</b> ' + dInfo.name + '<br>' +
                     '📞 <b>Tel:</b> <a href="tel:'+dInfo.phone+'" style="color:var(--accent); font-weight:700;">' + dInfo.phone + '</a><br>' +
-                    '📍 <b>Manzil:</b> ' + dInfo.address + '<br>' +
-                    '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + discInfoTxt + '<br>' +
+                    '📍 <b>Manzil:</b> ' + dInfo.address + ' <a href="'+mapUrl+'" target="_blank" style="font-size:11px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; text-decoration:none; font-weight:700;">📍 Xaritada</a>' +
+                    noteInfoTxt +
+                    discInfoTxt + '<br>' +
+                    '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br>' +
                     '<small style="color:var(--muted);">Qabul qilingan vaqt: ' + (dInfo.time || '-') + '</small>';
 
                 btnConfirmKitchen.innerText = (dInfo.status === 'pending') ? "✅ Tasdiqlash va Oshxonaga yuborish" : "👨‍🍳 Oshxonaga qayta yuborish";
@@ -1607,6 +1677,7 @@
                 btnServeOrder.innerText = "🚗 Kuryer yo'lga chiqdi deb belgilash";
             } else {
                 delivBox.style.display = 'none';
+                btnCancelDelivery.style.display = 'none';
                 btnConfirmKitchen.innerText = "👨‍🍳 Oshxonaga yuborish";
                 btnServeOrder.style.display = isReady ? 'block' : 'none';
                 btnServeOrder.innerText = "✅ Mehmonlarga topshirildi";
@@ -1668,6 +1739,7 @@
             var waiter = state.tableWaiters[state.selectedKey] || 'Xodim';
             var d = new Date();
             var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
+            var dInfo = (isDeliv && state.deliveryDetails) ? state.deliveryDetails[state.selectedKey] : null;
 
             if (!state.kdsTickets) state.kdsTickets = [];
             state.kdsTickets.unshift({
@@ -1676,6 +1748,7 @@
                 zone: curTbl ? curTbl.zone : '-',
                 tableNum: curTbl ? curTbl.number : '-',
                 waiter: waiter,
+                note: dInfo ? (dInfo.note || '') : '',
                 time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
                 items: JSON.parse(JSON.stringify(cur)),
                 status: 'waiting',
@@ -1691,6 +1764,27 @@
             renderCurOrder();
             renderDashboard();
             alert("✅ Buyurtma tasdiqlandi va oshxona ekraniga (KDS) uzatildi!");
+        }
+
+        function cancelDeliveryOrder() {
+            var reason = prompt("Buyurtmani bekor qilish sababini kiriting (mijozga ko'rinadi):", "Taomlar tugagan yoki manzil yetkazish hududidan tashqarida");
+            if (!reason) return;
+
+            var key = state.selectedKey;
+            if (state.deliveryDetails && state.deliveryDetails[key]) {
+                state.deliveryDetails[key].status = 'cancelled';
+                state.deliveryDetails[key].cancelReason = reason;
+            }
+
+            state.tables = state.tables.filter(function(t){ return t.key !== key; });
+            delete state.orders[key];
+            state.selectedKey = state.tables[0] ? state.tables[0].key : 'Asosiy zal-1';
+
+            saveToFirebase();
+            renderHallTables();
+            renderCurOrder();
+            renderDashboard();
+            alert("Buyurtma bekor qilindi!");
         }
 
         function serveOrderToGuests() {
@@ -1709,6 +1803,51 @@
             renderCurOrder();
             if (document.getElementById('view-kds').style.display === 'block') renderKDS();
             alert(isDeliv ? "🚗 Kuryer yo'lga chiqdi deb belgilandi! Mijoz telefonida status o'zgardi." : "✅ Mehmonlarga topshirildi!");
+        }
+
+        // CHEK PECHAT QILISH (PRINTERGA CHIQARISH)
+        function printCurrentBill() {
+            var curOrders = state.orders[state.selectedKey] || [];
+            if (curOrders.length === 0) return alert("Chiqarish uchun buyurtma yo'q!");
+
+            var calc = getCurrentCalculations();
+            var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
+            var waiter = state.tableWaiters[state.selectedKey] || 'Xodim';
+            var d = new Date();
+
+            var printBox = document.getElementById('printable-receipt');
+            var itemsHtml = '';
+            curOrders.forEach(function(o){
+                itemsHtml += '<div style="display:flex; justify-content:space-between; margin:2px 0;">' +
+                    '<span>' + o.name + ' x ' + o.qty + '</span>' +
+                    '<span>' + (o.price * o.qty).toLocaleString() + '</span>' +
+                '</div>';
+            });
+
+            printBox.innerHTML = '<div style="text-align:center; margin-bottom:8px;">' +
+                '<h2 style="margin:0; font-size:16px;">RestaurantOS</h2>' +
+                '<div style="font-size:11px;">Milliy Taomlar & Dostavka</div>' +
+                '<div style="font-size:10px;">Tel: +998 (90) 123-45-67</div>' +
+                '<hr style="border:none; border-top:1px dashed #000; margin:6px 0;">' +
+            '</div>' +
+            '<div style="font-size:11px; margin-bottom:6px;">' +
+                'Vaqt: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + '<br>' +
+                'Joy: ' + (calc.isDeliv ? 'Dostavka #' + curTbl.number : curTbl.zone + ' #' + curTbl.number) + '<br>' +
+                'Xodim: ' + waiter + '<br>' +
+            '</div>' +
+            '<hr style="border:none; border-top:1px dashed #000; margin:6px 0;">' +
+            itemsHtml +
+            '<hr style="border:none; border-top:1px dashed #000; margin:6px 0;">' +
+            '<div style="display:flex; justify-content:space-between;"><span>Taomlar:</span><span>' + calc.subtotal.toLocaleString() + ' so\'m</span></div>' +
+            (calc.discountAmt > 0 ? ('<div style="display:flex; justify-content:space-between;"><span>Chegirma ('+calc.discountPct+'%):</span><span>-' + calc.discountAmt.toLocaleString() + ' so\'m</span></div>') : '') +
+            (calc.isDeliv ? ('<div style="display:flex; justify-content:space-between;"><span>Yetkazish:</span><span>10 000 so\'m</span></div>') : ('<div style="display:flex; justify-content:space-between;"><span>Xizmat ('+calc.feePct+'%):</span><span>' + calc.feeAmt.toLocaleString() + ' so\'m</span></div>')) +
+            '<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-top:6px;"><span>JAMI:</span><span>' + calc.total.toLocaleString() + ' so\'m</span></div>' +
+            '<hr style="border:none; border-top:1px dashed #000; margin:8px 0;">' +
+            '<div style="text-align:center; font-size:11px;">Xaridingiz uchun rahmat!<br>Yoqimli ishtaha!</div>';
+
+            printBox.style.display = 'block';
+            window.print();
+            printBox.style.display = 'none';
         }
 
         function setKdsFilter(dept) {
@@ -1742,6 +1881,8 @@
                 var itHtml = '';
                 filtered.forEach(function(i){ itHtml += '<div>• ' + i.name + ' &times; ' + i.qty + '</div>'; });
 
+                var noteHtml = ticket.note ? '<div style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; margin-bottom:6px;">📝 Izoh: ' + ticket.note + '</div>' : '';
+
                 var btnActionHtml = '';
                 if (ticket.status === 'waiting') {
                     btnActionHtml = '<button class="btn-login" onclick="advanceKds('+ticket.id+', \'cooking\')">🔵 Pishirishni boshlash</button>';
@@ -1754,6 +1895,7 @@
                 card.innerHTML = '<div>' +
                     '<h4>' + (ticket.isDelivery ? '🚗 DOSTAVKA #' + ticket.tableNum + ' <span style="font-size:11px; background:#fef08a; padding:2px 4px; border-radius:4px; color:#854d0e;">(Konteynerga)</span>' : ticket.zone + ' #' + ticket.tableNum) + '</h4>' +
                     '<small style="color:var(--muted);">' + ticket.time + ' (' + ticket.waiter + ')</small>' +
+                    noteHtml +
                     '<div style="margin:8px 0; font-size:13px;">' + itHtml + '</div>' +
                     '</div>' + btnActionHtml;
                 container.appendChild(card);
@@ -1878,6 +2020,7 @@
             saveToFirebase();
             renderAdminStaff();
             renderCurOrder();
+            renderStaff();
             document.getElementById('adm-staff-name').value = '';
         }
 
@@ -1887,6 +2030,7 @@
                 saveToFirebase();
                 renderAdminStaff();
                 renderCurOrder();
+                renderStaff();
             }
         }
 
@@ -2027,6 +2171,7 @@
             renderHallTables();
             renderCurOrder();
             renderDashboard();
+            renderStaff();
 
             alert("✅ To'lov qabul qilindi! Mijoz telefoniga «Yetkazildi» xabari va baholash oynasi darhol uzatildi.");
         }
@@ -2149,29 +2294,87 @@
             });
         }
 
+        // BARCHA XODIMLAR RO'YXATINI VA STATISTIKASINI CHIQARISH
         function renderStaff() {
             var b = document.getElementById('staff-cards-box');
+            if (!b) return;
             b.innerHTML = '';
+
+            // Barcha mavjud xodimlarni bazadan yig'ish
+            var allStaffNames = [];
+            for (var z in state.zoneWaiters) {
+                (state.zoneWaiters[z] || []).forEach(function(w){
+                    if (!allStaffNames.includes(w)) allStaffNames.push(w);
+                });
+            }
+
+            // Tarixdan tushum va yulduzlarni hisoblash
             var stats = {};
-            (state.history || []).forEach(function(h){
-                if (!stats[h.waiter]) stats[h.waiter] = { count: 0, stars: 0, ratedCount: 0, total: 0 };
-                stats[h.waiter].count++;
-                if (h.rating > 0) {
-                    stats[h.waiter].stars += h.rating;
-                    stats[h.waiter].ratedCount++;
-                }
-                stats[h.waiter].total += h.total;
+            allStaffNames.forEach(function(name){
+                stats[name] = { count: 0, stars: 0, ratedCount: 0, total: 0, orders: [] };
             });
 
-            for (var w in stats) {
-                var avg = stats[w].ratedCount > 0 ? (stats[w].stars / stats[w].ratedCount).toFixed(1) : "0.0";
-                b.innerHTML += '<div style="background:var(--card); border:2px solid var(--ink); border-radius:10px; padding:14px; min-width:200px;">' +
-                    '<b>👤 ' + w + '</b><br>' +
-                    '<span style="color:var(--yellow); font-weight:700;">★ ' + avg + ' (' + stats[w].stars + ' ta yulduz)</span><br>' +
-                    '<small>Buyurtmalar: ' + stats[w].count + ' ta</small><br>' +
-                    '<b>Tushum: ' + stats[w].total.toLocaleString() + ' so\'m</b>' +
-                '</div>';
+            (state.history || []).forEach(function(h){
+                var w = h.waiter || "Xodim";
+                if (!stats[w]) stats[w] = { count: 0, stars: 0, ratedCount: 0, total: 0, orders: [] };
+                stats[w].count++;
+                if (h.rating > 0) {
+                    stats[w].stars += h.rating;
+                    stats[w].ratedCount++;
+                }
+                stats[w].total += h.total;
+                stats[w].orders.push(h);
+            });
+
+            for (var name in stats) {
+                var s = stats[name];
+                var avg = s.ratedCount > 0 ? (s.stars / s.ratedCount).toFixed(1) : "0.0";
+                var isCourier = name.includes('Kuryer');
+
+                var card = document.createElement('div');
+                card.className = 'staff-tile-card';
+                card.onclick = (function(stName, stData){
+                    return function() { openStaffDetailModal(stName, stData); };
+                })(name, s);
+
+                card.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                    '<b style="font-size:15px; color:var(--ink);">' + (isCourier ? '🚴 ' : '👤 ') + name + '</b>' +
+                    '<span style="background:var(--fill); font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;">' + (isCourier ? 'Kuryer' : 'Ofitsiant') + '</span>' +
+                '</div>' +
+                '<div style="color:var(--yellow); font-weight:800; font-size:15px; margin:6px 0;">★ ' + avg + ' <small style="color:var(--muted); font-size:12px;">(' + s.stars + ' ta yulduz)</small></div>' +
+                '<div style="font-size:12px; color:var(--muted);">Buyurtmalar: <b>' + s.count + ' ta</b></div>' +
+                '<div style="font-size:13px; font-weight:800; color:var(--green); margin-top:4px;">Tushum: ' + s.total.toLocaleString() + ' so\'m</div>' +
+                '<div style="font-size:11px; color:var(--accent); margin-top:8px; text-align:right;">Batafsil ko\'rish ➔</div>';
+
+                b.appendChild(card);
             }
+        }
+
+        function openStaffDetailModal(name, data) {
+            document.getElementById('staff-detail-title').innerText = name + " — To'liq statistikasi";
+            var avg = data.ratedCount > 0 ? (data.stars / data.ratedCount).toFixed(1) : "0.0";
+
+            document.getElementById('staff-detail-summary').innerHTML = '<b>Jami tushum:</b> ' + data.total.toLocaleString() + ' so\'m<br>' +
+                '<b>Bajarilgan buyurtmalar:</b> ' + data.count + ' ta<br>' +
+                '<b>O\'rtacha mijoz bahosi:</b> ★ ' + avg + ' (' + data.ratedCount + ' ta mijoz baholagan)';
+
+            var ordBox = document.getElementById('staff-detail-orders');
+            ordBox.innerHTML = '';
+
+            if (data.orders.length === 0) {
+                ordBox.innerHTML = '<p style="color:var(--muted); font-size:12px;">Hozircha yopilgan buyurtmalar yo\'q.</p>';
+            } else {
+                data.orders.forEach(function(o){
+                    var starTxt = (o.rating > 0) ? (o.rating + ' ★') : 'Baholanmagan';
+                    ordBox.innerHTML += '<div style="background:white; border:1px solid var(--line); padding:8px 10px; border-radius:6px; font-size:12px;">' +
+                        '<div style="display:flex; justify-content:space-between;"><b>' + o.table + '</b> <span style="color:var(--yellow); font-weight:800;">' + starTxt + '</span></div>' +
+                        '<div style="color:var(--muted);">' + o.time + ' | ' + o.method + ' | ' + o.total.toLocaleString() + ' so\'m</div>' +
+                        '<div style="font-size:11px; margin-top:2px;">🍲 ' + o.items + '</div>' +
+                    '</div>';
+                });
+            }
+
+            document.getElementById('modal-staff-detail').style.display = 'grid';
         }
 
         function renderAllOrders() {
