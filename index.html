@@ -55,17 +55,18 @@
         .hero-perks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; font-size: 13px; font-weight: 600; }
         .hero-perk-item { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; backdrop-filter: blur(4px); }
 
-        /* MIJOZNING BUYURTMA STATUSI KARTASI */
+        /* JONLI KUZATUV TREKKERI */
         #client-order-tracker {
             display: none; background: #ffffff; border: 2px solid var(--accent); border-radius: 14px;
-            padding: 16px 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
+            padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
         }
         .tracker-steps { display: flex; justify-content: space-between; position: relative; margin-top: 14px; }
-        .tracker-step { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; color: var(--muted); z-index: 2; text-align: center; width: 22%; }
-        .tracker-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--fill); border: 2px solid var(--line); display: grid; place-items: center; margin-bottom: 4px; font-size: 12px; }
-        .tracker-step.active .tracker-dot { background: var(--accent); color: white; border-color: var(--accent); }
+        .tracker-step { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; color: var(--muted); z-index: 2; text-align: center; width: 22%; transition: 0.3s; }
+        .tracker-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--fill); border: 2px solid var(--line); display: grid; place-items: center; margin-bottom: 6px; font-size: 14px; }
+        .tracker-step.active .tracker-dot { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 0 10px rgba(2, 132, 199, 0.4); }
         .tracker-step.active { color: var(--ink); }
         .tracker-step.done .tracker-dot { background: var(--green); color: white; border-color: var(--green); }
+        .tracker-step.done { color: var(--green); }
 
         .catalog-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
         .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
@@ -192,9 +193,9 @@
 
         .btn-action-wide { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; }
         .btn-kds-send { background: var(--accent); color: white; }
-        .btn-close-bill { background: var(--yellow); color: white; }
+        .btn-close-bill { background: var(--green); color: white; }
         .btn-split-bill { background: var(--fill); border: 1.5px solid var(--accent); color: var(--accent); }
-        .btn-serve-done { display: none; width: 100%; background: var(--green); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; animation: pulse-ready 1.2s infinite; }
+        .btn-serve-done { display: none; width: 100%; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; }
 
         .kds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
         .kds-card { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
@@ -206,8 +207,8 @@
 
         .modal-mask { display: none; position: fixed; inset: 0; background: rgba(19, 35, 46, 0.6); z-index: 1000; place-items: center; padding: 20px; }
         .modal-box { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; width: 100%; max-width: 480px; padding: 20px; max-height: 85vh; overflow-y: auto; }
-        .rating-stars { display: flex; gap: 8px; font-size: 32px; justify-content: center; margin: 10px 0; cursor: pointer; user-select: none; }
-        .star { color: #cbd5e1; }
+        .rating-stars { display: flex; gap: 8px; font-size: 34px; justify-content: center; margin: 12px 0; cursor: pointer; user-select: none; }
+        .star { color: #cbd5e1; transition: color 0.2s; }
         .star.selected { color: var(--yellow); }
     </style>
 </head>
@@ -254,7 +255,7 @@
                     <span>Yetkazildi!</span>
                 </div>
             </div>
-            <div id="tracker-msg" style="margin-top:12px; font-size:12px; text-align:center; color:var(--accent); font-weight:700;">Buyurtmangiz kassa tomonidan ko'rib chiqilmoqda...</div>
+            <div id="tracker-msg" style="margin-top:14px; font-size:13px; text-align:center; color:var(--accent); font-weight:700;">Buyurtmangiz kassa tomonidan ko'rib chiqilmoqda...</div>
         </div>
 
         <header class="client-hero">
@@ -338,6 +339,29 @@
         </div>
     </div>
 
+    <!-- MIJOZ UCHUN BAHOLASH MODALI -->
+    <div class="modal-mask" id="modal-client-rating">
+        <div class="modal-box" style="text-align:center; border:2px solid var(--green);">
+            <div style="font-size:40px; margin-bottom:8px;">🎉</div>
+            <h3 style="margin:0; font-size:18px;">Buyurtmangiz yetkazildi!</h3>
+            <p style="font-size:13px; color:var(--muted); margin:6px 0 14px;">Taomlar sifati va yetkazib berish xizmatidan mamnunmisiz? Baho bering:</p>
+            
+            <div class="rating-stars" id="client-stars">
+                <span class="star" onclick="setClientRating(1)">★</span>
+                <span class="star" onclick="setClientRating(2)">★</span>
+                <span class="star" onclick="setClientRating(3)">★</span>
+                <span class="star" onclick="setClientRating(4)">★</span>
+                <span class="star" onclick="setClientRating(5)">★</span>
+            </div>
+
+            <div id="client-rating-note" style="font-size:12px; font-weight:700; color:var(--green); margin-bottom:14px;">Iltimos, yulduzcha tanlang!</div>
+
+            <button class="btn-login" style="width:100%; background:var(--green); font-size:15px; padding:12px;" onclick="submitClientRating()">
+                Baho berish va Yakunlash
+            </button>
+        </div>
+    </div>
+
     <!-- ==================== 2. LOGIN EKRANI ==================== -->
     <div id="auth-screen">
         <div class="login-wrap">
@@ -390,7 +414,6 @@
 
             <div class="workspace">
                 <div id="view-dash" class="view-panel active">
-                    <!-- KASSIRGA YANGI BUYURTMALAR KELISHI VA TASDIQLASH QISMI -->
                     <div id="incoming-deliveries-container" style="display:none; margin-bottom:20px;">
                         <div class="panel-box" style="border: 2px solid var(--primary); background:#fffaf0;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -416,7 +439,7 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Ofitsiant/Kuryer</th><th>To'lov</th><th>Summa</th>
+                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Ofitsiant/Kuryer</th><th>Mijoz bahosi</th><th>To'lov</th><th>Summa</th>
                                 </tr>
                             </thead>
                             <tbody id="dash-recent-rows"></tbody>
@@ -467,10 +490,10 @@
                                 <b style="font-size:18px; color:var(--ink);" id="cur-total-price">0 so'm</b>
                             </div>
 
-                            <!-- KASSIR BOSQICHLARI -->
+                            <!-- KASSA BOSQICHLARI -->
                             <button class="btn-action-wide btn-kds-send" id="btn-confirm-kitchen" onclick="confirmAndSendKitchen()">✅ Tasdiqlash va Oshxonaga yuborish</button>
-                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">✅ Taom tayyor (Kuryerga / Mehmonlarga berildi)</button>
-                            <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">Hisobni yopish</button>
+                            <button class="btn-serve-done" id="btn-serve-order" onclick="serveOrderToGuests()">🚗 Kuryer yo'lga chiqdi deb belgilash</button>
+                            <button class="btn-action-wide btn-close-bill" onclick="openPaymentModal()">💵 To'lovni qabul qilish va Yakunlash</button>
                         </div>
                     </div>
                 </div>
@@ -484,7 +507,7 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
                             <thead>
                                 <tr style="border-bottom:2px solid var(--ink); text-align:left;">
-                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Xodim</th><th>Baho</th><th>Taomlar</th><th>To'lov</th><th>Summa</th>
+                                    <th style="padding:6px;">Vaqt</th><th>Stol / Manzil</th><th>Xodim</th><th>Mijoz bahosi</th><th>Taomlar</th><th>To'lov</th><th>Summa</th>
                                 </tr>
                             </thead>
                             <tbody id="all-history-rows"></tbody>
@@ -529,7 +552,7 @@
 
                 <div id="view-staff" class="view-panel">
                     <div class="panel-box">
-                        <h3>Ofitsiantlar va Kuryerlar faoliyati</h3>
+                        <h3>Ofitsiantlar va Kuryerlar faoliyati (Mijozlar bergan baho)</h3>
                         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;" id="staff-cards-box"></div>
                     </div>
                 </div>
@@ -599,32 +622,21 @@
         </main>
     </div>
 
-    <!-- MODALLAR: TO'LOV, BO'LIB TO'LASH, KO'CHIRISH, BRON -->
+    <!-- MODAL: KASSA TO'LOV OYNASI (Admindan baho so'ralmaydi) -->
     <div class="modal-mask" id="modal-pay">
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="margin:0;">Hisobni yopish</h3>
+                <h3 style="margin:0;">To'lovni qabul qilish va Yopish</h3>
                 <button onclick="closeModal('modal-pay')" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
             </div>
             
-            <p style="font-size:16px; margin:12px 0 6px 0;">To'lov summasi: <b id="pay-modal-amount" style="color:var(--accent); font-size:20px;">0 so'm</b></p>
+            <p style="font-size:16px; margin:14px 0 10px 0;">To'lov summasi: <b id="pay-modal-amount" style="color:var(--accent); font-size:20px;">0 so'm</b></p>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:12px;">Xizmat va taom bahosini mijoz o'z telefonida mustaqil ravishda qo'yadi.</div>
 
-            <div style="text-align:center; background:var(--fill); padding:8px; border-radius:8px;">
-                <span style="font-size:12px; font-weight:700;">Xizmatni baholang:</span>
-                <div class="rating-stars" id="pay-stars">
-                    <span class="star" onclick="setPayRating(1)">★</span>
-                    <span class="star" onclick="setPayRating(2)">★</span>
-                    <span class="star" onclick="setPayRating(3)">★</span>
-                    <span class="star" onclick="setPayRating(4)">★</span>
-                    <span class="star" onclick="setPayRating(5)">★</span>
-                </div>
-                <small id="pay-rating-txt" style="color:var(--red); font-weight:700;">⚠️ Yulduzcha tanlang!</small>
-            </div>
-
-            <div style="display:grid; gap:8px; margin-top:14px;">
-                <button class="btn-login" onclick="execFullPay('Naqd')">💵 To'liq Naqd pul bilan yopish</button>
-                <button class="btn-login" style="background:#2980b9;" onclick="execFullPay('Karta')">💳 To'liq Karta bilan yopish</button>
-                <button class="btn-login" style="background:#8e44ad;" onclick="execFullPay('Payme')">📲 To'liq Payme bilan yopish</button>
+            <div style="display:grid; gap:8px;">
+                <button class="btn-login" onclick="execFullPay('Naqd')">💵 To'liq Naqd pul</button>
+                <button class="btn-login" style="background:#2980b9;" onclick="execFullPay('Karta')">💳 To'liq Karta</button>
+                <button class="btn-login" style="background:#8e44ad;" onclick="execFullPay('Payme')">📲 To'liq Payme / Click</button>
                 <button class="btn-split-bill" onclick="toggleSplitBox()">🔀 Aralash to'lov (Naqd + Karta)</button>
             </div>
 
@@ -645,6 +657,7 @@
         </div>
     </div>
 
+    <!-- MODAL: CHEKNI BO'LIB TO'LASH -->
     <div class="modal-mask" id="modal-split-bill">
         <div class="modal-box">
             <h3>✂️ Chekni bo'lib to'lash (Mehmon ulushi)</h3>
@@ -660,6 +673,7 @@
         </div>
     </div>
 
+    <!-- MODAL: KO'CHIRISH -->
     <div class="modal-mask" id="modal-transfer">
         <div class="modal-box">
             <h3>🔁 Bo'sh stolga ko'chirish</h3>
@@ -669,6 +683,7 @@
         </div>
     </div>
 
+    <!-- MODAL: BRON -->
     <div class="modal-mask" id="modal-reserve">
         <div class="modal-box">
             <h3>📅 Stolni bron qilish</h3>
@@ -699,7 +714,7 @@
             currentZone: 'Barchasi',
             currentKdsDept: 'Barchasi',
             clientCatFilter: 'Barchasi',
-            payRating: 0,
+            clientGivenRating: 5,
             splitBillSelection: {},
             clientCart: [],
             tables: [
@@ -802,7 +817,7 @@
             });
 
             toast.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:6px; margin-bottom:8px;">' +
-                '<b style="color:#4ade80; font-size:14px;">🚗 YANGI BUYURTMA KELDI</b>' +
+                '<b style="color:#4ade80; font-size:14px;">🚗 YANGI BUYURTMA TUSHDI</b>' +
                 '<button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">&times;</button>' +
             '</div>' +
             '<div style="font-size:13px; line-height:1.5;">' +
@@ -828,7 +843,7 @@
             }, 15000);
         }
 
-        // FIREBASE JONLI SINXRONIZATSIYA
+        // FIREBASE JONLI BOG'LANISH
         var isFirstSync = true;
         var prevOrdersCount = 0;
 
@@ -849,7 +864,6 @@
                     saveToFirebase();
                 }
 
-                // Kassada yangi kelgan buyurtmalar soni
                 var curOrdersCount = 0;
                 state.tables.forEach(function(t){
                     if (t.zone === 'Dostavka' && (state.orders[t.key]||[]).length > 0) curOrdersCount++;
@@ -902,7 +916,7 @@
             });
         }
 
-        // MIJOZ BUYURTMASI STATUSINI KUZATISH
+        // MIJOZNING TELEFONIDAGI BUYURTMA STATUSI VA BAHOLASH
         function renderClientTracker() {
             var myKey = localStorage.getItem('ros_my_delivery_key');
             var trackerBox = document.getElementById('client-order-tracker');
@@ -915,7 +929,7 @@
             var curTable = state.tables.find(function(t){ return t.key === myKey; });
 
             trackerBox.style.display = 'block';
-            document.getElementById('tracker-order-id').innerText = '#' + (curTable ? curTable.number : '');
+            document.getElementById('tracker-order-id').innerText = '#' + (curTable ? curTable.number : (dInfo.number || ''));
 
             var pStep = document.getElementById('tr-step-pending');
             var cStep = document.getElementById('tr-step-cooking');
@@ -931,23 +945,66 @@
             } else if (dInfo.status === 'cooking') {
                 pStep.className = 'tracker-step done';
                 cStep.className = 'tracker-step active';
-                msg.innerText = "👨‍🍳 Kassir buyurtmani tasdiqladi! Oshpazlar taomni tayyorlamoqda...";
+                msg.innerText = "👨‍🍳 Kassir buyurtmani tasdiqladi! Oshpazlar taomlarni tayyorlamoqda...";
             } else if (dInfo.status === 'delivering') {
                 pStep.className = 'tracker-step done';
                 cStep.className = 'tracker-step done';
                 dStep.className = 'tracker-step active';
-                msg.innerText = "🚗 Taom tayyor bo'ldi! Kuryer siz tomonga yo'lga chiqdi (" + (dInfo.courier || 'Kuryer') + ")";
+                msg.innerText = "🚗 Taomlar tayyor bo'ldi! Kuryer siz tomonga yo'lga chiqdi (" + (dInfo.courier || 'Kuryer') + ")";
             } else if (dInfo.status === 'delivered') {
                 pStep.className = 'tracker-step done';
                 cStep.className = 'tracker-step done';
                 dStep.className = 'tracker-step done';
                 doneStep.className = 'tracker-step done';
-                msg.innerText = "🎉 Buyurtma muvaffaqiyatli yetkazildi! Yoqimli ishtaha!";
-                setTimeout(function(){
-                    localStorage.removeItem('ros_my_delivery_key');
-                    trackerBox.style.display = 'none';
-                }, 20000);
+                msg.innerHTML = "🎉 <b style='color:var(--green);'>Buyurtma yetkazildi! Yoqimli ishtaha!</b>";
+
+                // Mijoz hali baho bermagan bo'lsa, baholash oynasini ochamiz
+                if (!dInfo.rated && !localStorage.getItem('ros_rated_' + myKey)) {
+                    setClientRating(5);
+                    document.getElementById('modal-client-rating').style.display = 'grid';
+                }
             }
+        }
+
+        function setClientRating(r) {
+            state.clientGivenRating = r;
+            document.querySelectorAll('#client-stars .star').forEach(function(s, idx){
+                s.classList.toggle('selected', idx < r);
+            });
+            var notes = {
+                1: "1 yulduz - Qoniqarsiz 😞",
+                2: "2 yulduz - O'rtacha 😐",
+                3: "3 yulduz - Yaxshi 🙂",
+                4: "4 yulduz - Juda yaxshi! 😊",
+                5: "5 yulduz - A'lo darajada! Mazali! 🌟"
+            };
+            document.getElementById('client-rating-note').innerText = notes[r];
+        }
+
+        function submitClientRating() {
+            var myKey = localStorage.getItem('ros_my_delivery_key');
+            if (myKey && state.deliveryDetails && state.deliveryDetails[myKey]) {
+                state.deliveryDetails[myKey].rated = true;
+                state.deliveryDetails[myKey].rating = state.clientGivenRating;
+
+                // Tarixdagi yozuvga mijoz qo'ygan bahoni yangilab qo'yamiz
+                var hist = (state.history || []).find(function(h){ return h.tableKey === myKey; });
+                if (hist) {
+                    hist.rating = state.clientGivenRating;
+                }
+
+                saveToFirebase();
+                localStorage.setItem('ros_rated_' + myKey, 'true');
+            }
+
+            document.getElementById('modal-client-rating').style.display = 'none';
+            alert("Katta rahmat! Sizning bahoyingiz qabul qilindi.");
+
+            setTimeout(function(){
+                localStorage.removeItem('ros_my_delivery_key');
+                var trackerBox = document.getElementById('client-order-tracker');
+                if (trackerBox) trackerBox.style.display = 'none';
+            }, 3000);
         }
 
         function openStaffLogin() {
@@ -1164,7 +1221,6 @@
             renderClientCart();
         }
 
-        // MIJOZ BUYURTMA BERGANDA — FAQAT KASSAGA BORADI (KDSGA BORMAYDI)
         function submitOnlineDeliveryOrder() {
             if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh! Iltimos, taom tanlang.");
             var name = document.getElementById('order-cust-name').value.trim();
@@ -1185,18 +1241,19 @@
             state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
             if (!state.deliveryDetails) state.deliveryDetails = {};
             state.deliveryDetails[key] = { 
+                number: nextNum,
                 name: name, 
                 phone: phone, 
                 address: addr, 
                 payMethod: pMethod,
                 time: curTimeStr,
-                status: 'pending' // Dastlab tasdiqlash kutilmoqda holatida
+                status: 'pending',
+                rated: false
             };
 
-            // Mijoz o'z buyurtmasini kuzatishi uchun brauzeriga saqlaymiz
             localStorage.setItem('ros_my_delivery_key', key);
+            localStorage.removeItem('ros_rated_' + key);
 
-            // Bulutga saqlash
             saveToFirebase();
 
             state.clientCart = [];
@@ -1222,7 +1279,6 @@
             var avg = (state.history || []).length > 0 ? Math.round(rev / state.history.length) : 0;
             document.getElementById('dash-avg-bill').innerText = avg.toLocaleString() + " so'm";
 
-            // Kutilayotgan yangi buyurtmalar (Tasdiqlanmagan yoki jarayondagi)
             var incomingDeliveries = state.tables.filter(function(t){
                 return t.zone === 'Dostavka' && (state.orders[t.key]||[]).length > 0;
             });
@@ -1247,7 +1303,7 @@
                     if (dInfo.status === 'pending') {
                         statusBadge = '<span style="background:#fee2e2; color:#b91c1c; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">⏳ KASSIR TASDIQLASHI KUTILMOQDA</span>';
                     } else if (dInfo.status === 'cooking') {
-                        statusBadge = '<span style="background:#fef08a; color:#854d0e; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">👨‍🍳 OSHXONADA TAYYORLANMOQDA</span>';
+                        statusBadge = '<span style="background:#fef08a; color:#854d0e; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">👨‍🍳 OSHXONADA</span>';
                     } else if (dInfo.status === 'delivering') {
                         statusBadge = '<span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">🚗 KURYER YO\'LDA</span>';
                     }
@@ -1285,10 +1341,12 @@
             var tbody = document.getElementById('dash-recent-rows');
             tbody.innerHTML = '';
             (state.history || []).slice(0, 5).forEach(function(r){
+                var starTxt = (r.rating > 0) ? (r.rating + ' ★') : '<span style="color:var(--muted);">Kutilmoqda</span>';
                 tbody.innerHTML += '<tr style="border-bottom:1px solid #eee;">' +
                     '<td style="padding:6px;">' + r.time + '</td>' +
                     '<td>' + r.table + '</td>' +
                     '<td>' + r.waiter + '</td>' +
+                    '<td style="color:var(--yellow); font-weight:800;">' + starTxt + '</td>' +
                     '<td>' + r.method + '</td>' +
                     '<td style="font-weight:700; color:var(--green);">' + r.total.toLocaleString() + ' so\'m</td>' +
                 '</tr>';
@@ -1426,32 +1484,35 @@
             var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
 
             document.getElementById('cur-table-title').innerHTML = (isDeliv ? '🚗 Dostavka #' + curTbl.number : (curTbl ? curTbl.zone + ' #' + curTbl.number : 'Stol')) + (isReady ? ' <span style="color:var(--green);">[🔔 TAYYOR!]</span>' : '');
-            document.getElementById('btn-serve-order').style.display = isReady ? 'block' : 'none';
 
             var delivBox = document.getElementById('cur-delivery-info-box');
             var btnConfirmKitchen = document.getElementById('btn-confirm-kitchen');
+            var btnServeOrder = document.getElementById('btn-serve-order');
 
             if (isDeliv && state.deliveryDetails && state.deliveryDetails[state.selectedKey]) {
                 var dInfo = state.deliveryDetails[state.selectedKey];
                 delivBox.style.display = 'block';
 
                 var stBadge = '';
-                if (dInfo.status === 'pending') stBadge = '<span style="color:var(--red); font-weight:800;">(Tasdiqlanmagan)</span>';
-                else if (dInfo.status === 'cooking') stBadge = '<span style="color:var(--yellow); font-weight:800;">(Oshxonada)</span>';
+                if (dInfo.status === 'pending') stBadge = '<span style="color:var(--red); font-weight:800;">(Kassir tasdiqlashi lozim)</span>';
+                else if (dInfo.status === 'cooking') stBadge = '<span style="color:var(--yellow); font-weight:800;">(Oshxonada tayyorlanmoqda)</span>';
                 else if (dInfo.status === 'delivering') stBadge = '<span style="color:var(--accent); font-weight:800;">(Kuryer yo\'lda)</span>';
 
-                delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtmachi: ' + stBadge + '</div>' +
+                delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtma ma\'lumotlari: ' + stBadge + '</div>' +
                     '👤 <b>Mijoz:</b> ' + dInfo.name + '<br>' +
                     '📞 <b>Tel:</b> <a href="tel:'+dInfo.phone+'" style="color:var(--accent); font-weight:700;">' + dInfo.phone + '</a><br>' +
                     '📍 <b>Manzil:</b> ' + dInfo.address + '<br>' +
                     '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br>' +
                     '<small style="color:var(--muted);">Qabul qilingan vaqt: ' + (dInfo.time || '-') + '</small>';
 
-                // Agar hali tasdiqlanmagan bo'lsa, tasdiqlash tugmasini ko'rsatamiz
                 btnConfirmKitchen.innerText = (dInfo.status === 'pending') ? "✅ Tasdiqlash va Oshxonaga yuborish" : "👨‍🍳 Oshxonaga qayta yuborish";
+                btnServeOrder.style.display = (dInfo.status === 'cooking' || isReady) ? 'block' : 'none';
+                btnServeOrder.innerText = "🚗 Kuryer yo'lga chiqdi deb belgilash";
             } else {
                 delivBox.style.display = 'none';
                 btnConfirmKitchen.innerText = "👨‍🍳 Oshxonaga yuborish";
+                btnServeOrder.style.display = isReady ? 'block' : 'none';
+                btnServeOrder.innerText = "✅ Mehmonlarga topshirildi";
             }
 
             var container = document.getElementById('cur-order-items');
@@ -1501,7 +1562,6 @@
 
         function updateTableFee() { renderCurOrder(); }
 
-        // KASSIR TASDIQLAYDI VA SHUNDAN KEYIN OSHXONAGA YUBORILADI
         function confirmAndSendKitchen() {
             var cur = state.orders[state.selectedKey] || [];
             if (cur.length === 0) return alert("Buyurtma bo'sh!");
@@ -1525,7 +1585,7 @@
             });
 
             if (isDeliv && state.deliveryDetails && state.deliveryDetails[state.selectedKey]) {
-                state.deliveryDetails[state.selectedKey].status = 'cooking'; // Mijoz ekranida "Oshxonada" deb chiqadi
+                state.deliveryDetails[state.selectedKey].status = 'cooking';
             }
 
             saveToFirebase();
@@ -1543,14 +1603,14 @@
             if (ticket) ticket.status = 'done';
 
             if (isDeliv && state.deliveryDetails && state.deliveryDetails[state.selectedKey]) {
-                state.deliveryDetails[state.selectedKey].status = 'delivering'; // Mijozga "Kuryer yo'lga chiqdi" deb boradi
+                state.deliveryDetails[state.selectedKey].status = 'delivering';
             }
 
             saveToFirebase();
             renderHallTables();
             renderCurOrder();
             if (document.getElementById('view-kds').style.display === 'block') renderKDS();
-            alert(isDeliv ? "✅ Taom kuryerga topshirildi, kuryer yo'lga chiqdi deb belgilandi!" : "✅ Mehmonlarga topshirildi!");
+            alert(isDeliv ? "🚗 Kuryer yo'lga chiqdi deb belgilandi! Mijoz telefonida status o'zgardi." : "✅ Mehmonlarga topshirildi!");
         }
 
         function setKdsFilter(dept) {
@@ -1609,7 +1669,6 @@
 
                 if (newStatus === 'ready') {
                     playAlertSound();
-                    // Agar dostavka bo'lsa kuryer yo'lga chiqishiga tayyor holat
                     if (t.isDelivery && state.deliveryDetails && state.deliveryDetails[t.tableKey]) {
                         state.deliveryDetails[t.tableKey].status = 'delivering';
                     }
@@ -1733,12 +1792,11 @@
             }
         }
 
-        // ADMIN PIN-KODINI O'ZGARTIRISH VA FIREBASE BAZAGA SAQLASH
         function adminChangePIN() {
             var p = document.getElementById('adm-new-pin').value.trim();
             if (p.length < 4) return alert("PIN kamida 4 xonali bo'lishi kerak!");
             state.adminPin = p;
-            saveToFirebase(); // Firebasega yoziladi
+            saveToFirebase();
             alert("Admin PIN-kodi muvaffaqiyatli saqlandi! Endi qayta kirsangiz ham ushbu yangi kod bilan kiriladi.");
             document.getElementById('adm-new-pin').value = '';
         }
@@ -1774,25 +1832,12 @@
 
             var calc = getCurrentCalculations();
             document.getElementById('pay-modal-amount').innerText = calc.total.toLocaleString() + " so'm";
-
-            state.payRating = 0;
-            document.querySelectorAll('#pay-stars .star').forEach(function(s){ s.classList.remove('selected'); });
-            document.getElementById('pay-rating-txt').innerText = "⚠️ Yulduzcha tanlang!";
             document.getElementById('split-box').style.display = 'none';
 
             document.getElementById('split-cash-input').value = '';
             document.getElementById('split-card-input').value = '';
 
             document.getElementById('modal-pay').style.display = 'grid';
-        }
-
-        function setPayRating(r) {
-            state.payRating = r;
-            document.querySelectorAll('#pay-stars .star').forEach(function(s, idx){
-                s.classList.toggle('selected', idx < r);
-            });
-            document.getElementById('pay-rating-txt').innerText = r + " yulduz tanlandi!";
-            document.getElementById('pay-rating-txt').style.color = "var(--green)";
         }
 
         function toggleSplitBox() {
@@ -1819,14 +1864,11 @@
         }
 
         function execFullPay(method) {
-            if (state.payRating === 0) return alert("Iltimos, xizmatga baho bering (1 dan 5 gacha)!");
             var calc = getCurrentCalculations();
             finishPayment(method, calc.total);
         }
 
         function execInstantSplitPay() {
-            if (state.payRating === 0) return alert("Iltimos, xizmatga baho bering (1 dan 5 gacha)!");
-
             var calc = getCurrentCalculations();
             var cVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
             var crdVal = parseFloat(document.getElementById('split-card-input').value) || 0;
@@ -1839,19 +1881,22 @@
             finishPayment(methodStr, calc.total);
         }
 
+        // KASSA TO'LOVNI YOPGANDA — MIJOZGA "YETKAZILDI" XABARI BORADI
         function finishPayment(method, finalTotal) {
             var curOrders = state.orders[state.selectedKey] || [];
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
             var d = new Date();
             var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
+            var closedKey = state.selectedKey;
 
             if (!state.history) state.history = [];
             state.history.unshift({
                 time: d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
                 date: d.toLocaleDateString(),
+                tableKey: closedKey,
                 table: (isDeliv ? '🚗 Dostavka #' + curTbl.number : curTbl.zone + ' #' + curTbl.number),
-                waiter: state.tableWaiters[state.selectedKey] || 'Xodim',
-                rating: state.payRating,
+                waiter: state.tableWaiters[closedKey] || 'Xodim',
+                rating: 0, // Dastlab 0, mijoz o'z telefonida baholaydi!
                 method: method,
                 items: curOrders.map(function(o){ return o.name + ' (x' + o.qty + ')'; }).join(', '),
                 total: finalTotal
@@ -1868,17 +1913,17 @@
             });
 
             if (isDeliv) {
-                // Mijozga "Yetkazildi" deb status jo'natamiz
-                if (state.deliveryDetails && state.deliveryDetails[state.selectedKey]) {
-                    state.deliveryDetails[state.selectedKey].status = 'delivered';
+                // Mijoz statusini "Yetkazildi" deb belgilaymiz
+                if (state.deliveryDetails && state.deliveryDetails[closedKey]) {
+                    state.deliveryDetails[closedKey].status = 'delivered';
                 }
-                state.tables = state.tables.filter(function(t){ return t.key !== state.selectedKey; });
-                delete state.orders[state.selectedKey];
-                delete state.tableWaiters[state.selectedKey];
+                state.tables = state.tables.filter(function(t){ return t.key !== closedKey; });
+                delete state.orders[closedKey];
+                delete state.tableWaiters[closedKey];
                 state.selectedKey = state.tables[0] ? state.tables[0].key : 'Asosiy zal-1';
             } else {
-                state.orders[state.selectedKey] = [];
-                delete state.reservations[state.selectedKey];
+                state.orders[closedKey] = [];
+                delete state.reservations[closedKey];
             }
 
             saveToFirebase();
@@ -1887,7 +1932,7 @@
             renderCurOrder();
             renderDashboard();
 
-            alert("✅ To'lov qabul qilindi va buyurtma muvaffaqiyatli yopildi!");
+            alert("✅ To'lov qabul qilindi! Mijoz telefoniga «Yetkazildi» bildirishnomasi va baholash oynasi yuborildi.");
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -2013,14 +2058,17 @@
             b.innerHTML = '';
             var stats = {};
             (state.history || []).forEach(function(h){
-                if (!stats[h.waiter]) stats[h.waiter] = { count: 0, stars: 0, total: 0 };
+                if (!stats[h.waiter]) stats[h.waiter] = { count: 0, stars: 0, ratedCount: 0, total: 0 };
                 stats[h.waiter].count++;
-                stats[h.waiter].stars += h.rating;
+                if (h.rating > 0) {
+                    stats[h.waiter].stars += h.rating;
+                    stats[h.waiter].ratedCount++;
+                }
                 stats[h.waiter].total += h.total;
             });
 
             for (var w in stats) {
-                var avg = (stats[w].stars / stats[w].count).toFixed(1);
+                var avg = stats[w].ratedCount > 0 ? (stats[w].stars / stats[w].ratedCount).toFixed(1) : "0.0";
                 b.innerHTML += '<div style="background:var(--card); border:2px solid var(--ink); border-radius:10px; padding:14px; min-width:200px;">' +
                     '<b>👤 ' + w + '</b><br>' +
                     '<span style="color:var(--yellow); font-weight:700;">★ ' + avg + ' (' + stats[w].stars + ' ta yulduz)</span><br>' +
@@ -2034,11 +2082,12 @@
             var tbody = document.getElementById('all-history-rows');
             tbody.innerHTML = '';
             (state.history || []).forEach(function(r){
+                var starTxt = (r.rating > 0) ? (r.rating + ' ★') : '<span style="color:var(--muted);">Mijoz baholamadi</span>';
                 tbody.innerHTML += '<tr style="border-bottom:1px solid #eee;">' +
                     '<td style="padding:6px;">' + r.time + '</td>' +
                     '<td>' + r.table + '</td>' +
                     '<td>' + r.waiter + '</td>' +
-                    '<td style="color:var(--yellow); font-weight:700;">' + r.rating + ' ★</td>' +
+                    '<td style="color:var(--yellow); font-weight:700;">' + starTxt + '</td>' +
                     '<td>' + r.items + '</td>' +
                     '<td>' + r.method + '</td>' +
                     '<td style="font-weight:700; color:var(--green);">' + r.total.toLocaleString() + ' so\'m</td>' +
@@ -2047,7 +2096,7 @@
         }
 
         function exportHistoryCSV() {
-            var csv = "Vaqt,Stol/Manzil,Xodim,Baho,Taomlar,To'lov,Summa\n";
+            var csv = "Vaqt,Stol/Manzil,Xodim,MijozBahosi,Taomlar,To'lov,Summa\n";
             (state.history || []).forEach(function(r){
                 csv += '"'+r.time+'","'+r.table+'","'+r.waiter+'",'+r.rating+',"'+r.items+'","'+r.method+'",'+r.total+'\n';
             });
