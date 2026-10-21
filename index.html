@@ -112,9 +112,12 @@
 
         .cart-calc-box { margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed var(--line); display: grid; gap: 6px; font-size: 13px; }
         .cart-calc-row { display: flex; justify-content: space-between; color: var(--muted); }
+        .cart-calc-row.discount-row { color: var(--green); font-weight: 700; background: #f0fdf4; padding: 4px 8px; border-radius: 6px; }
         .cart-calc-row.total { color: var(--ink); font-size: 1.15rem; font-weight: 800; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--line); }
 
-        .checkout-form { margin-top: 16px; display: grid; gap: 10px; }
+        .discount-promo-badge { background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 8px; padding: 8px 10px; margin-top: 10px; font-size: 11px; color: #b45309; line-height: 1.4; }
+
+        .checkout-form { margin-top: 14px; display: grid; gap: 10px; }
         .form-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 2px; }
         .form-input { width: 100%; background: var(--fill); border: 1.5px solid transparent; border-radius: 8px; padding: 10px 12px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; }
         .form-input:focus { background: white; border-color: var(--primary); }
@@ -264,10 +267,10 @@
             <h1 class="hero-title">Mazali milliy taomlarni uyingizga buyurtma qiling!</h1>
             <p class="hero-p">To‘yimli osh, shirador shashliklar, tansiq qozon kabob va sho‘rvalar. Buyurtmangizni 30-40 daqiqa ichida yetkazib beramiz.</p>
             <div class="hero-perks">
+                <span class="hero-perk-item">🎁 100 000+ so'mga 2% chegirma</span>
+                <span class="hero-perk-item">🔥 200 000+ so'mga 4% chegirma</span>
                 <span class="hero-perk-item">⏱ 30-45 daqiqa yetkazish</span>
-                <span class="hero-perk-item">⚡ Issiq holda yetkazish</span>
                 <span class="hero-perk-item">💵 Naqd, Karta yoki Payme</span>
-                <span class="hero-perk-item">📞 +998 (90) 123-45-67</span>
             </div>
         </header>
 
@@ -304,10 +307,25 @@
                         <p style="color:var(--muted); font-size:13px; text-align:center; margin:20px 0;">Savatchangiz bo'sh.<br>Menyudan taom tanlang!</p>
                     </div>
 
+                    <!-- CHEGIRMA VA HISOB-KITOBLAR -->
                     <div class="cart-calc-box">
-                        <div class="cart-calc-row"><span>Taomlar narxi:</span> <span id="client-subtotal">0 so'm</span></div>
+                        <div class="cart-calc-row"><span>Taomlar narxi:</span> <span id="client-raw-subtotal">0 so'm</span></div>
+                        <div class="cart-calc-row discount-row" id="client-discount-line" style="display:none;">
+                            <span id="client-discount-label">🎉 Chegirma (0%):</span> 
+                            <span id="client-discount-amount">-0 so'm</span>
+                        </div>
+                        <div class="cart-calc-row" id="client-net-line" style="display:none;">
+                            <span>Chegirmadan so'ng:</span> 
+                            <span id="client-net-amount" style="font-weight:700; color:var(--ink);">0 so'm</span>
+                        </div>
                         <div class="cart-calc-row"><span>Yetkazib berish:</span> <span style="color:var(--green); font-weight:700;">10 000 so'm</span></div>
                         <div class="cart-calc-row total"><span>Jami to'lov:</span> <span id="client-cart-total" style="color:var(--primary);">0 so'm</span></div>
+                    </div>
+
+                    <div class="discount-promo-badge">
+                        💡 <b>Maxsus aksiya:</b><br>
+                        • 100 000 so'mdan oshsa — <b>2% chegirma</b><br>
+                        • 200 000 so'mdan oshsa — <b>4% chegirma</b>
                     </div>
 
                     <div class="checkout-form">
@@ -817,6 +835,8 @@
                 itemsHtml += '• <b>' + it.name + '</b> &times; ' + it.qty + ' ta<br>';
             });
 
+            var discTxt = (orderData.discountAmt > 0) ? '<span style="color:#4ade80;">Chegirma ('+orderData.discountPct+'%): -'+orderData.discountAmt.toLocaleString()+' so\'m</span><br>' : '';
+
             toast.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:6px; margin-bottom:8px;">' +
                 '<b style="color:#4ade80; font-size:14px;">🚗 YANGI BUYURTMA TUSHDI</b>' +
                 '<button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">&times;</button>' +
@@ -826,6 +846,7 @@
                 '📞 <b>Tel:</b> ' + orderData.phone + '<br>' +
                 '📍 <b>Manzil:</b> ' + orderData.address + '<br>' +
                 '💳 <b>To\'lov:</b> ' + orderData.payMethod + '<br>' +
+                discTxt +
                 '<div style="background:rgba(255,255,255,0.08); padding:6px 8px; border-radius:6px; margin:6px 0;">' + itemsHtml + '</div>' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">' +
                     '<b style="font-size:15px; color:#facc15;">Jami: ' + (orderData.total || 0).toLocaleString() + ' so\'m</b>' +
@@ -866,7 +887,6 @@
                     saveToFirebase();
                 }
 
-                // Kassada yangi kelgan buyurtmalar soni
                 var curOrdersCount = 0;
                 state.tables.forEach(function(t){
                     if (t.zone === 'Dostavka' && (state.orders[t.key]||[]).length > 0) curOrdersCount++;
@@ -877,8 +897,8 @@
                     if (latestDeliv) {
                         var dInfo = (state.deliveryDetails && state.deliveryDetails[latestDeliv.key]) || {};
                         var curOrds = state.orders[latestDeliv.key] || [];
-                        var sum = 10000;
-                        curOrds.forEach(function(c){ sum += (c.price * c.qty); });
+                        var dCalc = calcCartFinancials(curOrds);
+
                         showRichInAppNotification({
                             tableKey: latestDeliv.key,
                             name: dInfo.name || "Mijoz",
@@ -886,7 +906,9 @@
                             address: dInfo.address || "-",
                             payMethod: dInfo.payMethod || "Naqd",
                             items: curOrds,
-                            total: sum
+                            discountPct: dCalc.discountPct,
+                            discountAmt: dCalc.discountAmt,
+                            total: dCalc.grandTotal
                         });
                     }
                 }
@@ -919,7 +941,40 @@
             });
         }
 
-        // MIJOZNING TELEFONIDAGI BUYURTMA STATUSI VA BAHOLASH (TO'LIQ ISHLAYDIGAN VERSIYA)
+        // CHEGIRMA VA MOLIYAVIY HISOB-KITOB FUNKSIYASI (100k -> 2%, 200k -> 4%)
+        function calcCartFinancials(itemsArray) {
+            var rawSubtotal = 0;
+            var totalCount = 0;
+
+            (itemsArray || []).forEach(function(c){
+                rawSubtotal += (c.price * c.qty);
+                totalCount += c.qty;
+            });
+
+            var discountPct = 0;
+            if (rawSubtotal >= 200000) {
+                discountPct = 4;
+            } else if (rawSubtotal >= 100000) {
+                discountPct = 2;
+            }
+
+            var discountAmt = Math.round(rawSubtotal * (discountPct / 100));
+            var netSubtotal = rawSubtotal - discountAmt;
+            var deliveryFee = (itemsArray && itemsArray.length > 0) ? 10000 : 0;
+            var grandTotal = netSubtotal + deliveryFee;
+
+            return {
+                rawSubtotal: rawSubtotal,
+                discountPct: discountPct,
+                discountAmt: discountAmt,
+                netSubtotal: netSubtotal,
+                deliveryFee: deliveryFee,
+                grandTotal: grandTotal,
+                totalCount: totalCount
+            };
+        }
+
+        // MIJOZNING TELEFONIDAGI STATUS VA BAHOLASH
         function renderClientTracker() {
             var myKey = localStorage.getItem('ros_my_delivery_key');
             var trackerBox = document.getElementById('client-order-tracker');
@@ -960,13 +1015,11 @@
                 doneStep.className = 'tracker-step done';
                 msg.innerHTML = "🎉 <b style='color:var(--green); font-size:14px;'>Buyurtmangiz yetkazildi! Yoqimli ishtaha!</b>";
 
-                // Agar hozirgina yetkazildi bo'lgan bo'lsa tovush chiqarish
                 if (lastDeliveryStatus !== 'delivered') {
                     playAlertSound();
                     lastDeliveryStatus = 'delivered';
                 }
 
-                // Mijoz hali baholamagan bo'lsa, baholash oynasini ochamiz
                 if (!dInfo.rated && !localStorage.getItem('ros_rated_' + myKey)) {
                     setClientRating(5);
                     document.getElementById('modal-client-rating').style.display = 'grid';
@@ -995,7 +1048,6 @@
                 state.deliveryDetails[myKey].rated = true;
                 state.deliveryDetails[myKey].rating = state.clientGivenRating;
 
-                // Tarixdagi yozuvga mijoz bergan bahoni qo'yish
                 var hist = (state.history || []).find(function(h){ return h.tableKey === myKey; });
                 if (hist) {
                     hist.rating = state.clientGivenRating;
@@ -1190,16 +1242,19 @@
             renderClientCart();
         }
 
+        // SAVATCHANI CHEGIRMA VA DETALLI HISOB-KITOBLAR BILAN CHIQARISH
         function renderClientCart() {
             var box = document.getElementById('client-cart-items');
             if (!box) return;
             box.innerHTML = '';
-            var subtotal = 0;
-            var totalCount = 0;
+
+            var cCalc = calcCartFinancials(state.clientCart);
 
             if (state.clientCart.length === 0) {
                 box.innerHTML = '<p style="color:var(--muted); font-size:13px; text-align:center; margin:20px 0;">Savatchangiz bo\'sh.<br>Menyudan taom tanlang!</p>';
-                document.getElementById('client-subtotal').innerText = '0 so\'m';
+                document.getElementById('client-raw-subtotal').innerText = '0 so\'m';
+                document.getElementById('client-discount-line').style.display = 'none';
+                document.getElementById('client-net-line').style.display = 'none';
                 document.getElementById('client-cart-total').innerText = '0 so\'m';
                 document.getElementById('client-cart-count').innerText = '0';
                 return;
@@ -1207,21 +1262,32 @@
 
             state.clientCart.forEach(function(c, i){
                 var itemTot = c.price * c.qty;
-                subtotal += itemTot;
-                totalCount += c.qty;
-
                 box.innerHTML += '<div class="cart-item-row">' +
                     '<div><b>' + c.name + '</b> &times; ' + c.qty + '<br><small style="color:var(--primary); font-weight:700;">' + itemTot.toLocaleString() + ' so\'m</small></div>' +
                     '<button class="cart-item-del" onclick="removeFromClientCart('+i+')">&times;</button>' +
                 '</div>';
             });
 
-            var deliveryFee = 10000;
-            var grandTotal = subtotal + deliveryFee;
+            document.getElementById('client-cart-count').innerText = cCalc.totalCount;
+            document.getElementById('client-raw-subtotal').innerText = cCalc.rawSubtotal.toLocaleString() + ' so\'m';
 
-            document.getElementById('client-cart-count').innerText = totalCount;
-            document.getElementById('client-subtotal').innerText = subtotal.toLocaleString() + ' so\'m';
-            document.getElementById('client-cart-total').innerText = grandTotal.toLocaleString() + ' so\'m';
+            // Chegirma bo'lsa ko'rsatamiz
+            var discLine = document.getElementById('client-discount-line');
+            var netLine = document.getElementById('client-net-line');
+
+            if (cCalc.discountAmt > 0) {
+                discLine.style.display = 'flex';
+                document.getElementById('client-discount-label').innerText = '🎉 Chegirma (' + cCalc.discountPct + '%):';
+                document.getElementById('client-discount-amount').innerText = '-' + cCalc.discountAmt.toLocaleString() + ' so\'m';
+
+                netLine.style.display = 'flex';
+                document.getElementById('client-net-amount').innerText = cCalc.netSubtotal.toLocaleString() + ' so\'m';
+            } else {
+                discLine.style.display = 'none';
+                netLine.style.display = 'none';
+            }
+
+            document.getElementById('client-cart-total').innerText = cCalc.grandTotal.toLocaleString() + ' so\'m';
         }
 
         function removeFromClientCart(i) {
@@ -1240,10 +1306,11 @@
 
             var deliveryCount = state.tables.filter(function(t){ return t.zone === 'Dostavka'; }).length;
             var nextNum = deliveryCount + 1;
-            var key = 'Dostavka-' + Date.now(); // Takrorlanmas unikal kalit
+            var key = 'Dostavka-' + Date.now();
 
             var dNow = new Date();
             var curTimeStr = dNow.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            var cCalc = calcCartFinancials(state.clientCart);
 
             state.tables.push({ key: key, zone: 'Dostavka', number: nextNum });
             state.orders[key] = JSON.parse(JSON.stringify(state.clientCart));
@@ -1256,10 +1323,13 @@
                 payMethod: pMethod,
                 time: curTimeStr,
                 status: 'pending',
-                rated: false
+                rated: false,
+                rawSubtotal: cCalc.rawSubtotal,
+                discountPct: cCalc.discountPct,
+                discountAmt: cCalc.discountAmt,
+                total: cCalc.grandTotal
             };
 
-            // Mijoz telefonida saqlaymiz
             localStorage.setItem('ros_my_delivery_key', key);
             localStorage.removeItem('ros_rated_' + key);
             lastDeliveryStatus = 'pending';
@@ -1273,7 +1343,12 @@
             renderClientCart();
             renderClientTracker();
 
-            alert("Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi. Hozir kassir uni tekshirib, oshxonaga uzatadi!");
+            var alertMsg = "Rahmat, " + name + "! Sizning buyurtmangiz qabul qilindi.\n\n" +
+                           "Taomlar: " + cCalc.rawSubtotal.toLocaleString() + " so'm\n" +
+                           (cCalc.discountAmt > 0 ? ("Chegirma (" + cCalc.discountPct + "%): -" + cCalc.discountAmt.toLocaleString() + " so'm\n") : "") +
+                           "Yetkazib berish: 10 000 so'm\n" +
+                           "Jami to'lov: " + cCalc.grandTotal.toLocaleString() + " so'm";
+            alert(alertMsg);
         }
 
         function renderDashboard() {
@@ -1305,9 +1380,8 @@
                 incomingDeliveries.forEach(function(dt){
                     var dInfo = (state.deliveryDetails && state.deliveryDetails[dt.key]) || { name: "Mijoz", phone: "-", address: "-", payMethod: "Naqd", time: "-", status: "pending" };
                     var curOrds = state.orders[dt.key] || [];
-                    var totalSum = 10000;
+                    var dCalc = calcCartFinancials(curOrds);
                     var itemsTxt = curOrds.map(function(ci){ return ci.name + ' (' + ci.qty + ' ta)'; }).join(', ');
-                    curOrds.forEach(function(ci){ totalSum += (ci.price * ci.qty); });
 
                     var statusBadge = '';
                     if (dInfo.status === 'pending') {
@@ -1317,6 +1391,8 @@
                     } else if (dInfo.status === 'delivering') {
                         statusBadge = '<span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800;">🚗 KURYER YO\'LDA</span>';
                     }
+
+                    var discNote = (dCalc.discountAmt > 0) ? '<span style="color:var(--green); font-weight:700;">Chegirma ('+dCalc.discountPct+'%): -'+dCalc.discountAmt.toLocaleString()+' so\'m</span>' : '';
 
                     var row = document.createElement('div');
                     row.style.background = 'white';
@@ -1336,9 +1412,10 @@
                         '</div>' +
                         '<div style="font-size:13px; margin:4px 0;">📞 <b>Tel:</b> ' + dInfo.phone + ' | 📍 <b>Manzil:</b> ' + dInfo.address + '</div>' +
                         '<div style="font-size:12px; color:var(--muted);">🍲 <b>Taomlar:</b> ' + itemsTxt + '</div>' +
+                        (discNote ? '<div style="font-size:12px; margin-top:2px;">' + discNote + '</div>' : '') +
                     '</div>' +
                     '<div style="text-align:right;">' +
-                        '<b style="color:var(--primary); font-size:16px;">' + totalSum.toLocaleString() + ' so\'m</b><br>' +
+                        '<b style="color:var(--primary); font-size:16px;">' + dCalc.grandTotal.toLocaleString() + ' so\'m</b><br>' +
                         '<button class="btn-login" style="padding:6px 14px; font-size:12px; margin-top:6px; background:var(--primary);" onclick="openDeliveryFromDash(\''+dt.key+'\')">Kassada boshqarish ➔</button>' +
                     '</div>';
 
@@ -1476,15 +1553,23 @@
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
             var isDeliv = (curTbl && curTbl.zone === 'Dostavka');
 
-            var subtotal = 0;
-            curOrders.forEach(function(o){ subtotal += (o.price * o.qty); });
-
             if (isDeliv) {
-                return { subtotal: subtotal, feePct: 0, feeAmt: 10000, total: subtotal + 10000, isDeliv: true };
+                var dCalc = calcCartFinancials(curOrders);
+                return { 
+                    subtotal: dCalc.rawSubtotal, 
+                    feePct: 0, 
+                    feeAmt: dCalc.deliveryFee, 
+                    discountPct: dCalc.discountPct, 
+                    discountAmt: dCalc.discountAmt, 
+                    total: dCalc.grandTotal, 
+                    isDeliv: true 
+                };
             } else {
+                var rawSub = 0;
+                curOrders.forEach(function(o){ rawSub += (o.price * o.qty); });
                 var feePct = parseInt(document.getElementById('cur-fee-sel')?.value) || 10;
-                var feeAmt = Math.round(subtotal * (feePct / 100));
-                return { subtotal: subtotal, feePct: feePct, feeAmt: feeAmt, total: subtotal + feeAmt, isDeliv: false };
+                var feeAmt = Math.round(rawSub * (feePct / 100));
+                return { subtotal: rawSub, feePct: feePct, feeAmt: feeAmt, discountPct: 0, discountAmt: 0, total: rawSub + feeAmt, isDeliv: false };
             }
         }
 
@@ -1508,11 +1593,13 @@
                 else if (dInfo.status === 'cooking') stBadge = '<span style="color:var(--yellow); font-weight:800;">(Oshxonada tayyorlanmoqda)</span>';
                 else if (dInfo.status === 'delivering') stBadge = '<span style="color:var(--accent); font-weight:800;">(Kuryer yo\'lda)</span>';
 
+                var discInfoTxt = (dInfo.discountAmt > 0) ? '<br>🎁 <b>Chegirma:</b> ' + dInfo.discountPct + '% (-' + dInfo.discountAmt.toLocaleString() + ' so\'m)' : '';
+
                 delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtma ma\'lumotlari: ' + stBadge + '</div>' +
                     '👤 <b>Mijoz:</b> ' + dInfo.name + '<br>' +
                     '📞 <b>Tel:</b> <a href="tel:'+dInfo.phone+'" style="color:var(--accent); font-weight:700;">' + dInfo.phone + '</a><br>' +
                     '📍 <b>Manzil:</b> ' + dInfo.address + '<br>' +
-                    '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + '<br>' +
+                    '💳 <b>To\'lov usuli:</b> ' + (dInfo.payMethod || 'Naqd') + discInfoTxt + '<br>' +
                     '<small style="color:var(--muted);">Qabul qilingan vaqt: ' + (dInfo.time || '-') + '</small>';
 
                 btnConfirmKitchen.innerText = (dInfo.status === 'pending') ? "✅ Tasdiqlash va Oshxonaga yuborish" : "👨‍🍳 Oshxonaga qayta yuborish";
@@ -1539,7 +1626,8 @@
 
             var calc = getCurrentCalculations();
             if (calc.isDeliv) {
-                document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Yetkazish: 10 000 so\'m';
+                var dNote = (calc.discountAmt > 0) ? ' | Chegirma ('+calc.discountPct+'%): -'+calc.discountAmt.toLocaleString() : '';
+                document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + dNote + ' | Yetkazish: 10 000 so\'m';
             } else {
                 document.getElementById('cur-calc-details').innerText = 'Taomlar: ' + calc.subtotal.toLocaleString() + ' | Xizmat (' + calc.feePct + '%): ' + calc.feeAmt.toLocaleString() + ' so\'m';
             }
@@ -1891,7 +1979,6 @@
             finishPayment(methodStr, calc.total);
         }
 
-        // KASSA TO'LOVNI YOPGANDA — BAZADAGI STATUSNI DELIVERED QILADI (O'CHIRMAYDI)
         function finishPayment(method, finalTotal) {
             var curOrders = state.orders[state.selectedKey] || [];
             var curTbl = state.tables.find(function(t){ return t.key === state.selectedKey; });
@@ -1923,7 +2010,6 @@
             });
 
             if (isDeliv) {
-                // DIQQAT: deliveryDetails o'chirilmaydi, faqat statusi "delivered" qilinadi!
                 if (state.deliveryDetails && state.deliveryDetails[closedKey]) {
                     state.deliveryDetails[closedKey].status = 'delivered';
                 }
