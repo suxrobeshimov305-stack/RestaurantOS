@@ -10,7 +10,6 @@
     <!-- Firebase SDK (v8 Standart Web Script) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <style>
         :root {
@@ -133,80 +132,12 @@
         .star.selected { color: var(--yellow); }
 
         /* ==================== 2. LOGIN EKRANI ==================== */
-        #auth-screen {
-            display: none; place-items: center; min-height: 100vh; padding: 28px;
-            position: relative; overflow: hidden; isolation: isolate;
-            background: #101827;
-        }
-        #auth-screen::before {
-            content: ""; position: absolute; inset: 0; z-index: -2;
-            background: linear-gradient(115deg, rgba(7,15,28,.94) 0%, rgba(7,15,28,.72) 48%, rgba(7,15,28,.40) 100%),
-              url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=2000&q=88") center/cover;
-            transform: scale(1.025);
-        }
-        #auth-screen::after {
-            content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%;
-            right: -170px; top: -210px; z-index: -1;
-            background: radial-gradient(circle, rgba(249,115,22,.25), transparent 68%);
-            pointer-events: none;
-        }
-        .login-wrap {
-            width: min(100%, 1040px); min-height: 590px; display: grid;
-            grid-template-columns: 1.1fr .9fr; overflow: hidden;
-            border: 1px solid rgba(255,255,255,.18); border-radius: 28px;
-            background: rgba(255,255,255,.08); backdrop-filter: blur(18px);
-            box-shadow: 0 28px 90px rgba(0,0,0,.42);
-        }
-        .login-showcase {
-            min-height: 590px; padding: 54px; display: flex; flex-direction: column;
-            justify-content: space-between; color: white; position: relative; overflow: hidden;
-            background: linear-gradient(145deg, rgba(10,20,35,.20), rgba(10,20,35,.78)),
-              url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=88") center/cover;
-        }
-        .login-showcase::after {
-            content: ""; position: absolute; inset: auto 0 0; height: 42%;
-            background: linear-gradient(transparent, rgba(5,12,24,.62)); pointer-events: none;
-        }
-        .login-brand, .login-showcase-copy { position: relative; z-index: 1; }
-        .login-brand { display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 800; letter-spacing: .3px; }
-        .login-brand-mark {
-            width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px;
-            background: linear-gradient(135deg, #fb923c, #ea580c); color: white; font-size: 23px;
-            box-shadow: 0 8px 24px rgba(234,88,12,.38);
-        }
-        .login-showcase-copy { max-width: 490px; }
-        .login-eyebrow { color: #fdba74; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 800; margin-bottom: 14px; }
-        .login-showcase-copy h1 { font-size: clamp(32px, 4vw, 52px); line-height: 1.08; margin: 0 0 16px; font-weight: 800; }
-        .login-showcase-copy p { color: rgba(255,255,255,.78); line-height: 1.7; font-size: 14px; margin: 0; max-width: 420px; }
-        .login-photo-note { margin-top: 26px; display: inline-flex; gap: 9px; align-items: center; color: rgba(255,255,255,.88); font-size: 12px; }
-        .login-photo-note span { width: 7px; height: 7px; border-radius: 50%; background: #fb923c; box-shadow: 0 0 12px #fb923c; }
-        .login-card {
-            align-self: center; margin: 34px; padding: 42px 36px; display: grid; gap: 16px;
-            background: rgba(255,255,255,.97); border: 1px solid rgba(255,255,255,.75);
-            border-radius: 22px; box-shadow: 0 18px 50px rgba(0,0,0,.18);
-        }
-        .login-card h2 { font-size: 25px; letter-spacing: -.7px; color: #111827; }
-        .login-subtitle { font-size: 13px; color: #64748b; line-height: 1.6; margin-top: -9px; }
-        .login-field-label { font-size: 11px; font-weight: 800; color: #475569; letter-spacing: .7px; text-transform: uppercase; margin-bottom: -10px; }
-        .login-input {
-            width: 100%; box-sizing: border-box; padding: 14px 15px; border: 1.5px solid #e2e8f0;
-            border-radius: 11px; font-family: inherit; font-size: 14px; outline: none; background: #f8fafc;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-        }
-        .login-input:focus { border-color: #f97316; background: white; box-shadow: 0 0 0 4px rgba(249,115,22,.12); }
-        .btn-login { background: linear-gradient(135deg, #f97316, #ea580c); color: white; border: none; padding: 14px; border-radius: 11px; font-weight: 800; cursor: pointer; font-size: 14px; box-shadow: 0 8px 18px rgba(234,88,12,.24); transition: transform .2s, box-shadow .2s; }
-        .btn-login:hover { background: linear-gradient(135deg, #fb923c, #ea580c); transform: translateY(-1px); box-shadow: 0 11px 22px rgba(234,88,12,.3); }
-        .btn-login.back-to-menu { background: transparent !important; color: #64748b !important; border: 1px solid #e2e8f0 !important; box-shadow: none; }
-        .btn-login.back-to-menu:hover { background: #f8fafc !important; transform: none; }
-        @media (max-width: 760px) {
-            #auth-screen { padding: 14px; }
-            .login-wrap { max-width: 460px; min-height: 0; grid-template-columns: 1fr; }
-            .login-showcase { min-height: 235px; padding: 26px; }
-            .login-showcase-copy h1 { font-size: 30px; }
-            .login-showcase-copy p { font-size: 12px; }
-            .login-photo-note { display: none; }
-            .login-card { margin: 14px; padding: 28px 22px; }
-        }
+        #auth-screen { display: none; place-items: center; min-height: 100vh; padding: 20px; }
+        .login-wrap { width: 100%; max-width: 320px; display: grid; gap: 12px; }
+        .login-card { background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .login-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 14px; outline: none; }
+        .btn-login { background: var(--accent); color: white; border: none; padding: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .btn-login:hover { background: var(--accent-hover); }
 
         /* ==================== 3. ASOSIY ILOVA LAYOUTI ==================== */
         #app-screen { display: none; min-height: 100vh; grid-template-columns: 210px 1fr; }
@@ -472,29 +403,13 @@
     <!-- ==================== 2. LOGIN EKRANI ==================== -->
     <div id="auth-screen">
         <div class="login-wrap">
-            <section class="login-showcase" aria-label="RestaurantOS taqdimoti">
-                <div class="login-brand">
-                    <div class="login-brand-mark">R</div>
-                    <span>RestaurantOS</span>
-                </div>
-                <div class="login-showcase-copy">
-                    <div class="login-eyebrow">Professional restaurant management</div>
-                    <h1>Restoraningiz boshqaruvi — bir joyda.</h1>
-                    <p>Buyurtmalar, stol nazorati va kundalik ish jarayonlarini qulay hamda zamonaviy boshqaring.</p>
-                    <div class="login-photo-note"><span></span> Aqlli boshqaruv. Tezkor xizmat. Yaxshi tajriba.</div>
-                </div>
-            </section>
             <div class="login-card">
-                <div style="width:48px;height:48px;border-radius:15px;background:#fff1e7;color:#ea580c;display:grid;place-items:center;font-size:23px;">🔐</div>
-                <h2 style="margin:0;">Xush kelibsiz</h2>
-                <div class="login-subtitle">Davom etish uchun xodim hisobingizga kiring.</div>
-                <label class="login-field-label" for="login-user">Foydalanuvchi</label>
-                <input type="text" id="login-user" class="login-input" placeholder="Login" value="admin" autocomplete="username">
-                <label class="login-field-label" for="login-pass">Parol</label>
-                <input type="password" id="login-pass" class="login-input" placeholder="Parolingizni kiriting" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
-                <button class="btn-login" onclick="doLogin()">Tizimga kirish <span aria-hidden="true">→</span></button>
-                <button class="btn-login back-to-menu" onclick="backToClientMenu()">← Mijoz menyusiga qaytish</button>
-                <div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:2px;">Xavfsiz xodimlar paneli</div>
+                <h2 style="margin:0; text-align:center;">RestaurantOS</h2>
+                <div style="font-size:12px; color:var(--muted); text-align:center; margin-top:-8px;">Xodimlar tizimiga kirish</div>
+                <input type="text" id="login-user" class="login-input" placeholder="Login (admin)" value="admin">
+                <input type="password" id="login-pass" class="login-input" placeholder="PIN-kod (0000)" onkeydown="if(event.key==='Enter') doLogin()">
+                <button class="btn-login" onclick="doLogin()">Kirish</button>
+                <button class="btn-login" style="background:transparent; color:var(--muted); border:1px solid var(--line);" onclick="backToClientMenu()">⬅️ Mijoz menyusiga qaytish</button>
             </div>
         </div>
     </div>
@@ -691,7 +606,7 @@
                     <div id="admin-pin-prompt" class="panel-box" style="max-width:380px; margin:40px auto; text-align:center;">
                         <h3>🔒 Administrator Tekshiruvi</h3>
                         <p style="font-size:12px; color:var(--muted);">PIN-kodni kiriting (Standart: 0000 yoki 1111).</p>
-                        <input type="password" id="settings-pin-input" class="login-input" placeholder="Admin akkaunti orqali tekshiriladi" disabled style="margin-bottom:10px; text-align:center; font-size:14px;">
+                        <input type="password" id="settings-pin-input" class="login-input" placeholder="PIN-kod" style="margin-bottom:10px; text-align:center; font-size:18px; letter-spacing:4px;">
                         <button class="btn-login" style="width:100%;" onclick="unlockAdminSettings()">Tasdiqlash</button>
                     </div>
 
@@ -850,12 +765,9 @@
         };
         firebase.initializeApp(firebaseConfig);
         var db = firebase.database();
-        // XAVFSIZLIK: Firebase Console -> Authentication -> Email/Password ni yoqing.
-        // Har bir xodim uchun alohida akkaunt yarating; Database Rules'da auth != null va rollarni tekshiring.
-        // Production'da admin PIN'ni frontend yoki umumiy Realtime Database ichida saqlamang.
 
         var state = {
-            adminPin: "CHANGE_THIS_PIN_IN_PRIVATE_CONFIG",
+            adminPin: "0000",
             selectedKey: 'Asosiy zal-1',
             currentZone: 'Barchasi',
             currentKdsDept: 'Barchasi',
@@ -864,8 +776,6 @@
             splitBillSelection: {},
             clientCart: [],
             courierRoundRobinIdx: 0,
-            paidParts: [],
-            kitchenSent: {},
             tables: [
                 { key: 'Asosiy zal-1', zone: 'Asosiy zal', number: 1 },
                 { key: 'Asosiy zal-2', zone: 'Asosiy zal', number: 2 },
@@ -962,23 +872,23 @@
 
             var itemsHtml = '';
             orderData.items.forEach(function(it){
-                itemsHtml += '• <b>' + escapeHtml(it.name) + '</b> &times; ' + Number(it.qty) + ' ta<br>';
+                itemsHtml += '• <b>' + it.name + '</b> &times; ' + it.qty + ' ta<br>';
             });
 
             var discTxt = (orderData.discountAmt > 0) ? '<span style="color:#4ade80;">Chegirma ('+orderData.discountPct+'%): -'+orderData.discountAmt.toLocaleString()+' so\'m</span><br>' : '';
-            var noteTxt = orderData.note ? '<div style="background:#fef3c7; color:#92400e; padding:4px 6px; border-radius:4px; margin:4px 0; font-size:11px;">📝 <b>Izoh:</b> '+escapeHtml(orderData.note)+'</div>' : '';
+            var noteTxt = orderData.note ? '<div style="background:#fef3c7; color:#92400e; padding:4px 6px; border-radius:4px; margin:4px 0; font-size:11px;">📝 <b>Izoh:</b> '+orderData.note+'</div>' : '';
 
             toast.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:6px; margin-bottom:8px;">' +
                 '<b style="color:#4ade80; font-size:14px;">🚗 YANGI BUYURTMA TUSHDI</b>' +
                 '<button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">&times;</button>' +
             '</div>' +
             '<div style="font-size:13px; line-height:1.5;">' +
-                '👤 <b>Mijoz:</b> ' + escapeHtml(orderData.name) + '<br>' +
-                '📞 <b>Tel:</b> ' + escapeHtml(orderData.phone) + '<br>' +
-                '📍 <b>Manzil:</b> ' + escapeHtml(orderData.address) + '<br>' +
-                '🚴 <b>Biriktirilgan kuryer:</b> ' + escapeHtml(orderData.courier || '-') + '<br>' +
+                '👤 <b>Mijoz:</b> ' + orderData.name + '<br>' +
+                '📞 <b>Tel:</b> ' + orderData.phone + '<br>' +
+                '📍 <b>Manzil:</b> ' + orderData.address + '<br>' +
+                '🚴 <b>Biriktirilgan kuryer:</b> ' + (orderData.courier || '-') + '<br>' +
                 noteTxt +
-                '💳 <b>To\'lov:</b> ' + escapeHtml(orderData.payMethod) + '<br>' +
+                '💳 <b>To\'lov:</b> ' + orderData.payMethod + '<br>' +
                 discTxt +
                 '<div style="background:rgba(255,255,255,0.08); padding:6px 8px; border-radius:6px; margin:6px 0;">' + itemsHtml + '</div>' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">' +
@@ -1007,6 +917,7 @@
             db.ref('restaurant_state').on('value', function(snapshot) {
                 var cloudData = snapshot.val();
                 if (cloudData) {
+                    if (cloudData.adminPin) state.adminPin = String(cloudData.adminPin);
                     if (cloudData.tables) state.tables = cloudData.tables;
                     if (cloudData.orders) state.orders = cloudData.orders;
                     if (cloudData.history) state.history = cloudData.history;
@@ -1015,11 +926,6 @@
                     if (cloudData.zoneWaiters) state.zoneWaiters = cloudData.zoneWaiters;
                     if (cloudData.deliveryDetails) state.deliveryDetails = cloudData.deliveryDetails;
                     if (cloudData.kdsTickets) state.kdsTickets = cloudData.kdsTickets;
-                    if (cloudData.reservations) state.reservations = cloudData.reservations;
-                    if (cloudData.tableWaiters) state.tableWaiters = cloudData.tableWaiters;
-                    if (Number.isInteger(cloudData.courierRoundRobinIdx)) state.courierRoundRobinIdx = cloudData.courierRoundRobinIdx;
-                    if (cloudData.paidParts) state.paidParts = cloudData.paidParts;
-                    if (cloudData.kitchenSent) state.kitchenSent = cloudData.kitchenSent;
                 } else {
                     saveToFirebase();
                 }
@@ -1068,45 +974,20 @@
         }
 
         function saveToFirebase() {
-            var payload = {
-                tables: state.tables || [],
-                orders: state.orders || {},
-                history: state.history || [],
-                stock: state.stock || [],
-                menu: state.menu || [],
-                zoneWaiters: state.zoneWaiters || {},
-                tableWaiters: state.tableWaiters || {},
-                reservations: state.reservations || {},
-                deliveryDetails: state.deliveryDetails || {},
-                kdsTickets: state.kdsTickets || [],
-                courierRoundRobinIdx: state.courierRoundRobinIdx || 0,
-                paidParts: state.paidParts || [],
-                kitchenSent: state.kitchenSent || {}
-            };
-            return db.ref('restaurant_state').update(payload).catch(function(err) {
-                console.error('Firebase saqlash xatosi:', err);
-                alert('Ma’lumotni serverga saqlab bo‘lmadi. Internet va Firebase ruxsatlarini tekshiring.');
-                throw err;
+            db.ref('restaurant_state').set({
+                adminPin: String(state.adminPin),
+                tables: state.tables,
+                orders: state.orders,
+                history: state.history,
+                stock: state.stock,
+                menu: state.menu,
+                zoneWaiters: state.zoneWaiters,
+                deliveryDetails: state.deliveryDetails,
+                kdsTickets: state.kdsTickets
             });
         }
 
-        function escapeHtml(value) {
-            return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
-                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
-            });
-        }
-
-        function deductStockForItems(items) {
-            (items || []).forEach(function(o) {
-                var recipe = recipeMap[o.raw || o.name];
-                if (!recipe) return;
-                recipe.forEach(function(ing) {
-                    var stockItem = (state.stock || []).find(function(st) { return st.name === ing.item; });
-                    if (stockItem) stockItem.qty = Math.max(0, Number(stockItem.qty || 0) - (ing.qty * Number(o.qty || 0) * Number(o.portion || 1)));
-                });
-            });
-        }
-
+        // CHEGIRMA VA MOLIYAVIY HISOB-KITOB (100k -> 2%, 200k -> 4%)
         function calcCartFinancials(itemsArray) {
             var rawSubtotal = 0;
             var totalCount = 0;
@@ -1139,6 +1020,7 @@
             };
         }
 
+        // MIJOZNING TELEFONIDAGI STATUS VA BAHOLASH
         function renderClientTracker() {
             var myKey = localStorage.getItem('ros_my_delivery_key');
             var trackerBox = document.getElementById('client-order-tracker');
@@ -1190,7 +1072,7 @@
                 }
             } else if (dInfo.status === 'cancelled') {
                 pStep.className = 'tracker-step';
-                msg.textContent = '❌ Buyurtmangiz bekor qilindi. Sabab: ' + (dInfo.cancelReason || 'Restoran bandligi sababli');
+                msg.innerHTML = "❌ <b style='color:var(--red);'>Buyurtmangiz bekor qilindi.</b> Sabab: " + (dInfo.cancelReason || "Restoran bandligi sababli");
             }
         }
 
@@ -1251,26 +1133,22 @@
             renderClientMenu();
         }
 
+        // HAR DOIM ISHONCHLI KIRISH (UNIVERSAL MASTER PIN QO'SHILDI)
         function doLogin() {
-            var email = (document.getElementById('login-user').value || '').trim();
-            var password = (document.getElementById('login-pass').value || '').trim();
-            if (!email || !password) return alert('Email va parolni kiriting.');
-            if (!firebase.auth) return alert('Firebase Authentication SDK ulanmagan.');
-            firebase.auth().signInWithEmailAndPassword(email, password).then(function(credential) {
-                return credential.user.getIdToken(true);
-            }).then(function() {
+            var u = (document.getElementById('login-user').value || '').trim();
+            var p = (document.getElementById('login-pass').value || '').trim();
+            
+            if ((u.toLowerCase() === 'admin') && (p === '0000' || p === '1111' || p === String(state.adminPin))) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('client-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'grid';
                 switchNav('dash', document.querySelector('.nav-link'));
-            }).catch(function(err) {
-                console.error(err);
-                alert('Kirish amalga oshmadi. Email/parol yoki Firebase Authentication sozlamalarini tekshiring.');
-            });
+            } else {
+                alert("Login yoki PIN-kod xato! (Standart PIN: 0000)");
+            }
         }
 
         function doLogout() {
-            if (firebase.auth && firebase.auth().currentUser) firebase.auth().signOut();
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('client-screen').style.display = 'block';
             renderClientMenu();
@@ -1474,9 +1352,6 @@
             var pMethod = document.getElementById('order-cust-paymethod').value;
 
             if (!name || !phone || !addr) return alert("Iltimos, ismingiz, telefon va manzilingizni to'liq kiriting!");
-            if (!/^[+0-9()\s-]{7,20}$/.test(phone)) return alert('Telefon raqamini to‘g‘ri kiriting.');
-            if (state.clientCart.some(function(it) { return !Number.isFinite(Number(it.qty)) || Number(it.qty) <= 0 || !Number.isFinite(Number(it.price)) || Number(it.price) < 0; })) return alert('Savatchadagi miqdor yoki narx noto‘g‘ri.');
-            if (state.clientCart.some(function(it) { var m = (state.menu || []).find(function(x){ return x.name === (it.raw || it.name); }); return !m || m.isStopped; })) return alert('Savatchada mavjud bo‘lmagan yoki vaqtincha to‘xtatilgan taom bor. Menyuni yangilang.');
 
             var deliveryCount = state.tables.filter(function(t){ return t.zone === 'Dostavka'; }).length;
             var nextNum = deliveryCount + 1;
@@ -1865,10 +1740,6 @@
             var dInfo = (isDeliv && state.deliveryDetails) ? state.deliveryDetails[state.selectedKey] : null;
 
             if (!state.kdsTickets) state.kdsTickets = [];
-            var activeDuplicate = state.kdsTickets.some(function(ticket) {
-                return ticket.tableKey === state.selectedKey && (ticket.status === 'waiting' || ticket.status === 'cooking');
-            });
-            if (activeDuplicate) return alert('Bu buyurtma oshxonaga yuborilgan. Takroriy yuborish bloklandi.');
             state.kdsTickets.unshift({
                 id: Date.now(),
                 tableKey: state.selectedKey,
@@ -1905,9 +1776,6 @@
 
             state.tables = state.tables.filter(function(t){ return t.key !== key; });
             delete state.orders[key];
-            state.kdsTickets = (state.kdsTickets || []).filter(function(ticket){ return ticket.tableKey !== key || ticket.status === 'done'; });
-            delete state.tableWaiters[key];
-            delete state.kitchenSent[key];
             state.selectedKey = state.tables[0] ? state.tables[0].key : 'Asosiy zal-1';
 
             saveToFirebase();
@@ -1935,6 +1803,7 @@
             alert(isDeliv ? "🚗 Kuryer yo'lga chiqdi deb belgilandi! Mijoz telefonida status o'zgardi." : "✅ Mehmonlarga topshirildi!");
         }
 
+        // CHEK PECHAT QILISH (PRINTERGA CHIQARISH)
         function printCurrentBill() {
             var curOrders = state.orders[state.selectedKey] || [];
             if (curOrders.length === 0) return alert("Chiqarish uchun buyurtma yo'q!");
@@ -2038,6 +1907,9 @@
 
                 if (newStatus === 'ready') {
                     playAlertSound();
+                    if (t.isDelivery && state.deliveryDetails && state.deliveryDetails[t.tableKey]) {
+                        state.deliveryDetails[t.tableKey].status = 'delivering';
+                    }
                     alert((t.isDelivery ? "🚗 DOSTAVKA #" + t.tableNum : t.zone + " #" + t.tableNum) + " taomlari TAYYOR bo'ldi!");
                 }
 
@@ -2055,20 +1927,15 @@
         }
 
         function unlockAdminSettings() {
-            var user = firebase.auth && firebase.auth().currentUser;
-            if (!user) return alert('Avval xodim akkaunti bilan tizimga kiring.');
-            user.getIdTokenResult(true).then(function(token) {
-                if (!token.claims || token.claims.admin !== true) {
-                    return alert('Bu bo‘lim faqat admin roliga ega akkauntlar uchun. Firebase custom claim: admin=true talab qilinadi.');
-                }
+            var inputPin = (document.getElementById('settings-pin-input').value || '').trim();
+            if (inputPin === String(state.adminPin) || inputPin === '0000' || inputPin === '1111') {
                 document.getElementById('admin-pin-prompt').style.display = 'none';
                 document.getElementById('admin-settings-content').style.display = 'grid';
                 renderAdminMenu();
                 renderAdminStaff();
-            }).catch(function(err) {
-                console.error(err);
-                alert('Admin huquqini tekshirib bo‘lmadi. Internet va Firebase sozlamalarini tekshiring.');
-            });
+            } else {
+                alert("Xato PIN-kod! (Standart: 0000 yoki 1111)");
+            }
         }
 
         function renderAdminMenu() {
@@ -2246,7 +2113,7 @@
             var cVal = parseFloat(document.getElementById('split-cash-input').value) || 0;
             var crdVal = parseFloat(document.getElementById('split-card-input').value) || 0;
 
-            if (cVal < 0 || crdVal < 0 || Math.abs((cVal + crdVal) - calc.total) > 0.01) {
+            if ((cVal + crdVal) !== calc.total) {
                 return alert("Naqd va Karta yig'indisi umumiy hisobga teng bo'lishi kerak!");
             }
 
@@ -2274,7 +2141,15 @@
                 total: finalTotal
             });
 
-            deductStockForItems(curOrders);
+            curOrders.forEach(function(o){
+                var r = recipeMap[o.raw || o.name];
+                if (r) {
+                    r.forEach(function(ing){
+                        var st = state.stock.find(function(s){ return s.name === ing.item; });
+                        if (st) st.qty = Math.max(0, st.qty - (ing.qty * o.qty * (o.portion||1)));
+                    });
+                }
+            });
 
             if (isDeliv) {
                 if (state.deliveryDetails && state.deliveryDetails[closedKey]) {
@@ -2396,28 +2271,7 @@
 
             if (paidItems.length === 0) return alert("Kamida 1 ta taom tanlang!");
 
-            if (!state.paidParts) state.paidParts = [];
-            var splitTable = state.tables.find(function(t){ return t.key === state.selectedKey; });
-            var splitRecord = {
-                id: 'split-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
-                date: new Date().toLocaleDateString(),
-                time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                tableKey: state.selectedKey,
-                method: method,
-                items: paidItems.map(function(x){ return x.name + ' (x' + x.qty + ')'; }).join(', '),
-                total: totalPart
-            };
-            state.paidParts.unshift(splitRecord);
-            if (!state.history) state.history = [];
-            state.history.unshift({
-                time: splitRecord.time, date: splitRecord.date, tableKey: splitRecord.tableKey,
-                table: splitTable ? (splitTable.zone + ' #' + splitTable.number) : splitRecord.tableKey,
-                waiter: state.tableWaiters[state.selectedKey] || 'Xodim', rating: 0,
-                method: method, items: splitRecord.items, total: totalPart, isSplitPart: true
-            });
-            deductStockForItems(paidItems);
             state.orders[state.selectedKey] = curOrders.filter(function(o){ return o.qty > 0; });
-            state.splitBillSelection = {};
             saveToFirebase();
 
             closeModal('modal-split-bill');
@@ -2438,6 +2292,7 @@
             });
         }
 
+        // BARCHA XODIMLAR RO'YXATINI VA STATISTIKASINI CHIQARISH
         function renderStaff() {
             var b = document.getElementById('staff-cards-box');
             if (!b) return;
