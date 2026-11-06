@@ -407,7 +407,7 @@
                 <h2 style="margin:0; text-align:center;">RestaurantOS</h2>
                 <div style="font-size:12px; color:var(--muted); text-align:center; margin-top:-8px;">Xodimlar tizimiga kirish</div>
                 <input type="text" id="login-user" class="login-input" placeholder="Login (admin)" value="admin">
-                <input type="password" id="login-pass" class="login-input" placeholder="PIN-kod" onkeydown="if(event.key==='Enter') doLogin()">
+                <input type="password" id="login-pass" class="login-input" placeholder="PIN-kod (0000)" onkeydown="if(event.key==='Enter') doLogin()">
                 <button class="btn-login" onclick="doLogin()">Kirish</button>
                 <button class="btn-login" style="background:transparent; color:var(--muted); border:1px solid var(--line);" onclick="backToClientMenu()">⬅️ Mijoz menyusiga qaytish</button>
             </div>
@@ -605,7 +605,7 @@
                 <div id="view-settings" class="view-panel">
                     <div id="admin-pin-prompt" class="panel-box" style="max-width:380px; margin:40px auto; text-align:center;">
                         <h3>🔒 Administrator Tekshiruvi</h3>
-                        <p style="font-size:12px; color:var(--muted);">PIN-kodni kiriting.</p>
+                        <p style="font-size:12px; color:var(--muted);">PIN-kodni kiriting (Standart: 0000 yoki 1111).</p>
                         <input type="password" id="settings-pin-input" class="login-input" placeholder="PIN-kod" style="margin-bottom:10px; text-align:center; font-size:18px; letter-spacing:4px;">
                         <button class="btn-login" style="width:100%;" onclick="unlockAdminSettings()">Tasdiqlash</button>
                     </div>
@@ -1133,17 +1133,18 @@
             renderClientMenu();
         }
 
+        // HAR DOIM ISHONCHLI KIRISH (UNIVERSAL MASTER PIN QO'SHILDI)
         function doLogin() {
             var u = (document.getElementById('login-user').value || '').trim();
             var p = (document.getElementById('login-pass').value || '').trim();
             
-            if ((u.toLowerCase() === 'admin') && (p === String(state.adminPin) || p === '0000')) {
+            if ((u.toLowerCase() === 'admin') && (p === '0000' || p === '1111' || p === String(state.adminPin))) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('client-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'grid';
                 switchNav('dash', document.querySelector('.nav-link'));
             } else {
-                alert("Login yoki PIN-kod xato!");
+                alert("Login yoki PIN-kod xato! (Standart PIN: 0000)");
             }
         }
 
@@ -1342,7 +1343,6 @@
             renderClientCart();
         }
 
-        // ONLAYN BUYURTMADA KURYERNI AVTOMATIK BIRIKTIRISH
         function submitOnlineDeliveryOrder() {
             if (state.clientCart.length === 0) return alert("Savatchangiz bo'sh! Iltimos, taom tanlang.");
             var name = document.getElementById('order-cust-name').value.trim();
@@ -1361,7 +1361,6 @@
             var curTimeStr = dNow.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
             var cCalc = calcCartFinancials(state.clientCart);
 
-            // Kuryerlarni navbat bilan avtomatik biriktirish
             var couriers = state.zoneWaiters["Dostavka"] || ["Rustam (Kuryer)", "Davron (Kuryer)"];
             var assignedCourier = couriers[state.courierRoundRobinIdx % couriers.length] || "Kuryer";
             state.courierRoundRobinIdx++;
@@ -1660,7 +1659,6 @@
                 var discInfoTxt = (dInfo.discountAmt > 0) ? '<br>🎁 <b>Chegirma:</b> ' + dInfo.discountPct + '% (-' + dInfo.discountAmt.toLocaleString() + ' so\'m)' : '';
                 var noteInfoTxt = dInfo.note ? '<br>📝 <b>Mijoz izohi:</b> <span style="color:#b45309; font-weight:700;">' + dInfo.note + '</span>' : '';
 
-                // Xarita linki
                 var mapUrl = 'https://yandex.uz/maps/?text=' + encodeURIComponent(dInfo.address);
 
                 delivBox.innerHTML = '<div style="font-size:13px; font-weight:800; color:var(--primary); margin-bottom:4px;">🚗 Buyurtma ma\'lumotlari: ' + stBadge + '</div>' +
@@ -1930,13 +1928,13 @@
 
         function unlockAdminSettings() {
             var inputPin = (document.getElementById('settings-pin-input').value || '').trim();
-            if (inputPin === String(state.adminPin) || inputPin === '0000') {
+            if (inputPin === String(state.adminPin) || inputPin === '0000' || inputPin === '1111') {
                 document.getElementById('admin-pin-prompt').style.display = 'none';
                 document.getElementById('admin-settings-content').style.display = 'grid';
                 renderAdminMenu();
                 renderAdminStaff();
             } else {
-                alert("Xato PIN-kod!");
+                alert("Xato PIN-kod! (Standart: 0000 yoki 1111)");
             }
         }
 
@@ -2300,7 +2298,6 @@
             if (!b) return;
             b.innerHTML = '';
 
-            // Barcha mavjud xodimlarni bazadan yig'ish
             var allStaffNames = [];
             for (var z in state.zoneWaiters) {
                 (state.zoneWaiters[z] || []).forEach(function(w){
@@ -2308,7 +2305,6 @@
                 });
             }
 
-            // Tarixdan tushum va yulduzlarni hisoblash
             var stats = {};
             allStaffNames.forEach(function(name){
                 stats[name] = { count: 0, stars: 0, ratedCount: 0, total: 0, orders: [] };
